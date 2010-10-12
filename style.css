@@ -1,0 +1,20 @@
+tr,table,td,th {
+	border: 0;
+	margin: 0;
+}
+
+td, th {
+	border: 1px solid gray;
+	margin: 0;
+	text-align: center;
+	background-color: #EEF;
+	min-width: 0.1cm;
+	max-width: 1cm;
+}
+th {
+	background-color: #FEE;
+}
+td.free {
+	background-color: #EFE;
+}
+
