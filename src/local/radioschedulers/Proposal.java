@@ -1,4 +1,5 @@
 package local.radioschedulers;
+
 import java.util.Collection;
 import java.util.Date;
 
@@ -22,7 +23,7 @@ public class Proposal implements Comparable<Proposal> {
 	 **/
 	public double priority;
 	/**
-	 * We are committed to this project. It has to be done this term.
+	 * We are committed to this project. It has to be done (highest priority).
 	 **/
 	public boolean mustcomplete;
 

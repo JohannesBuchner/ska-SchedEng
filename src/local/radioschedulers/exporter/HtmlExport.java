@@ -13,7 +13,13 @@ public class HtmlExport extends IExport {
 
 	private static final boolean MERGESAME = true;
 	private File f;
-	
+	private String title;
+
+	public HtmlExport(File f, String title) {
+		this.f = f;
+		this.title = title;
+	}
+
 	public HtmlExport(File f) {
 		this.f = f;
 	}
@@ -21,14 +27,19 @@ public class HtmlExport extends IExport {
 	public void export(Schedule schedule) throws IOException {
 		FileWriter fw;
 		fw = new FileWriter(f);
+		fw.append("<html>");
+		fw.append("<head>");
+		if (this.title != null)
+			fw.append("<title>" + this.title + "</title>");
 		fw
 				.append("<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">");
+		fw.append("</head>");
 		fw.append("<table>\n\t<thead>\n\t\t<tr>\n\t\t\t<th>day \\ LST</th>");
 		for (int i = 0; i < 24; i++) {
-			fw.append("\n\t\t\t<th>" + i + "</th>");
-			fw.append("\n\t\t\t<th>&nbsp;</th>");
-			fw.append("\n\t\t\t<th>&nbsp;</th>");
-			fw.append("\n\t\t\t<th>&nbsp;</th>");
+			fw.append("\n\t\t\t<th colspan=4>" + i + "</th>");
+			// fw.append("\n\t\t\t<th>&nbsp;</th>");
+			// fw.append("\n\t\t\t<th>&nbsp;</th>");
+			// fw.append("\n\t\t\t<th>&nbsp;</th>");
 		}
 		fw.append("\n\t\t</tr>\n\t</thead>\n\t<tbody>");
 

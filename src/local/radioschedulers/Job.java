@@ -1,4 +1,6 @@
 package local.radioschedulers;
+
+
 public class Job implements Comparable<Job> {
 	public Proposal proposal;
 	/**

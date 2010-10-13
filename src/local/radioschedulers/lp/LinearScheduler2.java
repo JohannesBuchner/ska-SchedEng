@@ -15,10 +15,11 @@ import java.util.List;
 
 import local.radioschedulers.IScheduler;
 import local.radioschedulers.Job;
+import local.radioschedulers.JobWithResources;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.Proposal;
+import local.radioschedulers.ResourceRequirements;
 import local.radioschedulers.Schedule;
-import local.radioschedulers.cpu.RandomizedScheduler;
 
 public class LinearScheduler2 implements IScheduler {
 	public static final int LST_SLOTS = 24 * 4;
@@ -59,23 +60,29 @@ public class LinearScheduler2 implements IScheduler {
 				log("job [" + j.lstmin + ".." + j.lstmax + "]: Proposal "
 						+ p.id);
 				for (int kd = 0; kd < ndays; kd++) {
+					boolean goodday = true;
+					
+					JobWithResources jr = null;
+					if (j instanceof JobWithResources) {
+						jr = (JobWithResources) j;
+						if (jr.date.requires(new LSTTime((long) kd, 0L)) == 0) {
+							goodday = false;
+						}
+					}
+					
 					for (int kh = 0; kh < LST_SLOTS; kh++) {
 						double hour = kh * LST_SLOTS_MINUTES / 60.;
-						boolean outside = false;
+						boolean inside = true;
 						String varname = getVar(njobs, (kd * LST_SLOTS + kh));
 
 						if (j.lstmax > j.lstmin)
 							if (hour > j.lstmax || hour < j.lstmin)
-								outside = true;
+								inside = false;
 						if (j.lstmax < j.lstmin)
 							if (hour < j.lstmin && hour > j.lstmax)
-								outside = true;
+								inside = false;
 
-						if (outside) {
-							constraints.append(varname + " = 0;\n");
-							varDefinition.append("int " + varname + ";\n");
-							// log("minute = " + hour + " ::: outside range");
-						} else {
+						if (inside && goodday) {
 							varDefinition.append("bin " + varname + ";\n");
 							// log("minute = " + hour + " ::: inside range");
 							/*
@@ -83,6 +90,10 @@ public class LinearScheduler2 implements IScheduler {
 							 * LST_SLOTS + kh / LST_SLOTS_MINUTES)) +
 							 * " >= 0;\n"); }
 							 */
+						} else {
+							constraints.append(varname + " = 0;\n");
+							varDefinition.append("int " + varname + ";\n");
+							// log("minute = " + hour + " ::: outside range");
 						}
 
 						/**
@@ -114,7 +125,17 @@ public class LinearScheduler2 implements IScheduler {
 		for (int k = 0; k < ndays * LST_SLOTS; k++) {
 			/* TODO: handle resources */
 			for (int j = 0; j < jobs.size(); j++) {
-				constraints.append(42 + " " + getVar(j, k) + " + ");
+				Integer antennaswanted;
+				
+				Job job = jobs.get(j);
+				if (job instanceof JobWithResources) {
+					JobWithResources jr = (JobWithResources) job;
+					ResourceRequirements r = jr.resources.get("antennas");
+					antennaswanted = r.totalRequired();
+				}else {
+					antennaswanted = nantennas;
+				}
+				constraints.append(antennaswanted + " " + getVar(j, k) + " + ");
 			}
 			constraints.append("0 <= " + nantennas + ";\n");
 		}
@@ -152,38 +173,6 @@ public class LinearScheduler2 implements IScheduler {
 		return s;
 	}
 
-	private void catFilesC(File out, File... in) {
-		String cmd = "cat ";
-
-		for (int i = 0; i < in.length; i++) {
-			cmd += in[i].getName() + " ";
-		}
-		cmd += "> " + out.getName();
-
-		try {
-			log("cmd = " + cmd);
-			Process p = Runtime.getRuntime().exec(cmd);
-			while (true) {
-				try {
-					int r = p.exitValue();
-					if (r != 0) {
-						throw new IOException("'" + cmd + "' returned " + r);
-					}
-					break;
-				} catch (IllegalThreadStateException e) {
-					try {
-						Thread.sleep(400);
-					} catch (InterruptedException e1) {
-						e1.printStackTrace();
-					}
-				}
-
-			}
-		} catch (IOException e) {
-			throw new IllegalStateException("bad copying", e);
-		}
-	}
-
 	private void catFilesF(File out, File... in) {
 
 		try {
@@ -191,9 +180,7 @@ public class LinearScheduler2 implements IScheduler {
 			FileChannel dstChannel = new FileOutputStream(out, true).getChannel();
 			for (File f : in) {
 				FileChannel srcChannel = new FileInputStream(f).getChannel();
-				long m = srcChannel.size();
-				long n = dstChannel.transferFrom(srcChannel, 0, m);
-				// log("copied " + n + " of " + m);
+				dstChannel.transferFrom(srcChannel, 0, srcChannel.size());
 				srcChannel.close();
 			}
 			dstChannel.close();
@@ -279,16 +266,5 @@ public class LinearScheduler2 implements IScheduler {
 
 	private String getVar(int j, int k) {
 		return "x_" + j + "_" + k;
-	}
-
-	protected Schedule evolveSchedules(Schedule[] s) {
-		return s[0];
-	}
-
-	protected Schedule[] getStartSchedules(Collection<Proposal> proposals) {
-		RandomizedScheduler rs = new RandomizedScheduler();
-		Schedule[] s = new Schedule[1];
-		s[0] = rs.schedule(proposals);
-		return s;
 	}
 }
