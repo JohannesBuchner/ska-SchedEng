@@ -13,7 +13,7 @@ public class FIFOScheduler implements IScheduler {
 	 * 
 	 * @see IScheduler#schedule(java.util.Collection)
 	 */
-	public Schedule schedule(Collection<Proposal> proposals) {
+	public Schedule schedule(Collection<Proposal> proposals, int ndays) {
 		Schedule s = new Schedule();
 		for (Proposal p : proposals) {
 			for (Job j : p.jobs) {
@@ -22,7 +22,7 @@ public class FIFOScheduler implements IScheduler {
 				double len = j.hours;
 				LSTTime t = new LSTTime(0L, 0L);
 
-				for (t.day = 0L;; t.day++) {
+				for (t.day = 0L;t.day < ndays; t.day++) {
 					for (t.minute = 0L; t.minute < 24 * 60; t.minute += 15) {
 						if (t.minute < j.lstmin * 60
 								|| t.minute > j.lstmax * 60) {

@@ -1,5 +1,6 @@
 package local.radioschedulers;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -33,5 +34,9 @@ public class Schedule {
 	public List<Job> get(LSTTime t) {
 		createIfNeeded(t);
 		return schedule.get(t);
+	}
+	
+	public LSTTime getLastEntry() {
+		return Collections.max(schedule.keySet());	
 	}
 }

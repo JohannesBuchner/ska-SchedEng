@@ -16,13 +16,15 @@ import local.radioschedulers.importer.PopulationGeneratingProposalReader;
 
 public class RunMain {
 
+	private static int ndays = 365; 
+
 	public static void main(String[] args) throws Exception {
 		IProposalReader pr = getProposalReader();
 		Collection<Proposal> proposals = pr.readall();
 		for (Proposal p : proposals)
 			System.out.println(p.toString());
 		IScheduler s = getScheduler();
-		Schedule schedule = s.schedule(proposals);
+		Schedule schedule = s.schedule(proposals, ndays);
 
 		display(schedule);
 	}
@@ -45,7 +47,7 @@ public class RunMain {
 	private static IProposalReader getProposalReader() throws Exception {
 		//SqliteProposalReader pr = new SqliteProposalReader();
 		PopulationGeneratingProposalReader pr = new PopulationGeneratingProposalReader();
-		pr.fill();
+		pr.fill(ndays);
 		return pr;
 	}
 

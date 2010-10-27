@@ -38,7 +38,7 @@ public class CPULikeScheduler implements IScheduler {
 	 * 
 	 * @see IScheduler#schedule(java.util.Collection)
 	 */
-	public Schedule schedule(Collection<Proposal> proposals) {
+	public Schedule schedule(Collection<Proposal> proposals, int ndays) {
 		Schedule s = new Schedule();
 		possibles = new HashMap<LSTTime, Vector<Job>>();
 		new HashMap<Job, Double>();
@@ -76,7 +76,7 @@ public class CPULikeScheduler implements IScheduler {
 
 		System.out.println("Allocating:");
 		LSTTime t = new LSTTime(0L, 0L);
-		for (t.day = 0L; !timeleft.isEmpty(); t.day++) {
+		for (t.day = 0L; !timeleft.isEmpty() && t.day < ndays; t.day++) {
 			cleanup(timeleft);
 			for (t.minute = 0L; t.minute < 24 * 60 && !timeleft.isEmpty(); t.minute += LST_SLOTS_MINUTES) {
 				Collection<Job> list = possibles.get(new LSTTime(0L, t.minute));

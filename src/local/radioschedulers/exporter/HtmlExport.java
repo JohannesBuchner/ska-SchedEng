@@ -36,15 +36,17 @@ public class HtmlExport extends IExport {
 		fw.append("</head>");
 		fw.append("<table>\n\t<thead>\n\t\t<tr>\n\t\t\t<th>day \\ LST</th>");
 		for (int i = 0; i < 24; i++) {
-			fw.append("\n\t\t\t<th colspan=4>" + i + "</th>");
-			// fw.append("\n\t\t\t<th>&nbsp;</th>");
-			// fw.append("\n\t\t\t<th>&nbsp;</th>");
-			// fw.append("\n\t\t\t<th>&nbsp;</th>");
+			fw.append("\n\t\t\t<th>" + i + "</th>");
+			fw.append("\n\t\t\t<th>&nbsp;</th>");
+			fw.append("\n\t\t\t<th>&nbsp;</th>");
+			fw.append("\n\t\t\t<th>&nbsp;</th>");
 		}
 		fw.append("\n\t\t</tr>\n\t</thead>\n\t<tbody>");
 
+		LSTTime lastday = schedule.getLastEntry();
+		
 		LSTTime t = new LSTTime(0L, 0L);
-		for (t.day = 0L; t.day < 365; t.day++) {
+		for (t.day = 0L; t.day <= lastday.day + 1; t.day++) {
 			fw.append("\n\t\t<tr>\n\t\t\t<th>" + t.day + "</th>");
 			for (t.minute = 0L; t.minute < 24 * 60;) {
 				fw.append("\n\t\t\t");

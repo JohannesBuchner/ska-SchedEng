@@ -13,7 +13,7 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 
 	List<Proposal> proposals = new ArrayList<Proposal>();
 
-	public void fill() throws Exception {
+	public void fill(int ndays) throws Exception {
 		int i = 1;
 		long totalhours = 0;
 		Random r = new Random();
@@ -21,7 +21,7 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 		/**
 		 * give a year's worth of proposals
 		 */
-		for (i = 0; totalhours < 365 * 24; i++) {
+		for (i = 0; totalhours < ndays * 24; i++) {
 
 			Proposal p = new Proposal();
 			p.id = Integer.toString(i);
@@ -41,9 +41,16 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 				j.hours = Math.round((1. / (r.nextDouble() * 200 + 1)) * 6000);
 			totalhours += j.hours;
 			j.proposal = p;
+			
+			// TODO: calculate
 			j.lstmin = r.nextDouble() * 24;
 			j.lstmax = (j.lstmin + 7) % 24;
+			// TODO: add surveys
 
+			// TODO: add resource requirements
+			
+			// TODO: something
+			
 			System.out.println(j);
 			p.jobs.add(j);
 		}

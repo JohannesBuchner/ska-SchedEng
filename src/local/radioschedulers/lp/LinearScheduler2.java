@@ -25,6 +25,8 @@ public class LinearScheduler2 implements IScheduler {
 	public static final int LST_SLOTS = 24 * 4;
 	public static final int LST_SLOTS_MINUTES = 24 * 60 / LST_SLOTS;
 
+	public static final int NANTENNAS = 42;
+	
 	List<Job> jobs = new ArrayList<Job>();
 
 	/*
@@ -32,9 +34,7 @@ public class LinearScheduler2 implements IScheduler {
 	 * 
 	 * @see IScheduler#schedule(java.util.Collection)
 	 */
-	public Schedule schedule(Collection<Proposal> proposals) {
-		int nantennas = 42;
-		int ndays = 365;
+	public Schedule schedule(Collection<Proposal> proposals, int ndays) {
 		int njobs = 0;
 
 		/**
@@ -133,11 +133,11 @@ public class LinearScheduler2 implements IScheduler {
 					ResourceRequirements r = jr.resources.get("antennas");
 					antennaswanted = r.totalRequired();
 				}else {
-					antennaswanted = nantennas;
+					antennaswanted = NANTENNAS;
 				}
 				constraints.append(antennaswanted + " " + getVar(j, k) + " + ");
 			}
-			constraints.append("0 <= " + nantennas + ";\n");
+			constraints.append("0 <= " + NANTENNAS + ";\n");
 		}
 
 		costFunction.append("max: ");

@@ -29,13 +29,15 @@ public class GeneticAlgorithmScheduler implements IScheduler {
 
 	protected HashMap<LSTTime, Vector<Job>> possibles = new HashMap<LSTTime, Vector<Job>>();
 	protected HashMap<Job, Double> timeleft = new HashMap<Job, Double>();
+	private int ndays;
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see IScheduler#schedule(java.util.Collection)
 	 */
-	public Schedule schedule(Collection<Proposal> proposals) {
+	public Schedule schedule(Collection<Proposal> proposals, int ndays) {
+		this.ndays = ndays;
 		Collection<Schedule> s = getStartSchedules(proposals);
 
 		Schedule bestschedule = evolveSchedules(s);
@@ -71,7 +73,7 @@ public class GeneticAlgorithmScheduler implements IScheduler {
 		for (IScheduler s : schedulers) {
 			log("scheduling using " + s);
 
-			Schedule schedule = s.schedule(proposals);
+			Schedule schedule = s.schedule(proposals, ndays);
 			log("scheduling done");
 			schedules.add(schedule);
 			File f = new File("schedule" + schedules.size() + ".html");
