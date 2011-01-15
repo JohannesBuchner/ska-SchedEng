@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import local.radioschedulers.Job;
+import local.radioschedulers.JobCombination;
 
 /**
  * Class to order a list of jobs by execution preference
@@ -33,19 +34,24 @@ public class JobSelector {
 	 *            must not be modified
 	 * @return ordered list
 	 */
-	public Collection<Job> select(Collection<Job> list) {
+	public Collection<JobCombination> select(Collection<JobCombination> list) {
 		return pruneDone(list);
 	}
 
 	/**
 	 * returns elements in the list that have not completed yet.
 	 */
-	protected List<Job> pruneDone(Collection<Job> list) {
-		List<Job> selected = new ArrayList<Job>();
-		for (Job j : list) {
-			if (timeleft.containsKey(j) && timeleft.get(j) > 0) {
-				selected.add(j);
+	protected List<JobCombination> pruneDone(Collection<JobCombination> list) {
+		List<JobCombination> selected = new ArrayList<JobCombination>();
+		for (JobCombination jc : list) {
+			boolean complete = false;
+			for (Job j : jc.jobs) {
+				if (!timeleft.containsKey(j) || timeleft.get(j) <= 0) {
+					complete = true;
+				}
 			}
+			if (!complete)
+				selected.add(jc);
 		}
 		return selected;
 	}

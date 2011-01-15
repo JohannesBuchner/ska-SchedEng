@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import local.radioschedulers.Job;
+import local.radioschedulers.JobCombination;
 
 public class ShortestFirstSelector extends JobSelector {
 
@@ -38,8 +39,8 @@ public class ShortestFirstSelector extends JobSelector {
 		};
 	};
 
-	public Collection<Job> select(Collection<Job> list) {
-		List<Job> jobs = pruneDone(list);
+	public Collection<JobCombination> select(Collection<JobCombination> list) {
+		List<JobCombination> jobs = pruneDone(list);
 		Collections.sort(jobs, cmp);
 		return super.select(jobs);
 	};

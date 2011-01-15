@@ -1,8 +1,10 @@
-package local.radioschedulers.cpu;
+package local.radioschedulers.parallel;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
@@ -21,8 +23,20 @@ import local.radioschedulers.ResourceRequirements;
  */
 public class RequirementGuard {
 
-	protected Map<Job, Double> datePreference;
+	public boolean isDateCompatible(Job j, LSTTime date) {
+		Double pref = 1.;
+		if (j instanceof JobWithResources) {
+			JobWithResources jr = (JobWithResources) j;
+			DateRequirements d = jr.date;
+			pref = d.requires(date);
 
+			if (pref == 0) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	/**
 	 * remove jobs that do not like the day
 	 * 
@@ -31,28 +45,18 @@ public class RequirementGuard {
 	 * @return
 	 */
 	public Collection<Job> pruneDate(Collection<Job> list, LSTTime date) {
-		datePreference = new HashMap<Job, Double>();
-
 		if (list.isEmpty())
 			return list;
 
+		List<Job> good = new ArrayList<Job>();
+
 		for (Job j : list) {
-			Double pref = 1.;
-			if (j instanceof JobWithResources) {
-				JobWithResources jr = (JobWithResources) j;
-				DateRequirements d = jr.date;
-				pref = d.requires(date);
-
-				if (pref == 0) {
-					datePreference.remove(j);
-					break;
-				}
-			}
-			datePreference.put(j, pref);
+			if (isDateCompatible(j, date))
+				good.add(j);
 		}
-		return datePreference.keySet();
+		return good;
 	}
-
+	
 	/**
 	 * add jobs in order of the list, but do not accept jobs that can not be
 	 * given the resource required.
@@ -89,7 +93,13 @@ public class RequirementGuard {
 		return selected;
 	}
 
-	private boolean compatible(Vector<Job> list) {
+	/**
+	 * checks if the given list of jobs is compatible
+	 * 
+	 * @param list
+	 * @return whether the jobs can be executed simultaneously (i.e. the resources are not overcommitted).
+	 */
+	public boolean compatible(List<Job> list) {
 		Map<String, Integer> nresources = new HashMap<String, Integer>();
 		Map<String, Set<Integer>> res = new HashMap<String, Set<Integer>>();
 

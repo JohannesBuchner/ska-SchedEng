@@ -18,10 +18,10 @@ import local.radioschedulers.cpu.CPULikeScheduler;
 import local.radioschedulers.cpu.FairPrioritizedSelector;
 import local.radioschedulers.cpu.PrioritizedSelector;
 import local.radioschedulers.cpu.RandomizedSelector;
-import local.radioschedulers.cpu.RequirementGuard;
 import local.radioschedulers.cpu.ShortestFirstSelector;
 import local.radioschedulers.exporter.HtmlExport;
 import local.radioschedulers.lp.LinearScheduler2;
+import local.radioschedulers.parallel.ParallelRequirementGuard;
 
 public class GeneticAlgorithmScheduler implements IScheduler {
 	public static final int LST_SLOTS = 24 * 4;
@@ -40,12 +40,18 @@ public class GeneticAlgorithmScheduler implements IScheduler {
 		this.ndays = ndays;
 		Collection<Schedule> s = getStartSchedules(proposals);
 
-		Schedule bestschedule = evolveSchedules(s);
+		Schedule bestschedule;
+		try {
+			bestschedule = evolveSchedules(s);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 
 		return bestschedule;
 	}
 
-	protected Schedule evolveSchedules(Collection<Schedule> s) {
+	protected Schedule evolveSchedules(Collection<Schedule> s) throws Exception {
 		return s.iterator().next();
 	}
 
@@ -56,13 +62,14 @@ public class GeneticAlgorithmScheduler implements IScheduler {
 		List<IScheduler> schedulers = new ArrayList<IScheduler>();
 
 		schedulers.add(new CPULikeScheduler(new FairPrioritizedSelector(),
-				new RequirementGuard()));
+				new ParallelRequirementGuard()));
 		schedulers.add(new CPULikeScheduler(new PrioritizedSelector(),
-				new RequirementGuard()));
+				new ParallelRequirementGuard()));
 		schedulers.add(new CPULikeScheduler(new ShortestFirstSelector(),
-				new RequirementGuard()));
+				new ParallelRequirementGuard()));
+
 		CPULikeScheduler rand = new CPULikeScheduler(new RandomizedSelector(),
-				new RequirementGuard());
+				new ParallelRequirementGuard());
 		schedulers.add(rand);
 		schedulers.add(rand);
 		schedulers.add(rand);

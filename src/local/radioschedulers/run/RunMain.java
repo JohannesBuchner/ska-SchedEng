@@ -7,12 +7,12 @@ import local.radioschedulers.IScheduler;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.cpu.CPULikeScheduler;
-import local.radioschedulers.cpu.RequirementGuard;
 import local.radioschedulers.cpu.ShortestFirstSelector;
 import local.radioschedulers.exporter.HtmlExport;
 import local.radioschedulers.exporter.IExport;
 import local.radioschedulers.importer.IProposalReader;
 import local.radioschedulers.importer.PopulationGeneratingProposalReader;
+import local.radioschedulers.parallel.ParallelRequirementGuard;
 
 public class RunMain {
 
@@ -40,7 +40,7 @@ public class RunMain {
 	}
 
 	private static IScheduler getScheduler() {
-		return new CPULikeScheduler(new ShortestFirstSelector(), new RequirementGuard());
+		return new CPULikeScheduler(new ShortestFirstSelector(), new ParallelRequirementGuard());
 		// return new LinearScheduler2();
 	}
 

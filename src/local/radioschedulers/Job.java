@@ -36,5 +36,13 @@ public class Job implements Comparable<Job> {
 			return v;
 
 	}
+	
+	public boolean isAvalailable(LSTTime t) {
+		return true && hasSufficientResources();
+	}
+
+	public boolean hasSufficientResources() {
+		return true;
+	}
 
 }

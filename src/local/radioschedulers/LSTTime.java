@@ -6,6 +6,10 @@ public class LSTTime implements Comparable<LSTTime> {
 		this.minute = minute;
 	}
 
+	public LSTTime(int i, int j) {
+		this(Long.valueOf(i), Long.valueOf(j));
+	}
+
 	public Long day;
 	public Long minute;
 
