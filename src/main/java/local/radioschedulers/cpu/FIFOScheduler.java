@@ -34,7 +34,7 @@ public class FIFOScheduler implements IScheduler {
 							continue;
 						}
 						if (s.isEmpty(t)) {
-							s.add(t, j);
+							s.add(t, jc);
 							len -= 15. / 60;
 							log("assigned a bit of " + j
 									+ " to " + t.day + ":" + t.minute + ". "

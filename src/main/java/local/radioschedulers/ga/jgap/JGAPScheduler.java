@@ -3,6 +3,7 @@ package local.radioschedulers.ga.jgap;
 import java.util.Collection;
 
 import local.radioschedulers.Job;
+import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ga.GeneticAlgorithmScheduler;
@@ -62,8 +63,8 @@ public class JGAPScheduler extends GeneticAlgorithmScheduler {
 		for (i = 0; i < genes.length; i++) {
 			LSTTime t = new LSTTime(i / Schedule.LST_SLOTS_PER_DAY, i
 					% Schedule.LST_SLOTS_PER_DAY);
-			Job j = (Job) genes[i].getAllele();
-			s.add(t, j);
+			JobCombination jc = (JobCombination) genes[i].getAllele();
+			s.add(t, jc);
 		}
 
 		return s;

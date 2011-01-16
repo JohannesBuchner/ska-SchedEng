@@ -1,21 +1,31 @@
 package local.radioschedulers;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
 
-public class Schedule implements Iterable<Entry<LSTTime, JobCombination>> {
+/**
+ * A schedule is a timeline that, for each time slot, defines a list of
+ * JobCombinations that can be executed.
+ * 
+ * @author Johannes Buchner
+ */
+public class Schedule implements Iterable<Entry<LSTTime, Set<JobCombination>>> {
 	public static final int LST_SLOTS_MINUTES = 15;
 	public static final int LST_SLOTS_PER_DAY = 60 * 24 / LST_SLOTS_MINUTES;
 
-	private Map<LSTTime, JobCombination> schedule = new TreeMap<LSTTime, JobCombination>();
+	private Map<LSTTime, Set<JobCombination>> schedule = new TreeMap<LSTTime, Set<JobCombination>>();
+
+	private Set<JobCombination> noJobCombinations = new HashSet<JobCombination>();
 
 	private void createIfNeeded(LSTTime t) {
 		if (!schedule.containsKey(t)) {
-			schedule.put(t, new JobCombination());
+			schedule.put(t, noJobCombinations);
 		}
 	}
 
@@ -23,24 +33,18 @@ public class Schedule implements Iterable<Entry<LSTTime, JobCombination>> {
 		schedule.remove(t);
 	}
 
-	public void add(LSTTime t, Job j) {
-		JobCombination jc = get(t);
-		jc.jobs.add(j);
-		schedule.put(t, jc);
-	}
-
-	public void add(LSTTime t, JobCombination j) {
-		schedule.put(t, j);
+	public void add(LSTTime t, JobCombination jc) {
+		schedule.get(t).add(jc);
 	}
 
 	public boolean isEmpty(LSTTime t) {
 		if (schedule.containsKey(t))
-			return schedule.get(t).jobs.isEmpty();
+			return schedule.get(t).isEmpty();
 		else
 			return true;
 	}
 
-	public JobCombination get(LSTTime t) {
+	public Set<JobCombination> get(LSTTime t) {
 		createIfNeeded(t);
 		return schedule.get(t);
 	}
@@ -50,8 +54,8 @@ public class Schedule implements Iterable<Entry<LSTTime, JobCombination>> {
 	}
 
 	@Override
-	public Iterator<Entry<LSTTime, JobCombination>> iterator() {
-		return new Iterator<Entry<LSTTime, JobCombination>>() {
+	public Iterator<Entry<LSTTime, Set<JobCombination>>> iterator() {
+		return new Iterator<Entry<LSTTime, Set<JobCombination>>>() {
 			LSTTime t = new LSTTime(0L, 0L);
 			LSTTime lastEntry = getLastEntry();
 
@@ -64,9 +68,9 @@ public class Schedule implements Iterable<Entry<LSTTime, JobCombination>> {
 			}
 
 			@Override
-			public Entry<LSTTime, JobCombination> next() {
-				JobCombination jc = get(new LSTTime(t.day, t.minute));
-				Entry<LSTTime, JobCombination> entry = new SimpleEntry<LSTTime, JobCombination>(
+			public Entry<LSTTime, Set<JobCombination>> next() {
+				Set<JobCombination> jc = get(new LSTTime(t.day, t.minute));
+				Entry<LSTTime, Set<JobCombination>> entry = new SimpleEntry<LSTTime, Set<JobCombination>>(
 						new LSTTime(t.day, t.minute), jc);
 				t.minute += LST_SLOTS_MINUTES;
 

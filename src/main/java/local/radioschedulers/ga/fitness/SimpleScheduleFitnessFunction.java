@@ -5,6 +5,7 @@ package local.radioschedulers.ga.fitness;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import local.radioschedulers.Job;
@@ -18,13 +19,14 @@ public final class SimpleScheduleFitnessFunction implements
 	@Override
 	public double evaluate(Schedule s) {
 		double v = 0.;
-		Entry<LSTTime, JobCombination> previousEntry = null;
+		JobCombination previousEntry = null;
 		double time;
 		Long timeleft;
 		Map<Job, Long> timeleftMap = new HashMap<Job, Long>();
 
-		for (Entry<LSTTime, JobCombination> entry : s) {
-			JobCombination jc = entry.getValue();
+		for (Entry<LSTTime, Set<JobCombination>> entry : s) {
+			Set<JobCombination> jcs = entry.getValue();
+			JobCombination jc = jcs.iterator().next();
 
 			for (Job j : jc.jobs) {
 				if (timeleftMap.containsKey(j)) {
@@ -35,7 +37,7 @@ public final class SimpleScheduleFitnessFunction implements
 				timeleftMap.put(j, timeleft);
 
 				if (previousEntry != null
-						&& previousEntry.getValue().jobs.contains(j)) {
+						&& previousEntry.jobs.contains(j)) {
 					// full time for continued
 					time = Schedule.LST_SLOTS_MINUTES;
 				} else {
@@ -55,7 +57,7 @@ public final class SimpleScheduleFitnessFunction implements
 				v = Math.log(Math.exp(v)
 						+ Math.exp(j.proposal.priority * time));
 			}
-			previousEntry = entry;
+			previousEntry = jc;
 
 		}
 		return v;

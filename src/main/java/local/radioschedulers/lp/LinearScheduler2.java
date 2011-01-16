@@ -15,6 +15,7 @@ import java.util.List;
 
 import local.radioschedulers.IScheduler;
 import local.radioschedulers.Job;
+import local.radioschedulers.JobCombination;
 import local.radioschedulers.JobWithResources;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.Proposal;
@@ -253,8 +254,11 @@ public class LinearScheduler2 implements IScheduler {
 			// ", minute "
 			// + minute + ", value " + value);
 			// log(t + " : " + j);
-			if (value != 0)
-				s.add(t, jobs.get(j));
+			if (value != 0) {
+				JobCombination jc = new JobCombination();
+				jc.jobs.add(jobs.get(j));
+				s.add(t, jc);
+			}
 		}
 		log("parsing output done");
 		return s;
