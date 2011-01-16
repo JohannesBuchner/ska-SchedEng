@@ -1,5 +1,10 @@
 package local.radioschedulers;
 
+/**
+ * A noop implementation of DateRequirements
+ *  
+ * @author Johannes Buchner
+ */
 public class NoDateRequirements implements DateRequirements {
 	public static final int NDAYS = 365;
 

@@ -1,4 +1,11 @@
 package local.radioschedulers;
+
+/**
+ * Fundamental time unit, made up of hours and minutes.
+ * LST = Local Sidereal Time 
+ * 
+ * @author Johannes Buchner
+ */
 public class LSTTime implements Comparable<LSTTime> {
 	public LSTTime(Long day, Long minute) {
 		super();
@@ -57,6 +64,5 @@ public class LSTTime implements Comparable<LSTTime> {
 			return false;
 		return true;
 	}
-	
-	
+
 }

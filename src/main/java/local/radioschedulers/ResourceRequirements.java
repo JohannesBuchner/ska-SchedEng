@@ -3,6 +3,11 @@ package local.radioschedulers;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Requirements on resources
+ * 
+ * @author Johannes Buchner
+ */
 public class ResourceRequirements {
 	/**
 	 * key: resourceid of wanted resource

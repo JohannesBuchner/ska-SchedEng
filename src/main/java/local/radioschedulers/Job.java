@@ -1,6 +1,10 @@
 package local.radioschedulers;
 
-
+/**
+ * a unit of execution. Jobs have no interdependencies.
+ * 
+ * @author Johannes Buchner
+ */
 public class Job implements Comparable<Job> {
 	public Proposal proposal;
 	/**
@@ -20,10 +24,10 @@ public class Job implements Comparable<Job> {
 	 */
 	public Double lstmin;
 	public Double lstmax;
-	
+
 	public Job() {
 	}
-	
+
 	public Job(Job j) {
 		this.proposal = j.proposal;
 		this.hours = j.hours;
@@ -48,7 +52,7 @@ public class Job implements Comparable<Job> {
 			return v;
 
 	}
-	
+
 	public boolean isAvalailable(LSTTime t) {
 		return true && hasSufficientResources();
 	}

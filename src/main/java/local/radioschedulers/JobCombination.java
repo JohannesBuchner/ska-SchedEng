@@ -3,6 +3,12 @@ package local.radioschedulers;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * A compatible combination of jobs, i.e. jobs that can be executed in parallel
+ * 
+ * @author Johannes Buchner
+ * 
+ */
 public class JobCombination {
 	public Set<Job> jobs = new HashSet<Job>();
 

@@ -3,6 +3,11 @@ package local.radioschedulers;
 import java.util.Collection;
 import java.util.Date;
 
+/**
+ * A proposal is a collection of jobs
+ *  
+ * @author Johannes Buchner.
+ */
 public class Proposal implements Comparable<Proposal> {
 	/**
 	 * some id

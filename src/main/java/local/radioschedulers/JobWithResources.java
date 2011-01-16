@@ -3,6 +3,11 @@ package local.radioschedulers;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A job with resource and date requirement specifications.
+ * 
+ * @author Johannes Buchner
+ */
 public class JobWithResources extends Job {
 	public JobWithResources() {
 	}
