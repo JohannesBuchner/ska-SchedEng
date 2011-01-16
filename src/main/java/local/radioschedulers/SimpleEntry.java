@@ -7,6 +7,14 @@ public class SimpleEntry<K, V> implements Entry<K, V> {
 	private K k;
 	private V v;
 
+	public SimpleEntry() {
+	}
+	
+	public SimpleEntry(K k, V v) {
+		this.k = k;
+		this.v = v;
+	}
+
 	@Override
 	public K getKey() {
 		return this.k;

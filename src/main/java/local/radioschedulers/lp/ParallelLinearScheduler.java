@@ -11,24 +11,25 @@ import java.io.PrintStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import local.radioschedulers.IScheduler;
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
-import local.radioschedulers.JobWithResources;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.Proposal;
-import local.radioschedulers.ResourceRequirements;
+import local.radioschedulers.SchedulePossibilities;
+import local.radioschedulers.SimpleEntry;
 import local.radioschedulers.SpecificSchedule;
+import local.radioschedulers.parallel.CompatibleJobFactory;
+import local.radioschedulers.parallel.ParallelRequirementGuard;
 
 public class ParallelLinearScheduler implements IScheduler {
-	public static final int LST_SLOTS = 24 * 4;
-	public static final int LST_SLOTS_MINUTES = 24 * 60 / LST_SLOTS;
-
-	public static final int NANTENNAS = 42;
-	
-	List<Job> jobs = new ArrayList<Job>();
+	protected List<JobCombination> jobComboIdSet = new ArrayList<JobCombination>();
 
 	/*
 	 * (non-Javadoc)
@@ -36,8 +37,6 @@ public class ParallelLinearScheduler implements IScheduler {
 	 * @see IScheduler#schedule(java.util.Collection)
 	 */
 	public SpecificSchedule schedule(Collection<Proposal> proposals, int ndays) {
-		int njobs = 0;
-
 		/**
 		 * set the variables to be binary
 		 */
@@ -51,108 +50,83 @@ public class ParallelLinearScheduler implements IScheduler {
 		} catch (FileNotFoundException e1) {
 			throw new IllegalStateException(e1);
 		}
-
-		/**
-		 * 2) A job is on when it can do work, i.e. the source object is up:
-		 */
+		List<Job> alljobs = new ArrayList<Job>();
 		for (Proposal p : proposals) {
 			for (Job j : p.jobs) {
-				StringBuilder jobsum = new StringBuilder();
-				log("job [" + j.lstmin + ".." + j.lstmax + "]: Proposal "
-						+ p.id);
-				for (int kd = 0; kd < ndays; kd++) {
-					boolean goodday = true;
-					
-					JobWithResources jr = null;
-					if (j instanceof JobWithResources) {
-						jr = (JobWithResources) j;
-						if (jr.date.requires(new LSTTime((long) kd, 0L)) == 0) {
-							goodday = false;
-						}
-					}
-					
-					for (int kh = 0; kh < LST_SLOTS; kh++) {
-						double hour = kh * LST_SLOTS_MINUTES / 60.;
-						boolean inside = true;
-						String varname = getVar(njobs, (kd * LST_SLOTS + kh));
-
-						if (j.lstmax > j.lstmin)
-							if (hour > j.lstmax || hour < j.lstmin)
-								inside = false;
-						if (j.lstmax < j.lstmin)
-							if (hour < j.lstmin && hour > j.lstmax)
-								inside = false;
-
-						if (inside && goodday) {
-							varDefinition.append("bin " + varname + ";\n");
-							// log("minute = " + hour + " ::: inside range");
-							/*
-							 * // inside text.append(getVar(njobs, (kd *
-							 * LST_SLOTS + kh / LST_SLOTS_MINUTES)) +
-							 * " >= 0;\n"); }
-							 */
-						} else {
-							constraints.append(varname + " = 0;\n");
-							varDefinition.append("int " + varname + ";\n");
-							// log("minute = " + hour + " ::: outside range");
-						}
-
-						/**
-						 * 4) A job gets its hours:
-						 */
-						jobsum.append(getVar(njobs, (kd * LST_SLOTS + kh
-								/ LST_SLOTS_MINUTES))
-								+ " +");
-
-					}
-				}
-				// TODO: this can be moved to the cost function
-				/**
-				 * all time for the job
-				 */
-				jobsum.append("0 <= " + j.hours * LST_SLOTS + ";\n");
-
-				constraints.append(jobsum);
-
-				jobs.add(j);
-
-				njobs++;
+				alljobs.add(j);
 			}
+		}
+		CompatibleJobFactory cjf = new CompatibleJobFactory(alljobs,
+				new ParallelRequirementGuard());
+		SchedulePossibilities scheduleTemplate = cjf
+				.getPossibleTimeLine(alljobs);
+
+		Map<Job, StringBuilder> jobsumSet = new HashMap<Job, StringBuilder>();
+		for (Job j : alljobs) {
+			jobsumSet.put(j, new StringBuilder());
 		}
 		/**
-		 * 1) No incompatible jobs are at the same time k, i.e. not requesting
-		 * more resources than we have:
+		 * cost function: simply maximizing time * priority
 		 */
-		for (int k = 0; k < ndays * LST_SLOTS; k++) {
-			/* TODO: handle resources */
-			for (int j = 0; j < jobs.size(); j++) {
-				Integer antennaswanted;
-				
-				Job job = jobs.get(j);
-				if (job instanceof JobWithResources) {
-					JobWithResources jr = (JobWithResources) job;
-					ResourceRequirements r = jr.resources.get("antennas");
-					antennaswanted = r.totalRequired();
-				}else {
-					antennaswanted = NANTENNAS;
-				}
-				constraints.append(antennaswanted + " " + getVar(j, k) + " + ");
-			}
-			constraints.append("0 <= " + NANTENNAS + ";\n");
-		}
-
 		costFunction.append("max: ");
-		for (int j = 0; j < jobs.size(); j++) {
-			for (int k = 0; k <= ndays * LST_SLOTS; k++) {
-				costFunction.append(jobs.get(j).proposal.priority + " "
-						+ getVar(j, k) + " + ");
+
+		/**
+		 * 1) No incompatible jobs are at the same time k, i.e. not requesting
+		 * more resources than we have.
+		 * 
+		 * 2) A job is on when it can do work, i.e. the source object is up:
+		 * 
+		 * This is already ensured by the timeline, which only allows compatible
+		 * jobs in the first place
+		 */
+		for (Entry<LSTTime, Set<JobCombination>> entry : scheduleTemplate) {
+			LSTTime t = entry.getKey();
+			Set<JobCombination> jcs = entry.getValue();
+			for (JobCombination jc : jcs) {
+				Integer id = jobComboIdSet.lastIndexOf(jc);
+				if (id == -1) {
+					id = jobComboIdSet.size();
+					jobComboIdSet.add(jc);
+				}
+				log("jobCombination " + id);
+				for (Job j : jc.jobs) {
+					log("job [" + j.lstmin + ".." + j.lstmax + "]: Proposal "
+							+ j.proposal.id);
+				}
+
+				String varname = getVar(t, id);
+
+				varDefinition.append("bin " + varname + ";\n");
+
+				for (Job j : jc.jobs) {
+					/**
+					 * 4) A job gets its hours:
+					 */
+					jobsumSet.get(j).append(varname);
+					jobsumSet.get(j).append(" +");
+
+					// cost function
+					costFunction.append(j.proposal.priority + " " + varname
+							+ " + ");
+				}
+
+				/**
+				 * only allow one JobCombination at a time
+				 */
+				constraints.append(varname);
+				constraints.append(" +");
 			}
+			constraints.append("0 <= 1");
+		}
+		/**
+		 * overall time for the job
+		 */
+		for (Job j : alljobs) {
+			constraints.append(jobsumSet.get(j));
+			constraints.append("0 <= " + j.hours
+					* SchedulePossibilities.LST_SLOTS_PER_DAY + ";\n");
 		}
 		costFunction.append("0;\n");
-		// System.out.println(costFunction + "\n" + constraints + "\n"
-		// + varDefinition);
-		// System.out.println(varDefinition);
-		// System.out.println(costFunction);
 
 		costFunction.close();
 		constraints.close();
@@ -178,7 +152,8 @@ public class ParallelLinearScheduler implements IScheduler {
 
 		try {
 			out.delete();
-			FileChannel dstChannel = new FileOutputStream(out, true).getChannel();
+			FileChannel dstChannel = new FileOutputStream(out, true)
+					.getChannel();
 			for (File f : in) {
 				FileChannel srcChannel = new FileInputStream(f).getChannel();
 				dstChannel.transferFrom(srcChannel, 0, srcChannel.size());
@@ -214,7 +189,8 @@ public class ParallelLinearScheduler implements IScheduler {
 		return parseLpsolve(is);
 	}
 
-	private SpecificSchedule parseLpsolve(LineNumberReader is) throws IOException {
+	private SpecificSchedule parseLpsolve(LineNumberReader is)
+			throws IOException {
 		String line;
 		line = is.readLine();
 		if (line.length() != 0)
@@ -243,21 +219,14 @@ public class ParallelLinearScheduler implements IScheduler {
 			// log(line);
 			String parts[] = line.split(" [ ]*", 2);
 			String varname = parts[0];
-			String varnameparts[] = varname.split("_", 3);
-			int j = Integer.parseInt(varnameparts[1]);
-			int k = Integer.parseInt(varnameparts[2]);
-			long day = k / LST_SLOTS;
-			long minute = (k % LST_SLOTS) * LST_SLOTS_MINUTES;
 			Double value = Double.parseDouble(parts[1]);
-			LSTTime t = new LSTTime(day, minute);
+			Entry<LSTTime, JobCombination> entry = decodeVar(varname);
 			// log("parsed as j " + j + ", k " + k + ", day " + day +
 			// ", minute "
 			// + minute + ", value " + value);
 			// log(t + " : " + j);
 			if (value != 0) {
-				JobCombination jc = new JobCombination();
-				jc.jobs.add(jobs.get(j));
-				s.add(t, jc);
+				s.add(entry.getKey(), entry.getValue());
 			}
 		}
 		log("parsing output done");
@@ -268,7 +237,24 @@ public class ParallelLinearScheduler implements IScheduler {
 		System.out.println("DEBUG: " + string);
 	}
 
-	private String getVar(int j, int k) {
-		return "x_" + j + "_" + k;
+	private Entry<LSTTime, JobCombination> decodeVar(String var) {
+		String varnameparts[] = var.split("_", 3);
+		int j = Integer.parseInt(varnameparts[1]);
+		int k = Integer.parseInt(varnameparts[2]);
+		long day = k / SchedulePossibilities.LST_SLOTS_PER_DAY;
+		long minute = (k % SchedulePossibilities.LST_SLOTS_PER_DAY)
+				* SchedulePossibilities.LST_SLOTS_MINUTES;
+		return new SimpleEntry<LSTTime, JobCombination>(
+				new LSTTime(day, minute), jobComboIdSet.get(j));
+	}
+
+	private String getVar(LSTTime t, int jobCombinationId) {
+		return getVar(jobCombinationId, t.day
+				* SchedulePossibilities.LST_SLOTS_PER_DAY + t.minute
+				/ SchedulePossibilities.LST_SLOTS_MINUTES);
+	}
+
+	private String getVar(int j, long l) {
+		return "x_" + j + "_" + l;
 	}
 }
