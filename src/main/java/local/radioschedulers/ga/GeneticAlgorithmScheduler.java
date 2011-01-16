@@ -22,11 +22,13 @@ import local.radioschedulers.cpu.RandomizedSelector;
 import local.radioschedulers.cpu.ShortestFirstSelector;
 import local.radioschedulers.exporter.HtmlExport;
 import local.radioschedulers.lp.LinearScheduler2;
+import local.radioschedulers.parallel.CompatibleJobFactory;
 import local.radioschedulers.parallel.ParallelRequirementGuard;
+import local.radioschedulers.parallel.RequirementGuard;
 
 public abstract class GeneticAlgorithmScheduler implements IScheduler {
 	protected HashMap<LSTTime, Vector<Job>> possibles = new HashMap<LSTTime, Vector<Job>>();
-	protected HashMap<Job, Double> timeleft = new HashMap<Job, Double>();
+	protected RequirementGuard requirementGuard;
 	protected int ndays;
 	protected int ngenes;
 
@@ -43,7 +45,8 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 	public SpecificSchedule schedule(Collection<Proposal> proposals, int ndays) {
 		this.ndays = ndays;
 		this.ngenes = ndays * SchedulePossibilities.LST_SLOTS_PER_DAY;
-		SchedulePossibilities possibles = getPossibleSchedules(proposals, ndays);
+		SchedulePossibilities possibles = getPossibleSchedules(proposals,
+				requirementGuard);
 		Collection<SpecificSchedule> s = getStartSchedules(proposals);
 
 		SpecificSchedule bestschedule;
@@ -58,9 +61,14 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 	}
 
 	protected SchedulePossibilities getPossibleSchedules(
-			Collection<Proposal> proposals, int ndays2) {
-		// TODO Auto-generated method stub
-		return null;
+			Collection<Proposal> proposals, RequirementGuard requirementGuard) {
+		List<Job> alljobs = new ArrayList<Job>();
+		for (Proposal p : proposals) {
+			alljobs.addAll(p.jobs);
+		}
+		CompatibleJobFactory compatibles = new CompatibleJobFactory(alljobs,
+				requirementGuard);
+		return compatibles.getPossibleTimeLine(alljobs);
 	}
 
 	protected abstract SpecificSchedule evolveSchedules(

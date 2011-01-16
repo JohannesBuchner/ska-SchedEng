@@ -92,7 +92,6 @@ public class CPULikeScheduler implements IScheduler {
 	}
 
 	private void generatePossibles(Collection<Proposal> proposals) {
-
 		List<Job> alljobs = new ArrayList<Job>();
 		for (Proposal p : proposals) {
 			alljobs.addAll(p.jobs);
