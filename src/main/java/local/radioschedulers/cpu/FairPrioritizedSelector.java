@@ -65,7 +65,7 @@ public class FairPrioritizedSelector extends JobSelector {
 			// priority)
 			Double coin = r.nextDouble() * priototal;
 			for (JobCombination jc : jobs) {
-				coin -= jc.proposal.priority;
+				coin -= jc.getPriority();
 				if (coin <= 0) {
 					// pick this job
 					selected.add(jc);

@@ -23,10 +23,7 @@ import local.radioschedulers.exporter.HtmlExport;
 import local.radioschedulers.lp.LinearScheduler2;
 import local.radioschedulers.parallel.ParallelRequirementGuard;
 
-public class GeneticAlgorithmScheduler implements IScheduler {
-	public static final int LST_SLOTS = 24 * 4;
-	public static final int LST_SLOTS_MINUTES = 24 * 60 / LST_SLOTS;
-
+public abstract class GeneticAlgorithmScheduler implements IScheduler {
 	protected HashMap<LSTTime, Vector<Job>> possibles = new HashMap<LSTTime, Vector<Job>>();
 	protected HashMap<Job, Double> timeleft = new HashMap<Job, Double>();
 	private int ndays;
@@ -51,9 +48,7 @@ public class GeneticAlgorithmScheduler implements IScheduler {
 		return bestschedule;
 	}
 
-	protected Schedule evolveSchedules(Collection<Schedule> s) throws Exception {
-		return s.iterator().next();
-	}
+	protected abstract Schedule evolveSchedules(Collection<Schedule> s) throws Exception;
 
 	protected Collection<Schedule> getStartSchedules(
 			Collection<Proposal> proposals) {

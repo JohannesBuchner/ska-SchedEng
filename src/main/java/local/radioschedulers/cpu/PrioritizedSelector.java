@@ -4,17 +4,18 @@ import java.util.Comparator;
 import java.util.HashMap;
 
 import local.radioschedulers.Job;
+import local.radioschedulers.JobCombination;
 
 public class PrioritizedSelector extends ShortestFirstSelector {
 
 	@Override
-	protected Comparator<Job> generateComparator(HashMap<Job, Double> timeleft) {
-		return new Comparator<Job>() {
+	protected Comparator<JobCombination> generateComparator(HashMap<Job, Double> timeleft) {
+		return new Comparator<JobCombination>() {
 
 			@Override
-			public int compare(Job o1, Job o2) {
-				Double p1 = o1.proposal.priority;
-				Double p2 = o2.proposal.priority;
+			public int compare(JobCombination o1, JobCombination o2) {
+				Double p1 = o1.getPriority();
+				Double p2 = o2.getPriority();
 
 				if (p1 == null)
 					if (p2 == null)

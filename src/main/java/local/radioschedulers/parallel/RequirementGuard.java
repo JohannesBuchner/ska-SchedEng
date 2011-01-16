@@ -99,7 +99,7 @@ public class RequirementGuard {
 	 * @param list
 	 * @return whether the jobs can be executed simultaneously (i.e. the resources are not overcommitted).
 	 */
-	public boolean compatible(List<Job> list) {
+	public boolean compatible(Collection<Job> list) {
 		Map<String, Integer> nresources = new HashMap<String, Integer>();
 		Map<String, Set<Integer>> res = new HashMap<String, Set<Integer>>();
 

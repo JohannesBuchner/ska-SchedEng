@@ -21,6 +21,18 @@ public class Job implements Comparable<Job> {
 	public Double lstmin;
 	public Double lstmax;
 	
+	public Job() {
+	}
+	
+	public Job(Job j) {
+		this.proposal = j.proposal;
+		this.hours = j.hours;
+		this.dec = j.dec;
+		this.ra = j.ra;
+		this.lstmax = j.lstmax;
+		this.lstmin = j.lstmin;
+	}
+
 	@Override
 	public String toString() {
 		return "Job " + hours + " (" + ra + "," + dec + ")=[" + lstmin + ".."

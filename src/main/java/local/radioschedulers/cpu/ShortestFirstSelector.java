@@ -17,12 +17,12 @@ public class ShortestFirstSelector extends JobSelector {
 		this.cmp = generateComparator(timeleft);
 	}
 	
-	protected Comparator<Job> cmp;
+	protected Comparator<JobCombination> cmp;
 
-	protected Comparator<Job> generateComparator(final HashMap<Job, Double> timeleft) {
-		return new Comparator<Job>() {
+	protected Comparator<JobCombination> generateComparator(final HashMap<Job, Double> timeleft) {
+		return new Comparator<JobCombination>() {
 			@Override
-			public int compare(Job o1, Job o2) {
+			public int compare(JobCombination o1, JobCombination o2) {
 				Double t1 = timeleft.get(o1);
 				Double t2 = timeleft.get(o2);
 

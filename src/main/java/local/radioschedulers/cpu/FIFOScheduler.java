@@ -3,6 +3,7 @@ import java.util.Collection;
 
 import local.radioschedulers.IScheduler;
 import local.radioschedulers.Job;
+import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
@@ -17,6 +18,9 @@ public class FIFOScheduler implements IScheduler {
 		Schedule s = new Schedule();
 		for (Proposal p : proposals) {
 			for (Job j : p.jobs) {
+				JobCombination jc = new JobCombination();
+				jc.jobs.add(j);
+				
 				log("placing " + j);
 
 				double len = j.hours;
@@ -29,7 +33,7 @@ public class FIFOScheduler implements IScheduler {
 							// System.out.println("Skipping " + t.minute);
 							continue;
 						}
-						if (s.get(t).isEmpty()) {
+						if (s.isEmpty(t)) {
 							s.add(t, j);
 							len -= 15. / 60;
 							log("assigned a bit of " + j

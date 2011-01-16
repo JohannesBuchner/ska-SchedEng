@@ -3,13 +3,13 @@ package local.radioschedulers.exporter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
 
 import local.radioschedulers.Job;
+import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.Schedule;
 
-public class HtmlExport extends IExport {
+public class HtmlExport implements IExport {
 
 	private static final boolean MERGESAME = true;
 	private File f;
@@ -50,19 +50,20 @@ public class HtmlExport extends IExport {
 			fw.append("\n\t\t<tr>\n\t\t\t<th>" + t.day + "</th>");
 			for (t.minute = 0L; t.minute < 24 * 60;) {
 				fw.append("\n\t\t\t");
-				List<Job> jobs = schedule.get(new LSTTime(t.day, t.minute));
+				JobCombination jc = schedule.get(new LSTTime(t.day, t.minute));
 				int ncells = 1;
 				LSTTime t2 = new LSTTime(t.day, t.minute + 15);
 				if (MERGESAME)
 					for (; t2.minute < 24 * 60; t2.minute += 15) {
-						if (HtmlExport.same(jobs, schedule.get(new LSTTime(
-								t2.day, t2.minute)))) {
+						JobCombination jc2 = schedule.get(new LSTTime(
+								t2.day, t2.minute));
+						if (jc.equals(jc2)) {
 							ncells++;
 						} else
 							break;
 					}
 				String params = "";
-				if (jobs.isEmpty())
+				if (jc.jobs.isEmpty())
 					params += " class=\"free\" ";
 
 				if (ncells > 1) {
@@ -71,10 +72,10 @@ public class HtmlExport extends IExport {
 				}
 				fw.append("<td " + params + ">");
 
-				if (jobs.isEmpty()) {
+				if (jc.jobs.isEmpty()) {
 					fw.append("&nbsp;");
 				} else {
-					for (Job j : jobs) {
+					for (Job j : jc.jobs) {
 						log("@" + t + ": " + j + "");
 						fw.append(j.proposal.name + "/" + j.hours + " ");
 					}

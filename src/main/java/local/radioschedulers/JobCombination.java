@@ -1,10 +1,10 @@
 package local.radioschedulers;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-public class JobCombination extends JobWithResources {
-	public List<Job> jobs = new ArrayList<Job>();
+public class JobCombination {
+	public Set<Job> jobs = new HashSet<Job>();
 
 	public double getPriority() {
 		double expprio = 0;
@@ -13,4 +13,30 @@ public class JobCombination extends JobWithResources {
 		}
 		return Math.log(expprio);
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((jobs == null) ? 0 : jobs.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		JobCombination other = (JobCombination) obj;
+		if (jobs == null) {
+			if (other.jobs != null)
+				return false;
+		} else if (!jobs.equals(other.jobs))
+			return false;
+		return true;
+	}
+
 }

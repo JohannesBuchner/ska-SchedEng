@@ -68,17 +68,15 @@ public class CPULikeScheduler implements IScheduler {
 				if (selected == null)
 					possibles.remove(new LSTTime(0L, t.minute));
 				else {
+					s.add(new LSTTime(t.day, t.minute), selected);
+					/* count down time left */
 					for (Job j : selected.jobs) {
-						s.add(new LSTTime(t.day, t.minute), j);
-						// System.out.println("selected job " + j + " for " +
-						// t);
 						Double newtime = timeleft.get(j) - LST_SLOTS_MINUTES
 								/ 60.;
 						System.out.println("@" + t + " : " + j + " (" + newtime
 								+ " left)");
 						if (newtime <= 0) {
 							timeleft.remove(j);
-							s.get(t).remove(j);
 						} else {
 							timeleft.put(j, newtime);
 						}
