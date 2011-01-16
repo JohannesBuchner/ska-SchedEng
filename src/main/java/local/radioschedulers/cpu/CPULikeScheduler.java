@@ -3,15 +3,17 @@ package local.radioschedulers.cpu;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import local.radioschedulers.IScheduler;
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.Proposal;
+import local.radioschedulers.SchedulePossibilities;
 import local.radioschedulers.SpecificSchedule;
-import local.radioschedulers.TimeLine;
 import local.radioschedulers.parallel.CompatibleJobFactory;
 import local.radioschedulers.parallel.ParallelRequirementGuard;
 
@@ -20,7 +22,7 @@ public class CPULikeScheduler implements IScheduler {
 	public static final int LST_SLOTS_MINUTES = 24 * 60 / LST_SLOTS;
 
 	protected HashMap<LSTTime, JobCombination> possibles = new HashMap<LSTTime, JobCombination>();
-	protected TimeLine timeline = new TimeLine();
+	protected SchedulePossibilities timeline = new SchedulePossibilities();
 	protected HashMap<Job, Double> timeleft = new HashMap<Job, Double>();
 
 	protected JobSelector jobselector;
@@ -53,8 +55,8 @@ public class CPULikeScheduler implements IScheduler {
 		for (t.day = 0L; !timeleft.isEmpty() && t.day < ndays; t.day++) {
 			cleanup(timeleft);
 			for (t.minute = 0L; t.minute < 24 * 60 && !timeleft.isEmpty(); t.minute += LST_SLOTS_MINUTES) {
-				List<JobCombination> list = timeline.possibles.get(new LSTTime(
-						0L, t.minute));
+				Set<JobCombination> list = timeline.get(new LSTTime(0L,
+						t.minute));
 
 				if (list == null || list.isEmpty()) {
 					System.out.println("nothing to do @" + t);
@@ -103,9 +105,9 @@ public class CPULikeScheduler implements IScheduler {
 		timeline = compatibles.getPossibleTimeLine(alljobs);
 	}
 
-	protected List<JobCombination> pruneForRequirements(
+	protected Set<JobCombination> pruneForRequirements(
 			Collection<JobCombination> list, LSTTime date) {
-		List<JobCombination> selected = new ArrayList<JobCombination>();
+		Set<JobCombination> selected = new HashSet<JobCombination>();
 		for (JobCombination jc : list) {
 			if (this.requirementGuard.isDateCompatible(jc, date)) {
 				selected.add(jc);

@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
-import local.radioschedulers.TimeLine;
+import local.radioschedulers.SchedulePossibilities;
 
 public class CompatibleJobFactory {
 	private Collection<Job> base;
@@ -97,8 +97,8 @@ public class CompatibleJobFactory {
 	public static final int LST_SLOTS = 24 * 4;
 	public static final int LST_SLOTS_MINUTES = 24 * 60 / LST_SLOTS;
 
-	public TimeLine getPossibleTimeLine(Collection<Job> alljobs) {
-		TimeLine timeline;
+	public SchedulePossibilities getPossibleTimeLine(Collection<Job> alljobs) {
+		SchedulePossibilities timeline;
 
 		HashMap<LSTTime, Vector<Job>> possibles = new HashMap<LSTTime, Vector<Job>>();
 
@@ -133,12 +133,14 @@ public class CompatibleJobFactory {
 		CompatibleJobFactory compatibles = new CompatibleJobFactory(alljobs,
 				guard);
 
-		timeline = new TimeLine();
+		timeline = new SchedulePossibilities();
 		for (Entry<LSTTime, Vector<Job>> e : possibles.entrySet()) {
 			LSTTime k = e.getKey();
 			Vector<Job> v = e.getValue();
 
-			timeline.possibles.put(k, compatibles.getCombinations(v));
+			for (JobCombination jc : compatibles.getCombinations(v)) {
+				timeline.add(k, jc);
+			}
 		}
 
 		return timeline;
