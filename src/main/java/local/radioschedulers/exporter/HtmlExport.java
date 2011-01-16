@@ -3,12 +3,11 @@ package local.radioschedulers.exporter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Set;
 
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
-import local.radioschedulers.Schedule;
+import local.radioschedulers.SpecificSchedule;
 
 public class HtmlExport implements IExport {
 
@@ -25,7 +24,7 @@ public class HtmlExport implements IExport {
 		this.f = f;
 	}
 
-	public void export(Schedule schedule) throws IOException {
+	public void export(SpecificSchedule schedule) throws IOException {
 		FileWriter fw;
 		fw = new FileWriter(f);
 		fw.append("<html>");
@@ -51,19 +50,15 @@ public class HtmlExport implements IExport {
 			fw.append("\n\t\t<tr>\n\t\t\t<th>" + t.day + "</th>");
 			for (t.minute = 0L; t.minute < 24 * 60;) {
 				fw.append("\n\t\t\t");
-				Set<JobCombination> jcs = schedule.get(new LSTTime(t.day,
+				JobCombination jc = schedule.get(new LSTTime(t.day,
 						t.minute));
-				JobCombination jc = jcs.iterator().next();
-				if (jcs.size() != 1) {
-					log("WARNING: schedule has multiple JobCombinations, only one was expected");
-				}
 				int ncells = 1;
 				LSTTime t2 = new LSTTime(t.day, t.minute + 15);
 				if (MERGESAME)
 					for (; t2.minute < 24 * 60; t2.minute += 15) {
-						Set<JobCombination> jcs2 = schedule.get(new LSTTime(
+						JobCombination jc2 = schedule.get(new LSTTime(
 								t2.day, t2.minute));
-						if (jcs.equals(jcs2)) {
+						if (jc.equals(jc2)) {
 							ncells++;
 						} else
 							break;

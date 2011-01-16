@@ -10,7 +10,6 @@ import java.util.Map.Entry;
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
-import local.radioschedulers.Proposal;
 import local.radioschedulers.TimeLine;
 
 public class CompatibleJobFactory {

@@ -20,7 +20,7 @@ import local.radioschedulers.JobWithResources;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.ResourceRequirements;
-import local.radioschedulers.Schedule;
+import local.radioschedulers.SpecificSchedule;
 
 public class ParallelLinearScheduler implements IScheduler {
 	public static final int LST_SLOTS = 24 * 4;
@@ -35,7 +35,7 @@ public class ParallelLinearScheduler implements IScheduler {
 	 * 
 	 * @see IScheduler#schedule(java.util.Collection)
 	 */
-	public Schedule schedule(Collection<Proposal> proposals, int ndays) {
+	public SpecificSchedule schedule(Collection<Proposal> proposals, int ndays) {
 		int njobs = 0;
 
 		/**
@@ -163,7 +163,7 @@ public class ParallelLinearScheduler implements IScheduler {
 				new File("vardef.lp"));
 		log("concat  done");
 
-		Schedule s;
+		SpecificSchedule s;
 		try {
 			log("solving ...");
 			s = lpsolve(lp);
@@ -201,7 +201,7 @@ public class ParallelLinearScheduler implements IScheduler {
 	 * @return schedule
 	 * @throws IOException
 	 */
-	protected Schedule lpsolve(File lp) throws IOException {
+	protected SpecificSchedule lpsolve(File lp) throws IOException {
 		List<String> cmd = new ArrayList<String>();
 		cmd.add("lp_solve");
 		cmd.add(lp.getAbsolutePath());
@@ -214,7 +214,7 @@ public class ParallelLinearScheduler implements IScheduler {
 		return parseLpsolve(is);
 	}
 
-	private Schedule parseLpsolve(LineNumberReader is) throws IOException {
+	private SpecificSchedule parseLpsolve(LineNumberReader is) throws IOException {
 		String line;
 		line = is.readLine();
 		if (line.length() != 0)
@@ -233,7 +233,7 @@ public class ParallelLinearScheduler implements IScheduler {
 			throw new IOException("unexpected response: " + line);
 
 		log("parsing output ...");
-		Schedule s = new Schedule();
+		SpecificSchedule s = new SpecificSchedule();
 
 		while (true) {
 			line = is.readLine();

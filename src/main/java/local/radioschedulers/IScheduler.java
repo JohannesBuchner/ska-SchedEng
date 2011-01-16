@@ -3,6 +3,6 @@ import java.util.Collection;
 
 public interface IScheduler {
 
-	public abstract Schedule schedule(Collection<Proposal> proposals, int ndays);
+	public abstract SpecificSchedule schedule(Collection<Proposal> proposals, int ndays);
 
 }

@@ -10,7 +10,7 @@ import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.Proposal;
-import local.radioschedulers.Schedule;
+import local.radioschedulers.SpecificSchedule;
 import local.radioschedulers.TimeLine;
 import local.radioschedulers.parallel.CompatibleJobFactory;
 import local.radioschedulers.parallel.ParallelRequirementGuard;
@@ -44,8 +44,8 @@ public class CPULikeScheduler implements IScheduler {
 	 * 
 	 * @see IScheduler#schedule(java.util.Collection)
 	 */
-	public Schedule schedule(Collection<Proposal> proposals, int ndays) {
-		Schedule s = new Schedule();
+	public SpecificSchedule schedule(Collection<Proposal> proposals, int ndays) {
+		SpecificSchedule s = new SpecificSchedule();
 		generatePossibles(proposals);
 
 		System.out.println("Allocating:");

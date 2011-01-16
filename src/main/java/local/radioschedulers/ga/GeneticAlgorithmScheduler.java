@@ -13,7 +13,8 @@ import local.radioschedulers.IScheduler;
 import local.radioschedulers.Job;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.Proposal;
-import local.radioschedulers.Schedule;
+import local.radioschedulers.SchedulePossibilities;
+import local.radioschedulers.SpecificSchedule;
 import local.radioschedulers.cpu.CPULikeScheduler;
 import local.radioschedulers.cpu.FairPrioritizedSelector;
 import local.radioschedulers.cpu.PrioritizedSelector;
@@ -33,13 +34,14 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 	 * 
 	 * @see IScheduler#schedule(java.util.Collection)
 	 */
-	public Schedule schedule(Collection<Proposal> proposals, int ndays) {
+	public SpecificSchedule schedule(Collection<Proposal> proposals, int ndays) {
 		this.ndays = ndays;
-		Collection<Schedule> s = getStartSchedules(proposals);
+		SchedulePossibilities possibles = getPossibleSchedules(proposals, ndays);
+		Collection<SpecificSchedule> s = getStartSchedules(proposals);
 
-		Schedule bestschedule;
+		SpecificSchedule bestschedule;
 		try {
-			bestschedule = evolveSchedules(s);
+			bestschedule = evolveSchedules(possibles, s);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -48,11 +50,19 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 		return bestschedule;
 	}
 
-	protected abstract Schedule evolveSchedules(Collection<Schedule> s) throws Exception;
+	protected SchedulePossibilities getPossibleSchedules(
+			Collection<Proposal> proposals, int ndays2) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-	protected Collection<Schedule> getStartSchedules(
+	protected abstract SpecificSchedule evolveSchedules(
+			SchedulePossibilities possibles, Collection<SpecificSchedule> s)
+			throws Exception;
+
+	protected Collection<SpecificSchedule> getStartSchedules(
 			Collection<Proposal> proposals) {
-		List<Schedule> schedules = new ArrayList<Schedule>();
+		List<SpecificSchedule> schedules = new ArrayList<SpecificSchedule>();
 
 		List<IScheduler> schedulers = new ArrayList<IScheduler>();
 
@@ -75,7 +85,7 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 		for (IScheduler s : schedulers) {
 			log("scheduling using " + s);
 
-			Schedule schedule = s.schedule(proposals, ndays);
+			SpecificSchedule schedule = s.schedule(proposals, ndays);
 			log("scheduling done");
 			schedules.add(schedule);
 			File f = new File("schedule" + schedules.size() + ".html");

@@ -15,7 +15,7 @@ import java.util.Map.Entry;
  * 
  * @author Johannes Buchner
  */
-public class Schedule implements Iterable<Entry<LSTTime, Set<JobCombination>>> {
+public class SchedulePossibilities implements Iterable<Entry<LSTTime, Set<JobCombination>>> {
 	public static final int LST_SLOTS_MINUTES = 15;
 	public static final int LST_SLOTS_PER_DAY = 60 * 24 / LST_SLOTS_MINUTES;
 

@@ -2,10 +2,10 @@ package local.radioschedulers.exporter;
 
 import java.io.IOException;
 
-import local.radioschedulers.Schedule;
+import local.radioschedulers.SpecificSchedule;
 
 public interface IExport {
 
-	public void export(Schedule schedule) throws IOException;
+	public void export(SpecificSchedule schedule) throws IOException;
 	
 }
