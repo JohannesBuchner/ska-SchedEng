@@ -45,7 +45,9 @@ public final class SimpleScheduleFitnessFunction implements
 					/* we are over desired limit already, no benefits */
 					time = 0;
 				}
-				if (!j.isAvalailable(entry.getKey())) {
+				
+				// TODO: add checks that the observation can actually be made
+				if (!j.isAvailable(entry.getKey())) {
 					time = 0;
 				}
 
