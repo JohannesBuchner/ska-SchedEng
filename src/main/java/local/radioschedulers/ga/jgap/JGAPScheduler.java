@@ -25,8 +25,6 @@ public class JGAPScheduler extends GeneticAlgorithmScheduler {
 
 	private int NUMBER_OF_EVOLUTIONS = 100;
 
-	private static final int NDAYS = 90;
-
 	private Configuration conf;
 
 	public JGAPScheduler(ScheduleFitnessFunction f)
@@ -43,8 +41,6 @@ public class JGAPScheduler extends GeneticAlgorithmScheduler {
 		// population = Genotype.randomInitialGenotype(conf);
 		Population pop = new Population(conf);
 
-		IChromosome template = getChromosomeFromSchedule(possibles);
-		pop.addChromosome(template);
 		for (SpecificSchedule s : ss) {
 			pop.addChromosome(getChromosomeFromSpecificSchedule(possibles, s));
 		}
@@ -102,12 +98,9 @@ public class JGAPScheduler extends GeneticAlgorithmScheduler {
 	protected IChromosome getChromosomeFromSpecificSchedule(
 			SchedulePossibilities possibles, SpecificSchedule s)
 			throws InvalidConfigurationException {
-		Gene[] genes = new Gene[NDAYS * SchedulePossibilities.LST_SLOTS_PER_DAY];
-		int i;
-		for (i = 0; i < NDAYS * SchedulePossibilities.LST_SLOTS_PER_DAY; i++) {
-			LSTTime t = new LSTTime(
-					i / SchedulePossibilities.LST_SLOTS_PER_DAY, i
-							% SchedulePossibilities.LST_SLOTS_PER_DAY);
+		Gene[] genes = new Gene[ngenes];
+		for (int i = 0; i < ngenes; i++) {
+			LSTTime t = new LSTTime(i / ngenes, i % ngenes);
 
 			SetGene g = new SetGene(conf);
 			// add all possible jobs, and select the one specified
@@ -121,35 +114,6 @@ public class JGAPScheduler extends GeneticAlgorithmScheduler {
 		}
 
 		Chromosome c = new Chromosome(conf, genes);
-		return c;
-	}
-
-	/**
-	 * Build a Chromosome, where a Gene is a scheduling slot, and each possible
-	 * Job(Combination) is a Allele.
-	 * 
-	 * @param s
-	 * @return
-	 * @throws InvalidConfigurationException
-	 */
-	protected IChromosome getChromosomeFromSchedule(SchedulePossibilities s)
-			throws InvalidConfigurationException {
-		Gene[] genes = new Gene[NDAYS * SchedulePossibilities.LST_SLOTS_PER_DAY];
-		int i;
-		for (i = 0; i < NDAYS * SchedulePossibilities.LST_SLOTS_PER_DAY; i++) {
-			LSTTime t = new LSTTime(
-					i / SchedulePossibilities.LST_SLOTS_PER_DAY, i
-							% SchedulePossibilities.LST_SLOTS_PER_DAY);
-
-			SetGene g = new SetGene(conf);
-			for (JobCombination jc : s.get(t)) {
-				g.addAllele(jc);
-			}
-			genes[i] = g;
-		}
-
-		Chromosome c = new Chromosome(conf, genes);
-
 		return c;
 	}
 }

@@ -27,7 +27,8 @@ import local.radioschedulers.parallel.ParallelRequirementGuard;
 public abstract class GeneticAlgorithmScheduler implements IScheduler {
 	protected HashMap<LSTTime, Vector<Job>> possibles = new HashMap<LSTTime, Vector<Job>>();
 	protected HashMap<Job, Double> timeleft = new HashMap<Job, Double>();
-	private int ndays;
+	protected int ndays;
+	protected int ngenes;
 
 	private double crossoverProbability = 0.1;
 	private double mutationProbability = 0.3;
@@ -41,6 +42,7 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 	 */
 	public SpecificSchedule schedule(Collection<Proposal> proposals, int ndays) {
 		this.ndays = ndays;
+		this.ngenes = ndays * SchedulePossibilities.LST_SLOTS_PER_DAY;
 		SchedulePossibilities possibles = getPossibleSchedules(proposals, ndays);
 		Collection<SpecificSchedule> s = getStartSchedules(proposals);
 
