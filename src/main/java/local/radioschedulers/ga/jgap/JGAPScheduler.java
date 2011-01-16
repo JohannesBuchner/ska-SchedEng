@@ -16,7 +16,9 @@ import org.jgap.Genotype;
 import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.Population;
+import org.jgap.impl.CrossoverOperator;
 import org.jgap.impl.DefaultConfiguration;
+import org.jgap.impl.MutationOperator;
 import org.jgap.impl.SetGene;
 
 public class JGAPScheduler extends GeneticAlgorithmScheduler {
@@ -37,18 +39,35 @@ public class JGAPScheduler extends GeneticAlgorithmScheduler {
 	@Override
 	protected SpecificSchedule evolveSchedules(SchedulePossibilities possibles,
 			Collection<SpecificSchedule> ss) throws Exception {
-		Genotype population;
+		Genotype genotype;
 		// population = Genotype.randomInitialGenotype(conf);
 		Population pop = new Population(conf);
 
 		IChromosome template = getChromosomeFromSchedule(possibles);
 		pop.addChromosome(template);
 		for (SpecificSchedule s : ss) {
-			pop.addChromosome(getChromosomeFromSpecificSchedule(template, s));
+			pop.addChromosome(getChromosomeFromSpecificSchedule(possibles, s));
 		}
-		population = new Genotype(conf, pop);
-		population.evolve(NUMBER_OF_EVOLUTIONS);
-		return getScheduleFromChromosome(population.getFittestChromosome());
+
+		conf.setPopulationSize(getPopulationSize());
+
+		addGeneticOperators();
+		if (getEliteSize() > 0)
+			conf.setPreservFittestIndividual(true);
+
+		// conf.setSampleChromosome(a_sampleChromosomeToSet);
+		genotype = new Genotype(conf, pop);
+		genotype.evolve(NUMBER_OF_EVOLUTIONS);
+		return getScheduleFromChromosome(genotype.getFittestChromosome());
+	}
+
+	protected void addGeneticOperators() throws InvalidConfigurationException {
+		conf.getGeneticOperators().clear();
+		conf.addGeneticOperator(new CrossoverOperator(conf,
+				getCrossoverProbability()));
+		conf.addGeneticOperator(new MutationOperator(conf,
+				(int) (1 / getMutationProbability())));
+		// TODO: add more fancy operators
 	}
 
 	/**
@@ -81,7 +100,7 @@ public class JGAPScheduler extends GeneticAlgorithmScheduler {
 	 * @throws InvalidConfigurationException
 	 */
 	protected IChromosome getChromosomeFromSpecificSchedule(
-			IChromosome template, SpecificSchedule s)
+			SchedulePossibilities possibles, SpecificSchedule s)
 			throws InvalidConfigurationException {
 		Gene[] genes = new Gene[NDAYS * SchedulePossibilities.LST_SLOTS_PER_DAY];
 		int i;
@@ -90,10 +109,14 @@ public class JGAPScheduler extends GeneticAlgorithmScheduler {
 					i / SchedulePossibilities.LST_SLOTS_PER_DAY, i
 							% SchedulePossibilities.LST_SLOTS_PER_DAY);
 
-			// SetGene g = new SetGene(conf);
-			SetGene g = (SetGene) template.getGene(i);
-			JobCombination jc = s.get(t);
-			g.setAllele(jc);
+			SetGene g = new SetGene(conf);
+			// add all possible jobs, and select the one specified
+			for (JobCombination jc : possibles.get(t)) {
+				g.addAllele(jc);
+
+				if (jc.equals(s.get(t)))
+					g.setAllele(jc);
+			}
 			genes[i] = g;
 		}
 

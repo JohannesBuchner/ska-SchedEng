@@ -29,6 +29,11 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 	protected HashMap<Job, Double> timeleft = new HashMap<Job, Double>();
 	private int ndays;
 
+	private double crossoverProbability = 0.1;
+	private double mutationProbability = 0.3;
+	private int populationSize = 100;
+	private int eliteSize = 1;
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -105,5 +110,37 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 
 	private void log(String string) {
 		System.out.println("DEBUG " + string);
+	}
+
+	public void setCrossoverProbability(double crossoverProbability) {
+		this.crossoverProbability = crossoverProbability;
+	}
+
+	public double getCrossoverProbability() {
+		return crossoverProbability;
+	}
+
+	public void setMutationProbability(double mutationProbability) {
+		this.mutationProbability = mutationProbability;
+	}
+
+	public double getMutationProbability() {
+		return mutationProbability;
+	}
+
+	public int getPopulationSize() {
+		return populationSize;
+	}
+
+	public void setPopulationSize(int populationSize) {
+		this.populationSize = populationSize;
+	}
+
+	public void setEliteSize(int eliteSize) {
+		this.eliteSize = eliteSize;
+	}
+
+	public int getEliteSize() {
+		return eliteSize;
 	}
 }
