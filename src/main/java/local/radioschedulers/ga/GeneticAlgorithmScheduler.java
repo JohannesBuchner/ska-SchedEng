@@ -12,7 +12,6 @@ import java.util.Vector;
 import local.radioschedulers.IScheduler;
 import local.radioschedulers.Job;
 import local.radioschedulers.LSTTime;
-import local.radioschedulers.Proposal;
 import local.radioschedulers.SchedulePossibilities;
 import local.radioschedulers.SpecificSchedule;
 import local.radioschedulers.cpu.CPULikeScheduler;
@@ -21,10 +20,9 @@ import local.radioschedulers.cpu.PrioritizedSelector;
 import local.radioschedulers.cpu.RandomizedSelector;
 import local.radioschedulers.cpu.ShortestFirstSelector;
 import local.radioschedulers.exporter.HtmlExport;
-import local.radioschedulers.lp.LinearScheduler2;
-import local.radioschedulers.parallel.CompatibleJobFactory;
-import local.radioschedulers.parallel.ParallelRequirementGuard;
-import local.radioschedulers.parallel.RequirementGuard;
+import local.radioschedulers.lp.ParallelLinearScheduler;
+import local.radioschedulers.preschedule.RequirementGuard;
+import local.radioschedulers.preschedule.parallel.ParallelRequirementGuard;
 
 public abstract class GeneticAlgorithmScheduler implements IScheduler {
 	protected HashMap<LSTTime, Vector<Job>> possibles = new HashMap<LSTTime, Vector<Job>>();
@@ -42,12 +40,10 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 	 * 
 	 * @see IScheduler#schedule(java.util.Collection)
 	 */
-	public SpecificSchedule schedule(Collection<Proposal> proposals, int ndays) {
-		this.ndays = ndays;
+	public SpecificSchedule schedule(SchedulePossibilities possibles) {
+		this.ndays = possibles.getLastEntry().day.intValue();
 		this.ngenes = ndays * SchedulePossibilities.LST_SLOTS_PER_DAY;
-		SchedulePossibilities possibles = getPossibleSchedules(proposals,
-				requirementGuard);
-		Collection<SpecificSchedule> s = getStartSchedules(proposals);
+		Collection<SpecificSchedule> s = getStartSchedules(possibles);
 
 		SpecificSchedule bestschedule;
 		try {
@@ -60,23 +56,12 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 		return bestschedule;
 	}
 
-	protected SchedulePossibilities getPossibleSchedules(
-			Collection<Proposal> proposals, RequirementGuard requirementGuard) {
-		List<Job> alljobs = new ArrayList<Job>();
-		for (Proposal p : proposals) {
-			alljobs.addAll(p.jobs);
-		}
-		CompatibleJobFactory compatibles = new CompatibleJobFactory(alljobs,
-				requirementGuard);
-		return compatibles.getPossibleTimeLine(alljobs);
-	}
-
 	protected abstract SpecificSchedule evolveSchedules(
 			SchedulePossibilities possibles, Collection<SpecificSchedule> s)
 			throws Exception;
 
 	protected Collection<SpecificSchedule> getStartSchedules(
-			Collection<Proposal> proposals) {
+			SchedulePossibilities timeline) {
 		List<SpecificSchedule> schedules = new ArrayList<SpecificSchedule>();
 
 		List<IScheduler> schedulers = new ArrayList<IScheduler>();
@@ -95,12 +80,12 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 		schedulers.add(rand);
 		schedulers.add(rand);
 
-		schedulers.add(new LinearScheduler2());
+		schedulers.add(new ParallelLinearScheduler());
 
 		for (IScheduler s : schedulers) {
 			log("scheduling using " + s);
 
-			SpecificSchedule schedule = s.schedule(proposals, ndays);
+			SpecificSchedule schedule = s.schedule(timeline);
 			log("scheduling done");
 			schedules.add(schedule);
 			File f = new File("schedule" + schedules.size() + ".html");

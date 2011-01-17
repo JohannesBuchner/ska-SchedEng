@@ -10,7 +10,6 @@ import java.io.LineNumberReader;
 import java.io.PrintStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,12 +20,9 @@ import local.radioschedulers.IScheduler;
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
-import local.radioschedulers.Proposal;
 import local.radioschedulers.SchedulePossibilities;
 import local.radioschedulers.SimpleEntry;
 import local.radioschedulers.SpecificSchedule;
-import local.radioschedulers.parallel.CompatibleJobFactory;
-import local.radioschedulers.parallel.ParallelRequirementGuard;
 
 public class ParallelLinearScheduler implements IScheduler {
 	protected List<JobCombination> jobComboIdSet = new ArrayList<JobCombination>();
@@ -36,7 +32,7 @@ public class ParallelLinearScheduler implements IScheduler {
 	 * 
 	 * @see IScheduler#schedule(java.util.Collection)
 	 */
-	public SpecificSchedule schedule(Collection<Proposal> proposals, int ndays) {
+	public SpecificSchedule schedule(SchedulePossibilities scheduleTemplate) {
 		/**
 		 * set the variables to be binary
 		 */
@@ -50,21 +46,8 @@ public class ParallelLinearScheduler implements IScheduler {
 		} catch (FileNotFoundException e1) {
 			throw new IllegalStateException(e1);
 		}
-		List<Job> alljobs = new ArrayList<Job>();
-		for (Proposal p : proposals) {
-			for (Job j : p.jobs) {
-				alljobs.add(j);
-			}
-		}
-		CompatibleJobFactory cjf = new CompatibleJobFactory(alljobs,
-				new ParallelRequirementGuard());
-		SchedulePossibilities scheduleTemplate = cjf
-				.getPossibleTimeLine(alljobs);
 
 		Map<Job, StringBuilder> jobsumSet = new HashMap<Job, StringBuilder>();
-		for (Job j : alljobs) {
-			jobsumSet.put(j, new StringBuilder());
-		}
 		/**
 		 * cost function: simply maximizing time * priority
 		 */
@@ -102,6 +85,11 @@ public class ParallelLinearScheduler implements IScheduler {
 					/**
 					 * 4) A job gets its hours:
 					 */
+					StringBuilder jobsum = jobsumSet.get(j);
+					if (jobsum == null) {
+						jobsum = new StringBuilder();
+						jobsumSet.put(j, jobsum);
+					}
 					jobsumSet.get(j).append(varname);
 					jobsumSet.get(j).append(" +");
 
@@ -121,7 +109,7 @@ public class ParallelLinearScheduler implements IScheduler {
 		/**
 		 * overall time for the job
 		 */
-		for (Job j : alljobs) {
+		for (Job j : jobsumSet.keySet()) {
 			constraints.append(jobsumSet.get(j));
 			constraints.append("0 <= " + j.hours
 					* SchedulePossibilities.LST_SLOTS_PER_DAY + ";\n");

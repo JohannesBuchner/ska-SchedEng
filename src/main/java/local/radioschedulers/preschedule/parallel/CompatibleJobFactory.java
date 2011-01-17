@@ -1,4 +1,4 @@
-package local.radioschedulers.parallel;
+package local.radioschedulers.preschedule.parallel;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,6 +11,7 @@ import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.SchedulePossibilities;
+import local.radioschedulers.preschedule.RequirementGuard;
 
 public class CompatibleJobFactory {
 	private Collection<Job> base;
@@ -130,15 +131,12 @@ public class CompatibleJobFactory {
 			}
 		}
 
-		CompatibleJobFactory compatibles = new CompatibleJobFactory(alljobs,
-				guard);
-
 		timeline = new SchedulePossibilities();
 		for (Entry<LSTTime, Vector<Job>> e : possibles.entrySet()) {
 			LSTTime k = e.getKey();
 			Vector<Job> v = e.getValue();
 
-			for (JobCombination jc : compatibles.getCombinations(v)) {
+			for (JobCombination jc : getCombinations(v)) {
 				timeline.add(k, jc);
 			}
 		}

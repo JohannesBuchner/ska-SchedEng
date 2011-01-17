@@ -1,5 +1,4 @@
 package local.radioschedulers;
-import java.util.Collection;
 
 /**
  * A scheduling algorithm
@@ -8,6 +7,6 @@ import java.util.Collection;
  */
 public interface IScheduler {
 
-	public abstract SpecificSchedule schedule(Collection<Proposal> proposals, int ndays);
+	public abstract SpecificSchedule schedule(SchedulePossibilities timeline);
 
 }

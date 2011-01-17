@@ -1,21 +1,17 @@
 package local.radioschedulers.cpu;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import local.radioschedulers.IScheduler;
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
-import local.radioschedulers.Proposal;
 import local.radioschedulers.SchedulePossibilities;
 import local.radioschedulers.SpecificSchedule;
-import local.radioschedulers.parallel.CompatibleJobFactory;
-import local.radioschedulers.parallel.ParallelRequirementGuard;
+import local.radioschedulers.preschedule.parallel.ParallelRequirementGuard;
 
 public class CPULikeScheduler implements IScheduler {
 	public static final int LST_SLOTS = 24 * 4;
@@ -46,9 +42,10 @@ public class CPULikeScheduler implements IScheduler {
 	 * 
 	 * @see IScheduler#schedule(java.util.Collection)
 	 */
-	public SpecificSchedule schedule(Collection<Proposal> proposals, int ndays) {
+	public SpecificSchedule schedule(SchedulePossibilities timeline) {
 		SpecificSchedule s = new SpecificSchedule();
-		generatePossibles(proposals);
+		this.timeline = timeline;
+		int ndays = timeline.getLastEntry().day.intValue();
 
 		System.out.println("Allocating:");
 		LSTTime t = new LSTTime(0L, 0L);
@@ -89,19 +86,6 @@ public class CPULikeScheduler implements IScheduler {
 
 		return s;
 
-	}
-
-	private void generatePossibles(Collection<Proposal> proposals) {
-		List<Job> alljobs = new ArrayList<Job>();
-		for (Proposal p : proposals) {
-			alljobs.addAll(p.jobs);
-			for (Job j : p.jobs) {
-				timeleft.put(j, j.hours * 1.);
-			}
-		}
-		CompatibleJobFactory compatibles = new CompatibleJobFactory(alljobs,
-				requirementGuard);
-		timeline = compatibles.getPossibleTimeLine(alljobs);
 	}
 
 	protected Set<JobCombination> pruneForRequirements(
