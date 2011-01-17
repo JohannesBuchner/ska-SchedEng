@@ -50,21 +50,21 @@ public class HtmlExport implements IExport {
 			fw.append("\n\t\t<tr>\n\t\t\t<th>" + t.day + "</th>");
 			for (t.minute = 0L; t.minute < 24 * 60;) {
 				fw.append("\n\t\t\t");
-				JobCombination jc = schedule.get(new LSTTime(t.day,
-						t.minute));
+				JobCombination jc = schedule.get(new LSTTime(t.day, t.minute));
 				int ncells = 1;
 				LSTTime t2 = new LSTTime(t.day, t.minute + 15);
 				if (MERGESAME)
 					for (; t2.minute < 24 * 60; t2.minute += 15) {
-						JobCombination jc2 = schedule.get(new LSTTime(
-								t2.day, t2.minute));
-						if (jc.equals(jc2)) {
+						JobCombination jc2 = schedule.get(new LSTTime(t2.day,
+								t2.minute));
+						if ((jc == null && jc2 == null)
+								|| (jc != null && jc.equals(jc2))) {
 							ncells++;
 						} else
 							break;
 					}
 				String params = "";
-				if (jc.jobs.isEmpty())
+				if (jc == null || jc.jobs.isEmpty())
 					params += " class=\"free\" ";
 
 				if (ncells > 1) {
@@ -73,7 +73,7 @@ public class HtmlExport implements IExport {
 				}
 				fw.append("<td " + params + ">");
 
-				if (jc.jobs.isEmpty()) {
+				if (jc == null || jc.jobs.isEmpty()) {
 					fw.append("&nbsp;");
 				} else {
 					for (Job j : jc.jobs) {

@@ -39,7 +39,11 @@ public class Schedule implements Iterable<Entry<LSTTime, JobCombination>> {
 	}
 
 	public LSTTime getLastEntry() {
-		return Collections.max(schedule.keySet());
+		if (schedule.isEmpty()) {
+			return new LSTTime(0, 0);
+		} else {
+			return Collections.max(schedule.keySet());
+		}
 	}
 
 	@Override

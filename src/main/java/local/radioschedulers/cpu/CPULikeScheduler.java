@@ -8,9 +8,9 @@ import local.radioschedulers.IScheduler;
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
-import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.Schedule;
-import local.radioschedulers.preschedule.parallel.ParallelRequirementGuard;
+import local.radioschedulers.ScheduleSpace;
+import local.radioschedulers.preschedule.RequirementGuard;
 
 public class CPULikeScheduler implements IScheduler {
 	public static final int LST_SLOTS = 24 * 4;
@@ -23,7 +23,7 @@ public class CPULikeScheduler implements IScheduler {
 	protected JobSelector jobselector;
 
 	public CPULikeScheduler(JobSelector jobselector,
-			ParallelRequirementGuard requirementGuard) {
+			RequirementGuard requirementGuard) {
 		this.jobselector = jobselector;
 		this.jobselector.setTimeleft(timeleft);
 	}

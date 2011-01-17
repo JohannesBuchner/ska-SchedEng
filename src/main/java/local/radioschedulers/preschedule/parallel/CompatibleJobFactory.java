@@ -3,8 +3,10 @@ package local.radioschedulers.preschedule.parallel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Vector;
+import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import local.radioschedulers.Job;
@@ -13,7 +15,11 @@ import local.radioschedulers.LSTTime;
 import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.preschedule.RequirementGuard;
 
+import org.apache.log4j.Logger;
+
 public class CompatibleJobFactory {
+	private static Logger log = Logger.getLogger(CompatibleJobFactory.class);
+
 	private Collection<Job> base;
 	private List<JobCombination> combinations;
 	private RequirementGuard guard;
@@ -28,9 +34,11 @@ public class CompatibleJobFactory {
 		combinations = new ArrayList<JobCombination>();
 
 		// the idle-job
+		log.debug("adding idle job");
 		combinations.add(new JobCombination());
 
 		// the single jobs
+		log.debug("adding single jobs");
 		List<JobCombination> extensions = new ArrayList<JobCombination>();
 		for (Job j : base) {
 			JobCombination c = new JobCombination();
@@ -42,7 +50,9 @@ public class CompatibleJobFactory {
 		// enrich
 		while (true) {
 			// this could be improved, but hey
-			extensions = extend(extensions, base);
+			log.debug("extending ...");
+			extensions = extend(combinations, base);
+			log.debug("extending ... got " + extensions.size() + " extensions");
 			if (extensions.size() == 0)
 				break;
 			else
@@ -70,7 +80,8 @@ public class CompatibleJobFactory {
 				lab.jobs.addAll(la.jobs);
 				lab.jobs.add(j);
 				if (guard.compatible(lab.jobs)) {
-					r.add(lab);
+					if (!a.contains(lab))
+						r.add(lab);
 				}
 			}
 		}
@@ -78,9 +89,8 @@ public class CompatibleJobFactory {
 		return r;
 	}
 
-	// TODO: I guess this could use some caching
-	public List<JobCombination> getCombinations(List<Job> jobs) {
-		List<JobCombination> combo = new ArrayList<JobCombination>();
+	protected Set<JobCombination> getCombinationsInternal(Set<Job> jobs) {
+		Set<JobCombination> combo = new HashSet<JobCombination>();
 		for (JobCombination c : combinations) {
 			boolean allthere = true;
 			for (Job j : c.jobs) {
@@ -95,13 +105,28 @@ public class CompatibleJobFactory {
 		return combo;
 	}
 
+	public List<JobCombination> getCombinations() {
+		return combinations;
+	}
+
+	private Map<Set<Job>, Set<JobCombination>> combinationsCache = new HashMap<Set<Job>, Set<JobCombination>>();
+
+	public Set<JobCombination> getCombinations(Set<Job> jobs) {
+		Set<JobCombination> result = combinationsCache.get(jobs);
+		if (result == null) {
+			result = getCombinationsInternal(jobs);
+			combinationsCache.put(jobs, result);
+		}
+		return result;
+	}
+
 	public static final int LST_SLOTS = 24 * 4;
 	public static final int LST_SLOTS_MINUTES = 24 * 60 / LST_SLOTS;
 
 	public ScheduleSpace getPossibleTimeLine(Collection<Job> alljobs) {
 		ScheduleSpace timeline;
 
-		HashMap<LSTTime, Vector<Job>> possibles = new HashMap<LSTTime, Vector<Job>>();
+		HashMap<LSTTime, Set<Job>> possibles = new HashMap<LSTTime, Set<Job>>();
 
 		System.out.println("Possibles:");
 		for (Job j : alljobs) {
@@ -118,26 +143,25 @@ public class CompatibleJobFactory {
 				}
 
 				LSTTime t = new LSTTime(0L, minute);
-				Vector<Job> list;
+				Set<Job> list;
 				if (possibles.containsKey(t)) {
 					list = possibles.get(t);
 				} else {
-					list = new Vector<Job>();
+					list = new HashSet<Job>();
 					possibles.put(t, list);
 				}
 				list.add(j);
 				System.out.println("@" + t + " : " + j);
-				possibles.put(t, list);
 			}
 		}
 
 		timeline = new ScheduleSpace();
-		for (Entry<LSTTime, Vector<Job>> e : possibles.entrySet()) {
-			LSTTime k = e.getKey();
-			Vector<Job> v = e.getValue();
+		for (Entry<LSTTime, Set<Job>> e : possibles.entrySet()) {
+			LSTTime t = e.getKey();
+			Set<Job> jobs = e.getValue();
 
-			for (JobCombination jc : getCombinations(v)) {
-				timeline.add(k, jc);
+			for (JobCombination jc : getCombinations(jobs)) {
+				timeline.add(t, jc);
 			}
 		}
 
