@@ -3,7 +3,7 @@ package local.radioschedulers.run;
 import java.util.Collection;
 
 import local.radioschedulers.Proposal;
-import local.radioschedulers.SchedulePossibilities;
+import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.ga.GeneticAlgorithmScheduler;
 import local.radioschedulers.ga.ScheduleFitnessFunction;
 import local.radioschedulers.ga.fitness.SimpleScheduleFitnessFunction;
@@ -25,7 +25,7 @@ public class RunGA {
 		}
 		ITimelineGenerator tlg = new SimpleTimelineGenerator(
 				new ParallelRequirementGuard());
-		SchedulePossibilities template = tlg.schedule(proposals, ndays);
+		ScheduleSpace template = tlg.schedule(proposals, ndays);
 		GeneticAlgorithmScheduler scheduler = new JGAPScheduler(
 				getFitnessFunction());
 		scheduler.schedule(template);

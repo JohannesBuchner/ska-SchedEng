@@ -6,7 +6,7 @@ import java.util.List;
 
 import local.radioschedulers.Job;
 import local.radioschedulers.Proposal;
-import local.radioschedulers.SchedulePossibilities;
+import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.preschedule.parallel.CompatibleJobFactory;
 
 public class SimpleTimelineGenerator implements ITimelineGenerator {
@@ -16,7 +16,7 @@ public class SimpleTimelineGenerator implements ITimelineGenerator {
 		this.req = req;
 	}
 
-	public SchedulePossibilities getPossibleSchedules(
+	public ScheduleSpace getPossibleSchedules(
 			Collection<Proposal> proposals, RequirementGuard requirementGuard) {
 		List<Job> alljobs = new ArrayList<Job>();
 		for (Proposal p : proposals) {
@@ -28,7 +28,7 @@ public class SimpleTimelineGenerator implements ITimelineGenerator {
 	}
 
 	@Override
-	public SchedulePossibilities schedule(Collection<Proposal> proposals,
+	public ScheduleSpace schedule(Collection<Proposal> proposals,
 			int ndays) {
 		return getPossibleSchedules(proposals, req);
 	}

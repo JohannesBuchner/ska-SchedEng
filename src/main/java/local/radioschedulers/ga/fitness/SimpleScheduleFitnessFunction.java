@@ -10,13 +10,13 @@ import java.util.Map.Entry;
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
-import local.radioschedulers.SpecificSchedule;
+import local.radioschedulers.Schedule;
 import local.radioschedulers.ga.ScheduleFitnessFunction;
 
 public final class SimpleScheduleFitnessFunction implements
 		ScheduleFitnessFunction {
 	@Override
-	public double evaluate(SpecificSchedule s) {
+	public double evaluate(Schedule s) {
 		double v = 0.;
 		JobCombination previousEntry = null;
 		double time;
@@ -31,15 +31,15 @@ public final class SimpleScheduleFitnessFunction implements
 					timeleftMap.put(j, j.hours);
 				}
 				timeleft = timeleftMap.get(j)
-						- SpecificSchedule.LST_SLOTS_MINUTES;
+						- Schedule.LST_SLOTS_MINUTES;
 				timeleftMap.put(j, timeleft);
 
 				if (previousEntry != null && previousEntry.jobs.contains(j)) {
 					// full time for continued
-					time = SpecificSchedule.LST_SLOTS_MINUTES;
+					time = Schedule.LST_SLOTS_MINUTES;
 				} else {
 					// some time lost for new observation
-					time = SpecificSchedule.LST_SLOTS_MINUTES * 0.7;
+					time = Schedule.LST_SLOTS_MINUTES * 0.7;
 				}
 				if (timeleft < 0) {
 					/* we are over desired limit already, no benefits */

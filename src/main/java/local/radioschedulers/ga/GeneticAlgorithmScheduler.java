@@ -12,8 +12,8 @@ import java.util.Vector;
 import local.radioschedulers.IScheduler;
 import local.radioschedulers.Job;
 import local.radioschedulers.LSTTime;
-import local.radioschedulers.SchedulePossibilities;
-import local.radioschedulers.SpecificSchedule;
+import local.radioschedulers.ScheduleSpace;
+import local.radioschedulers.Schedule;
 import local.radioschedulers.cpu.CPULikeScheduler;
 import local.radioschedulers.cpu.FairPrioritizedSelector;
 import local.radioschedulers.cpu.PrioritizedSelector;
@@ -40,12 +40,12 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 	 * 
 	 * @see IScheduler#schedule(java.util.Collection)
 	 */
-	public SpecificSchedule schedule(SchedulePossibilities possibles) {
+	public Schedule schedule(ScheduleSpace possibles) {
 		this.ndays = possibles.getLastEntry().day.intValue();
-		this.ngenes = ndays * SchedulePossibilities.LST_SLOTS_PER_DAY;
-		Collection<SpecificSchedule> s = getStartSchedules(possibles);
+		this.ngenes = ndays * ScheduleSpace.LST_SLOTS_PER_DAY;
+		Collection<Schedule> s = getStartSchedules(possibles);
 
-		SpecificSchedule bestschedule;
+		Schedule bestschedule;
 		try {
 			bestschedule = evolveSchedules(possibles, s);
 		} catch (Exception e) {
@@ -56,13 +56,13 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 		return bestschedule;
 	}
 
-	protected abstract SpecificSchedule evolveSchedules(
-			SchedulePossibilities possibles, Collection<SpecificSchedule> s)
+	protected abstract Schedule evolveSchedules(
+			ScheduleSpace possibles, Collection<Schedule> s)
 			throws Exception;
 
-	protected Collection<SpecificSchedule> getStartSchedules(
-			SchedulePossibilities timeline) {
-		List<SpecificSchedule> schedules = new ArrayList<SpecificSchedule>();
+	protected Collection<Schedule> getStartSchedules(
+			ScheduleSpace timeline) {
+		List<Schedule> schedules = new ArrayList<Schedule>();
 
 		List<IScheduler> schedulers = new ArrayList<IScheduler>();
 
@@ -85,7 +85,7 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 		for (IScheduler s : schedulers) {
 			log("scheduling using " + s);
 
-			SpecificSchedule schedule = s.schedule(timeline);
+			Schedule schedule = s.schedule(timeline);
 			log("scheduling done");
 			schedules.add(schedule);
 			File f = new File("schedule" + schedules.size() + ".html");

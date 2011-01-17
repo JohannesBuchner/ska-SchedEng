@@ -7,7 +7,7 @@ import java.io.IOException;
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
-import local.radioschedulers.SpecificSchedule;
+import local.radioschedulers.Schedule;
 
 public class HtmlExport implements IExport {
 
@@ -24,7 +24,7 @@ public class HtmlExport implements IExport {
 		this.f = f;
 	}
 
-	public void export(SpecificSchedule schedule) throws IOException {
+	public void export(Schedule schedule) throws IOException {
 		FileWriter fw;
 		fw = new FileWriter(f);
 		fw.append("<html>");

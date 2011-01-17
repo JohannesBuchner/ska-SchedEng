@@ -1,7 +1,7 @@
 package local.radioschedulers.ga;
 
-import local.radioschedulers.SpecificSchedule;
+import local.radioschedulers.Schedule;
 
 public interface ScheduleFitnessFunction {
-	public double evaluate(SpecificSchedule s);
+	public double evaluate(Schedule s);
 }

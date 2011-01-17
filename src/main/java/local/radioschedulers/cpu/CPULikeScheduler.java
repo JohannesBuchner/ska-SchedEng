@@ -8,8 +8,8 @@ import local.radioschedulers.IScheduler;
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
-import local.radioschedulers.SchedulePossibilities;
-import local.radioschedulers.SpecificSchedule;
+import local.radioschedulers.ScheduleSpace;
+import local.radioschedulers.Schedule;
 import local.radioschedulers.preschedule.parallel.ParallelRequirementGuard;
 
 public class CPULikeScheduler implements IScheduler {
@@ -17,7 +17,7 @@ public class CPULikeScheduler implements IScheduler {
 	public static final int LST_SLOTS_MINUTES = 24 * 60 / LST_SLOTS;
 
 	protected HashMap<LSTTime, JobCombination> possibles = new HashMap<LSTTime, JobCombination>();
-	protected SchedulePossibilities timeline = new SchedulePossibilities();
+	protected ScheduleSpace timeline = new ScheduleSpace();
 	protected HashMap<Job, Double> timeleft = new HashMap<Job, Double>();
 
 	protected JobSelector jobselector;
@@ -38,8 +38,8 @@ public class CPULikeScheduler implements IScheduler {
 	 * 
 	 * @see IScheduler#schedule(java.util.Collection)
 	 */
-	public SpecificSchedule schedule(SchedulePossibilities timeline) {
-		SpecificSchedule s = new SpecificSchedule();
+	public Schedule schedule(ScheduleSpace timeline) {
+		Schedule s = new Schedule();
 		this.timeline = timeline;
 		int ndays = timeline.getLastEntry().day.intValue();
 

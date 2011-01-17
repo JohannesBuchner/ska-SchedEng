@@ -4,8 +4,8 @@ import java.util.Collection;
 
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
-import local.radioschedulers.SchedulePossibilities;
-import local.radioschedulers.SpecificSchedule;
+import local.radioschedulers.ScheduleSpace;
+import local.radioschedulers.Schedule;
 import local.radioschedulers.ga.GeneticAlgorithmScheduler;
 import local.radioschedulers.ga.ScheduleFitnessFunction;
 
@@ -35,13 +35,13 @@ public class JGAPScheduler extends GeneticAlgorithmScheduler {
 	}
 
 	@Override
-	protected SpecificSchedule evolveSchedules(SchedulePossibilities possibles,
-			Collection<SpecificSchedule> ss) throws Exception {
+	protected Schedule evolveSchedules(ScheduleSpace possibles,
+			Collection<Schedule> ss) throws Exception {
 		Genotype genotype;
 		// population = Genotype.randomInitialGenotype(conf);
 		Population pop = new Population(conf);
 
-		for (SpecificSchedule s : ss) {
+		for (Schedule s : ss) {
 			pop.addChromosome(getChromosomeFromSpecificSchedule(possibles, s));
 		}
 
@@ -72,14 +72,14 @@ public class JGAPScheduler extends GeneticAlgorithmScheduler {
 	 * @param c
 	 * @return
 	 */
-	public static SpecificSchedule getScheduleFromChromosome(IChromosome c) {
+	public static Schedule getScheduleFromChromosome(IChromosome c) {
 		int i;
 		Gene[] genes = c.getGenes();
-		SpecificSchedule s = new SpecificSchedule();
+		Schedule s = new Schedule();
 
 		for (i = 0; i < genes.length; i++) {
-			LSTTime t = new LSTTime(i / SpecificSchedule.LST_SLOTS_PER_DAY, i
-					% SpecificSchedule.LST_SLOTS_PER_DAY);
+			LSTTime t = new LSTTime(i / Schedule.LST_SLOTS_PER_DAY, i
+					% Schedule.LST_SLOTS_PER_DAY);
 			JobCombination jc = (JobCombination) genes[i].getAllele();
 			s.add(t, jc);
 		}
@@ -96,7 +96,7 @@ public class JGAPScheduler extends GeneticAlgorithmScheduler {
 	 * @throws InvalidConfigurationException
 	 */
 	protected IChromosome getChromosomeFromSpecificSchedule(
-			SchedulePossibilities possibles, SpecificSchedule s)
+			ScheduleSpace possibles, Schedule s)
 			throws InvalidConfigurationException {
 		Gene[] genes = new Gene[ngenes];
 		for (int i = 0; i < ngenes; i++) {

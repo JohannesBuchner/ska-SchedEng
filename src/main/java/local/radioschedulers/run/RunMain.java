@@ -6,8 +6,8 @@ import java.util.Collection;
 
 import local.radioschedulers.IScheduler;
 import local.radioschedulers.Proposal;
-import local.radioschedulers.SchedulePossibilities;
-import local.radioschedulers.SpecificSchedule;
+import local.radioschedulers.ScheduleSpace;
+import local.radioschedulers.Schedule;
 import local.radioschedulers.cpu.CPULikeScheduler;
 import local.radioschedulers.cpu.ShortestFirstSelector;
 import local.radioschedulers.exporter.HtmlExport;
@@ -30,13 +30,13 @@ public class RunMain {
 		IScheduler s = getScheduler();
 		ITimelineGenerator tlg = new SimpleTimelineGenerator(
 				new ParallelRequirementGuard());
-		SchedulePossibilities template = tlg.schedule(proposals, ndays);
-		SpecificSchedule schedule = s.schedule(template);
+		ScheduleSpace template = tlg.schedule(proposals, ndays);
+		Schedule schedule = s.schedule(template);
 
 		display(schedule);
 	}
 
-	private static void display(SpecificSchedule schedule) {
+	private static void display(Schedule schedule) {
 		try {
 			IExport ex = new HtmlExport(new File("schedule.html"));
 			ex.export(schedule);

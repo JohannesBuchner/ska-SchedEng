@@ -7,6 +7,6 @@ package local.radioschedulers;
  */
 public interface IScheduler {
 
-	public abstract SpecificSchedule schedule(SchedulePossibilities timeline);
+	public abstract Schedule schedule(ScheduleSpace timeline);
 
 }

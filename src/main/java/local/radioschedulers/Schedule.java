@@ -8,12 +8,12 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
 
 /**
- * A schedule is a timeline that, for each time slot, defines a list of
- * JobCombinations that can be executed.
+ * A schedule is a timeline that, for each time slot, assigns a JobCombination
+ * that is planned to be executed.
  * 
  * @author Johannes Buchner
  */
-public class SpecificSchedule implements Iterable<Entry<LSTTime, JobCombination>> {
+public class Schedule implements Iterable<Entry<LSTTime, JobCombination>> {
 	public static final int LST_SLOTS_MINUTES = 15;
 	public static final int LST_SLOTS_PER_DAY = 60 * 24 / LST_SLOTS_MINUTES;
 

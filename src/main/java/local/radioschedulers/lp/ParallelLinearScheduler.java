@@ -20,9 +20,9 @@ import local.radioschedulers.IScheduler;
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
-import local.radioschedulers.SchedulePossibilities;
+import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.SimpleEntry;
-import local.radioschedulers.SpecificSchedule;
+import local.radioschedulers.Schedule;
 
 public class ParallelLinearScheduler implements IScheduler {
 	protected List<JobCombination> jobComboIdSet = new ArrayList<JobCombination>();
@@ -32,7 +32,7 @@ public class ParallelLinearScheduler implements IScheduler {
 	 * 
 	 * @see IScheduler#schedule(java.util.Collection)
 	 */
-	public SpecificSchedule schedule(SchedulePossibilities scheduleTemplate) {
+	public Schedule schedule(ScheduleSpace scheduleTemplate) {
 		/**
 		 * set the variables to be binary
 		 */
@@ -112,7 +112,7 @@ public class ParallelLinearScheduler implements IScheduler {
 		for (Job j : jobsumSet.keySet()) {
 			constraints.append(jobsumSet.get(j));
 			constraints.append("0 <= " + j.hours
-					* SchedulePossibilities.LST_SLOTS_PER_DAY + ";\n");
+					* ScheduleSpace.LST_SLOTS_PER_DAY + ";\n");
 		}
 		costFunction.append("0;\n");
 
@@ -125,7 +125,7 @@ public class ParallelLinearScheduler implements IScheduler {
 				new File("vardef.lp"));
 		log("concat  done");
 
-		SpecificSchedule s;
+		Schedule s;
 		try {
 			log("solving ...");
 			s = lpsolve(lp);
@@ -164,7 +164,7 @@ public class ParallelLinearScheduler implements IScheduler {
 	 * @return schedule
 	 * @throws IOException
 	 */
-	protected SpecificSchedule lpsolve(File lp) throws IOException {
+	protected Schedule lpsolve(File lp) throws IOException {
 		List<String> cmd = new ArrayList<String>();
 		cmd.add("lp_solve");
 		cmd.add(lp.getAbsolutePath());
@@ -177,7 +177,7 @@ public class ParallelLinearScheduler implements IScheduler {
 		return parseLpsolve(is);
 	}
 
-	private SpecificSchedule parseLpsolve(LineNumberReader is)
+	private Schedule parseLpsolve(LineNumberReader is)
 			throws IOException {
 		String line;
 		line = is.readLine();
@@ -197,7 +197,7 @@ public class ParallelLinearScheduler implements IScheduler {
 			throw new IOException("unexpected response: " + line);
 
 		log("parsing output ...");
-		SpecificSchedule s = new SpecificSchedule();
+		Schedule s = new Schedule();
 
 		while (true) {
 			line = is.readLine();
@@ -229,17 +229,17 @@ public class ParallelLinearScheduler implements IScheduler {
 		String varnameparts[] = var.split("_", 3);
 		int j = Integer.parseInt(varnameparts[1]);
 		int k = Integer.parseInt(varnameparts[2]);
-		long day = k / SchedulePossibilities.LST_SLOTS_PER_DAY;
-		long minute = (k % SchedulePossibilities.LST_SLOTS_PER_DAY)
-				* SchedulePossibilities.LST_SLOTS_MINUTES;
+		long day = k / ScheduleSpace.LST_SLOTS_PER_DAY;
+		long minute = (k % ScheduleSpace.LST_SLOTS_PER_DAY)
+				* ScheduleSpace.LST_SLOTS_MINUTES;
 		return new SimpleEntry<LSTTime, JobCombination>(
 				new LSTTime(day, minute), jobComboIdSet.get(j));
 	}
 
 	private String getVar(LSTTime t, int jobCombinationId) {
 		return getVar(jobCombinationId, t.day
-				* SchedulePossibilities.LST_SLOTS_PER_DAY + t.minute
-				/ SchedulePossibilities.LST_SLOTS_MINUTES);
+				* ScheduleSpace.LST_SLOTS_PER_DAY + t.minute
+				/ ScheduleSpace.LST_SLOTS_MINUTES);
 	}
 
 	private String getVar(int j, long l) {
