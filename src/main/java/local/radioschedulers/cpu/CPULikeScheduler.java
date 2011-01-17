@@ -2,7 +2,6 @@ package local.radioschedulers.cpu;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Set;
 
 import local.radioschedulers.IScheduler;
@@ -22,19 +21,16 @@ public class CPULikeScheduler implements IScheduler {
 	protected HashMap<Job, Double> timeleft = new HashMap<Job, Double>();
 
 	protected JobSelector jobselector;
-	protected ParallelRequirementGuard requirementGuard;
 
 	public CPULikeScheduler(JobSelector jobselector,
 			ParallelRequirementGuard requirementGuard) {
 		this.jobselector = jobselector;
 		this.jobselector.setTimeleft(timeleft);
-		this.requirementGuard = requirementGuard;
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getName() + " with jobselector " + jobselector
-				+ ", requirementGuard " + requirementGuard;
+		return getClass().getName() + " with jobselector " + jobselector;
 	}
 
 	/*
@@ -59,7 +55,6 @@ public class CPULikeScheduler implements IScheduler {
 					System.out.println("nothing to do @" + t);
 					continue;
 				}
-				list = pruneForRequirements(list, t);
 
 				// select next
 				JobCombination selected = selectJobs(list);
@@ -86,17 +81,6 @@ public class CPULikeScheduler implements IScheduler {
 
 		return s;
 
-	}
-
-	protected Set<JobCombination> pruneForRequirements(
-			Collection<JobCombination> list, LSTTime date) {
-		Set<JobCombination> selected = new HashSet<JobCombination>();
-		for (JobCombination jc : list) {
-			if (this.requirementGuard.isDateCompatible(jc, date)) {
-				selected.add(jc);
-			}
-		}
-		return selected;
 	}
 
 	protected JobCombination selectJobs(Collection<JobCombination> list) {
