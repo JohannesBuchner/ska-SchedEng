@@ -6,6 +6,7 @@ import local.radioschedulers.importer.GeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
 import local.radioschedulers.preschedule.SimpleTimelineGenerator;
 import local.radioschedulers.preschedule.SingleRequirementGuard;
+import local.radioschedulers.preschedule.parallel.ParallelRequirementGuard;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -27,11 +28,19 @@ public class SimpleTimelineGeneratorTest {
 		gpr.fill();
 		proposals = gpr.readall();
 		Assert.assertTrue(proposals.size() > 0);
-		tlg = new SimpleTimelineGenerator(ndays, new SingleRequirementGuard());
 	}
 
 	@Test
-	public void testSchedule() throws Exception {
+	public void testSingle() throws Exception {
+		tlg = new SimpleTimelineGenerator(ndays, new SingleRequirementGuard());
+		ScheduleSpace template = tlg.schedule(proposals, ndays);
+		log.debug("last entry:" + template.getLastEntry());
+		Assert.assertTrue(template.getLastEntry().day >= ndays - 1);
+	}
+
+	@Test
+	public void testParallel() throws Exception {
+		tlg = new SimpleTimelineGenerator(ndays, new ParallelRequirementGuard());
 		ScheduleSpace template = tlg.schedule(proposals, ndays);
 		log.debug("last entry:" + template.getLastEntry());
 		Assert.assertTrue(template.getLastEntry().day >= ndays - 1);
