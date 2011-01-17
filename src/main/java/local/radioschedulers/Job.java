@@ -1,5 +1,7 @@
 package local.radioschedulers;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 /**
  * a unit of execution. Jobs have no interdependencies.
  * 

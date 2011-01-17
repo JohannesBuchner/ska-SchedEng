@@ -12,7 +12,7 @@ import java.util.Set;
 public class JobCombination {
 	public Set<Job> jobs = new HashSet<Job>();
 
-	public double getPriority() {
+	public double calculatePriority() {
 		double expprio = 0;
 		for (Job j : jobs) {
 			expprio = Math.exp(expprio) + Math.exp(j.proposal.priority);

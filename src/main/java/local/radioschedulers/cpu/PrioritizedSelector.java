@@ -14,8 +14,8 @@ public class PrioritizedSelector extends ShortestFirstSelector {
 
 			@Override
 			public int compare(JobCombination o1, JobCombination o2) {
-				Double p1 = o1.getPriority();
-				Double p2 = o2.getPriority();
+				Double p1 = o1.calculatePriority();
+				Double p2 = o2.calculatePriority();
 
 				if (p1 == null)
 					if (p2 == null)

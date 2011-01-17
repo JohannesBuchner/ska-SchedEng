@@ -34,15 +34,15 @@ public class SimpleTimelineGeneratorTest {
 	public void testSingle() throws Exception {
 		tlg = new SimpleTimelineGenerator(ndays, new SingleRequirementGuard());
 		ScheduleSpace template = tlg.schedule(proposals, ndays);
-		log.debug("last entry:" + template.getLastEntry());
-		Assert.assertTrue(template.getLastEntry().day >= ndays - 1);
+		log.debug("last entry:" + template.findLastEntry());
+		Assert.assertTrue(template.findLastEntry().day >= ndays - 1);
 	}
 
 	@Test
 	public void testParallel() throws Exception {
 		tlg = new SimpleTimelineGenerator(ndays, new ParallelRequirementGuard());
 		ScheduleSpace template = tlg.schedule(proposals, ndays);
-		log.debug("last entry:" + template.getLastEntry());
-		Assert.assertTrue(template.getLastEntry().day >= ndays - 1);
+		log.debug("last entry:" + template.findLastEntry());
+		Assert.assertTrue(template.findLastEntry().day >= ndays - 1);
 	}
 }

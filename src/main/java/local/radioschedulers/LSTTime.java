@@ -1,8 +1,8 @@
 package local.radioschedulers;
 
 /**
- * Fundamental time unit, made up of hours and minutes.
- * LST = Local Sidereal Time 
+ * Fundamental time unit, made up of hours and minutes. LST = Local Sidereal
+ * Time
  * 
  * @author Johannes Buchner
  */
@@ -11,6 +11,12 @@ public class LSTTime implements Comparable<LSTTime> {
 		super();
 		this.day = day;
 		this.minute = minute;
+	}
+
+	public LSTTime(String s) {
+		String[] parts = s.split(":", 2);
+		this.day = Long.parseLong(parts[0]);
+		this.minute = Long.parseLong(parts[1]);
 	}
 
 	public LSTTime(int i, int j) {

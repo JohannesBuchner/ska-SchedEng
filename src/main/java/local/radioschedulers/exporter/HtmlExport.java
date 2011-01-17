@@ -43,7 +43,7 @@ public class HtmlExport implements IExport {
 		}
 		fw.append("\n\t\t</tr>\n\t</thead>\n\t<tbody>");
 
-		LSTTime lastday = schedule.getLastEntry();
+		LSTTime lastday = schedule.findLastEntry();
 
 		LSTTime t = new LSTTime(0L, 0L);
 		for (t.day = 0L; t.day <= lastday.day + 1; t.day++) {

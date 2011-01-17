@@ -48,15 +48,23 @@ public class ScheduleSpace implements Iterable<Entry<LSTTime, Set<JobCombination
 		return schedule.get(t);
 	}
 
-	public LSTTime getLastEntry() {
+	public LSTTime findLastEntry() {
 		return Collections.max(schedule.keySet());
+	}
+	
+	public Map<LSTTime, Set<JobCombination>> getSchedule() {
+		return schedule;
+	}
+	
+	public void setSchedule(Map<LSTTime, Set<JobCombination>> schedule) {
+		this.schedule = schedule;
 	}
 
 	@Override
 	public Iterator<Entry<LSTTime, Set<JobCombination>>> iterator() {
 		return new Iterator<Entry<LSTTime, Set<JobCombination>>>() {
 			LSTTime t = new LSTTime(0L, 0L);
-			LSTTime lastEntry = getLastEntry();
+			LSTTime lastEntry = findLastEntry();
 
 			@Override
 			public boolean hasNext() {

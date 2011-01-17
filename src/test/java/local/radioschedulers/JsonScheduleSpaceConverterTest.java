@@ -34,7 +34,7 @@ public class JsonScheduleSpaceConverterTest {
 		ITimelineGenerator tlg = new SimpleTimelineGenerator(ndays,
 				new SingleRequirementGuard());
 		template = tlg.schedule(proposals, ndays);
-		Assert.assertTrue(template.getLastEntry().day > 2);
+		Assert.assertTrue(template.findLastEntry().day > 2);
 	}
 
 	@Test
@@ -44,7 +44,10 @@ public class JsonScheduleSpaceConverterTest {
 		mapper.writeValue(sw, template);
 		StringBuffer s = sw.getBuffer();
 		System.out.println(s);
-
+		//mapper.registerModule(getLSTModule());
+		ScheduleSpace space = mapper.readValue(s.toString(),
+				ScheduleSpace.class);
+		Assert.assertEquals(template.getSchedule().size(), space.getSchedule().size());
 	}
 
 	@Test

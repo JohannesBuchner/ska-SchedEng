@@ -41,7 +41,7 @@ public class CPULikeScheduler implements IScheduler {
 	public Schedule schedule(ScheduleSpace timeline) {
 		Schedule s = new Schedule();
 		this.timeline = timeline;
-		int ndays = timeline.getLastEntry().day.intValue();
+		int ndays = timeline.findLastEntry().day.intValue();
 
 		System.out.println("Allocating:");
 		LSTTime t = new LSTTime(0L, 0L);

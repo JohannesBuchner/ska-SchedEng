@@ -38,7 +38,7 @@ public class Schedule implements Iterable<Entry<LSTTime, JobCombination>> {
 		return schedule.get(t);
 	}
 
-	public LSTTime getLastEntry() {
+	public LSTTime findLastEntry() {
 		if (schedule.isEmpty()) {
 			return new LSTTime(0, 0);
 		} else {
@@ -50,7 +50,7 @@ public class Schedule implements Iterable<Entry<LSTTime, JobCombination>> {
 	public Iterator<Entry<LSTTime, JobCombination>> iterator() {
 		return new Iterator<Entry<LSTTime, JobCombination>>() {
 			LSTTime t = new LSTTime(0L, 0L);
-			LSTTime lastEntry = getLastEntry();
+			LSTTime lastEntry = findLastEntry();
 
 			@Override
 			public boolean hasNext() {

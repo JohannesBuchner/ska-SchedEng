@@ -41,7 +41,7 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 	 * @see IScheduler#schedule(java.util.Collection)
 	 */
 	public Schedule schedule(ScheduleSpace possibles) {
-		this.ndays = possibles.getLastEntry().day.intValue();
+		this.ndays = possibles.findLastEntry().day.intValue();
 		this.ngenes = ndays * ScheduleSpace.LST_SLOTS_PER_DAY;
 		Collection<Schedule> s = getStartSchedules(possibles);
 
