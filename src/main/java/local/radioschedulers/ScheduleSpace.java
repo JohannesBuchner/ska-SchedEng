@@ -21,11 +21,9 @@ public class ScheduleSpace implements Iterable<Entry<LSTTime, Set<JobCombination
 
 	private Map<LSTTime, Set<JobCombination>> schedule = new TreeMap<LSTTime, Set<JobCombination>>();
 
-	private Set<JobCombination> noJobCombinations = new HashSet<JobCombination>();
-
 	private void createIfNeeded(LSTTime t) {
 		if (!schedule.containsKey(t)) {
-			schedule.put(t, noJobCombinations);
+			schedule.put(t, new HashSet<JobCombination>());
 		}
 	}
 
@@ -34,6 +32,7 @@ public class ScheduleSpace implements Iterable<Entry<LSTTime, Set<JobCombination
 	}
 
 	public void add(LSTTime t, JobCombination jc) {
+		createIfNeeded(t);
 		schedule.get(t).add(jc);
 	}
 
