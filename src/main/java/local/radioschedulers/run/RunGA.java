@@ -5,6 +5,7 @@ import java.util.Collection;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.ga.GeneticAlgorithmScheduler;
+import local.radioschedulers.ga.HeuristicsScheduleCollector;
 import local.radioschedulers.ga.ScheduleFitnessFunction;
 import local.radioschedulers.ga.fitness.SimpleScheduleFitnessFunction;
 import local.radioschedulers.ga.jgap.JGAPScheduler;
@@ -28,6 +29,8 @@ public class RunGA {
 		ScheduleSpace template = tlg.schedule(proposals, ndays);
 		GeneticAlgorithmScheduler scheduler = new JGAPScheduler(
 				getFitnessFunction());
+		scheduler.setPopulation(HeuristicsScheduleCollector
+				.getStartSchedules(template));
 		scheduler.schedule(template);
 	}
 
