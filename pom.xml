@@ -63,7 +63,7 @@
 			<artifactId>jackson-core-asl</artifactId>
 			<version>1.7.1</version>
 		</dependency>
-
+	</dependencies>
 	<repositories>
 		<repository>
 			<id>jetty repo</id>

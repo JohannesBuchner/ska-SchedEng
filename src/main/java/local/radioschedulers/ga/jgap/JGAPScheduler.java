@@ -1,11 +1,13 @@
 package local.radioschedulers.ga.jgap;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
-import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.Schedule;
+import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.ga.GeneticAlgorithmScheduler;
 import local.radioschedulers.ga.ScheduleFitnessFunction;
 
@@ -35,7 +37,7 @@ public class JGAPScheduler extends GeneticAlgorithmScheduler {
 	}
 
 	@Override
-	protected Schedule evolveSchedules(ScheduleSpace possibles,
+	protected List<Schedule> evolveSchedules(ScheduleSpace possibles,
 			Collection<Schedule> ss) throws Exception {
 		Genotype genotype;
 		// population = Genotype.randomInitialGenotype(conf);
@@ -54,7 +56,11 @@ public class JGAPScheduler extends GeneticAlgorithmScheduler {
 		// conf.setSampleChromosome(a_sampleChromosomeToSet);
 		genotype = new Genotype(conf, pop);
 		genotype.evolve(NUMBER_OF_EVOLUTIONS);
-		return getScheduleFromChromosome(genotype.getFittestChromosome());
+		List<Schedule> survivers = new ArrayList<Schedule>();
+		for (Object chrome : genotype.getPopulation().getChromosomes()) {
+			survivers.add(getScheduleFromChromosome((IChromosome) chrome));
+		}
+		return survivers;
 	}
 
 	protected void addGeneticOperators() throws InvalidConfigurationException {
