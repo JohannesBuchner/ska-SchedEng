@@ -6,20 +6,26 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 
 public class ShortestFirstSelector extends JobSelector {
+
+	private static Logger log = Logger.getLogger(ShortestFirstSelector.class);
 
 	@Override
 	public void setTimeleft(HashMap<Job, Double> timeleft) {
 		super.setTimeleft(timeleft);
 		this.cmp = generateComparator(timeleft);
 	}
-	
+
 	protected Comparator<JobCombination> cmp;
 
-	protected Comparator<JobCombination> generateComparator(final HashMap<Job, Double> timeleft) {
+	protected Comparator<JobCombination> generateComparator(
+			final HashMap<Job, Double> timeleft) {
+		log.debug("generating ShortestFirstSelector Comparator");
 		return new Comparator<JobCombination>() {
 			@Override
 			public int compare(JobCombination o1, JobCombination o2) {

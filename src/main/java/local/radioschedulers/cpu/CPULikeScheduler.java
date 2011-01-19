@@ -2,7 +2,11 @@ package local.radioschedulers.cpu;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.Map.Entry;
+
+import org.apache.log4j.Logger;
 
 import local.radioschedulers.IScheduler;
 import local.radioschedulers.Job;
@@ -16,8 +20,11 @@ public class CPULikeScheduler implements IScheduler {
 	public static final int LST_SLOTS = 24 * 4;
 	public static final int LST_SLOTS_MINUTES = 24 * 60 / LST_SLOTS;
 
-	protected HashMap<LSTTime, JobCombination> possibles = new HashMap<LSTTime, JobCombination>();
-	protected ScheduleSpace timeline = new ScheduleSpace();
+	private static Logger log = Logger.getLogger(CPULikeScheduler.class);
+
+	/**
+	 * how many hours are left for this job
+	 */
 	protected HashMap<Job, Double> timeleft = new HashMap<Job, Double>();
 
 	protected JobSelector jobselector;
@@ -40,40 +47,40 @@ public class CPULikeScheduler implements IScheduler {
 	 */
 	public Schedule schedule(ScheduleSpace timeline) {
 		Schedule s = new Schedule();
-		this.timeline = timeline;
-		int ndays = timeline.findLastEntry().day.intValue();
 
-		System.out.println("Allocating:");
-		LSTTime t = new LSTTime(0L, 0L);
-		for (t.day = 0L; !timeleft.isEmpty() && t.day < ndays; t.day++) {
+		fillTimeLeft(timeline);
+
+		log.debug("Allocating:");
+
+		for (Entry<LSTTime, Set<JobCombination>> e : timeline) {
 			cleanup(timeleft);
-			for (t.minute = 0L; t.minute < 24 * 60 && !timeleft.isEmpty(); t.minute += LST_SLOTS_MINUTES) {
-				Set<JobCombination> list = timeline.get(new LSTTime(0L,
-						t.minute));
+			if (timeleft.isEmpty())
+				break;
 
-				if (list == null || list.isEmpty()) {
-					System.out.println("nothing to do @" + t);
-					continue;
-				}
+			Set<JobCombination> list = e.getValue();
+			LSTTime t = e.getKey();
 
-				// select next
-				JobCombination selected = selectJobs(list);
+			if (list == null || list.isEmpty()) {
+				log.debug("nothing to do @" + t);
+				continue;
+			}
 
-				if (selected == null)
-					possibles.remove(new LSTTime(0L, t.minute));
-				else {
-					s.add(new LSTTime(t.day, t.minute), selected);
-					/* count down time left */
-					for (Job j : selected.jobs) {
-						Double newtime = timeleft.get(j) - LST_SLOTS_MINUTES
-								/ 60.;
-						System.out.println("@" + t + " : " + j + " (" + newtime
-								+ " left)");
-						if (newtime <= 0) {
-							timeleft.remove(j);
-						} else {
-							timeleft.put(j, newtime);
-						}
+			// select next
+			JobCombination selected = selectJobs(list);
+
+			if (selected == null) {
+				log.debug("@" + t + " : nothing");
+			} else {
+				log.debug("@" + t + " : #jobs: " + selected.jobs.size());
+				s.add(new LSTTime(t.day, t.minute), selected);
+				/* count down time left */
+				for (Job j : selected.jobs) {
+					Double newtime = timeleft.get(j) - LST_SLOTS_MINUTES / 60.;
+					log.debug("@" + t + " : " + j + " (" + newtime + " left)");
+					if (newtime <= 0) {
+						timeleft.remove(j);
+					} else {
+						timeleft.put(j, newtime);
 					}
 				}
 			}
@@ -81,6 +88,20 @@ public class CPULikeScheduler implements IScheduler {
 
 		return s;
 
+	}
+
+	private void fillTimeLeft(ScheduleSpace timeline) {
+		HashSet<JobCombination> alljobCombinations = new HashSet<JobCombination>();
+		Set<Job> alljobs = new HashSet<Job>();
+		for (Entry<LSTTime, Set<JobCombination>> e : timeline) {
+			alljobCombinations.addAll(e.getValue());
+		}
+		for (JobCombination jc : alljobCombinations) {
+			alljobs.addAll(jc.jobs);
+		}
+		for (Job j : alljobs) {
+			timeleft.put(j, (double) j.hours);
+		}
 	}
 
 	protected JobCombination selectJobs(Collection<JobCombination> list) {
@@ -95,12 +116,9 @@ public class CPULikeScheduler implements IScheduler {
 		for (Job j2 : timeleft.keySet()) {
 			if (timeleft.get(j2) <= 0) {
 				timeleft.remove(j2);
-				System.out.println("only " + timeleft.size()
-						+ " proposals left");
-			} else {
-				System.out.println("Job left: " + j2);
+				log.debug("only " + timeleft.size() + " proposals left");
 			}
 		}
-		System.out.println(timeleft.size() + " proposals left");
+		// log.debug(timeleft.size() + " proposals left");
 	}
 }

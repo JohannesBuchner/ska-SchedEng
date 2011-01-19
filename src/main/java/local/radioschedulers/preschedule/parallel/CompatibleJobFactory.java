@@ -1,10 +1,8 @@
 package local.radioschedulers.preschedule.parallel;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -21,7 +19,7 @@ public class CompatibleJobFactory {
 	private static Logger log = Logger.getLogger(CompatibleJobFactory.class);
 
 	private Collection<Job> base;
-	private List<JobCombination> combinations;
+	private Set<JobCombination> combinations;
 	private RequirementGuard guard;
 
 	public CompatibleJobFactory(Collection<Job> base, RequirementGuard req) {
@@ -31,7 +29,7 @@ public class CompatibleJobFactory {
 	}
 
 	private void generateAllCombinations() {
-		combinations = new ArrayList<JobCombination>();
+		combinations = new HashSet<JobCombination>();
 
 		// the idle-job
 		log.debug("adding idle job");
@@ -39,7 +37,7 @@ public class CompatibleJobFactory {
 
 		// the single jobs
 		log.debug("adding single jobs");
-		List<JobCombination> extensions = new ArrayList<JobCombination>();
+		Set<JobCombination> extensions = new HashSet<JobCombination>();
 		for (Job j : base) {
 			JobCombination c = new JobCombination();
 			c.jobs.add(j);
@@ -67,9 +65,9 @@ public class CompatibleJobFactory {
 	 * @param b
 	 * @return crossproduct of a x b
 	 */
-	private List<JobCombination> extend(Collection<JobCombination> a,
+	private Set<JobCombination> extend(Collection<JobCombination> a,
 			Collection<Job> b) {
-		List<JobCombination> r = new ArrayList<JobCombination>();
+		Set<JobCombination> r = new HashSet<JobCombination>();
 
 		for (JobCombination la : a) {
 			for (Job j : b) {
@@ -105,7 +103,7 @@ public class CompatibleJobFactory {
 		return combo;
 	}
 
-	public List<JobCombination> getCombinations() {
+	public Collection<JobCombination> getCombinations() {
 		return combinations;
 	}
 

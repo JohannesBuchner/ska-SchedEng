@@ -40,7 +40,7 @@ public class GeneratingProposalReader implements IProposalReader {
 		
 		Job j = new Job();
 		j.proposal = p1;
-		j.hours = 100L;
+		j.hours = 101L;
 		j.ra = -(5 + 35. / 60 + 30. / 60. / 60.);
 		j.dec = +(5 + 35. / 60 + 30. / 60. / 60.);
 		j.lstmin = 4.;
@@ -49,7 +49,7 @@ public class GeneratingProposalReader implements IProposalReader {
 		
 		j = new Job();
 		j.proposal = p1;
-		j.hours = 40L;
+		j.hours = 41L;
 		j.ra = -(5 + 25. / 60 + 30. / 60. / 60.);
 		j.dec = +(5 + 45. / 60 + 30. / 60. / 60.);
 		j.lstmin = 8.;
@@ -58,7 +58,7 @@ public class GeneratingProposalReader implements IProposalReader {
 		
 		j = new Job();
 		j.proposal = p1;
-		j.hours = 10L;
+		j.hours = 11L;
 		j.ra = -(5 + 25. / 60 + 30. / 60. / 60.);
 		j.dec = +(5 + 35. / 60 + 30. / 60. / 60.);
 		j.lstmin = 2.;
@@ -67,7 +67,7 @@ public class GeneratingProposalReader implements IProposalReader {
 		
 		j = new Job();
 		j.proposal = p2;
-		j.hours = 100L;
+		j.hours = 102L;
 		j.ra = -(12 + 35. / 60 + 30. / 60. / 60.);
 		j.dec = +(15 + 35. / 60 + 30. / 60. / 60.);
 		j.lstmin = 19.;
@@ -76,7 +76,7 @@ public class GeneratingProposalReader implements IProposalReader {
 
 		j = new Job();
 		j.proposal = p3;
-		j.hours = 40L;
+		j.hours = 43L;
 		j.ra = -(20 + 35. / 60 + 30. / 60. / 60.);
 		j.dec = +(12 + 35. / 60 + 30. / 60. / 60.);
 		j.lstmin = 0.;

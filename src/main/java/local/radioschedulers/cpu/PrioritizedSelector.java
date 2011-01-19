@@ -6,10 +6,14 @@ import java.util.HashMap;
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 
+/**
+ * select descending by priority
+ * @author Johannes Buchner
+ */
 public class PrioritizedSelector extends ShortestFirstSelector {
 
-	@Override
-	protected Comparator<JobCombination> generateComparator(HashMap<Job, Double> timeleft) {
+	protected Comparator<JobCombination> generateComparator(
+			HashMap<Job, Double> timeleft) {
 		return new Comparator<JobCombination>() {
 
 			@Override
@@ -17,15 +21,7 @@ public class PrioritizedSelector extends ShortestFirstSelector {
 				Double p1 = o1.calculatePriority();
 				Double p2 = o2.calculatePriority();
 
-				if (p1 == null)
-					if (p2 == null)
-						return 0;
-					else
-						return 1;
-				else if (p2 == null)
-					return -1;
-				else
-					return p1.compareTo(p2);
+				return p2.compareTo(p1);
 			}
 		};
 	}

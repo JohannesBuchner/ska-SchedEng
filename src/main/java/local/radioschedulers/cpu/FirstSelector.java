@@ -5,6 +5,10 @@ import java.util.List;
 
 import local.radioschedulers.JobCombination;
 
+/**
+ * Simply selects the first available JobCombination
+ * @author Johannes Buchner
+ */
 public class FirstSelector extends JobSelector {
 	@Override
 	public Collection<JobCombination> select(Collection<JobCombination> list) {
