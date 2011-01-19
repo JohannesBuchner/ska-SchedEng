@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
+
 import local.radioschedulers.IScheduler;
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
@@ -25,6 +27,8 @@ import local.radioschedulers.SimpleEntry;
 import local.radioschedulers.Schedule;
 
 public class ParallelLinearScheduler implements IScheduler {
+	private static Logger log = Logger.getLogger(ParallelLinearScheduler.class);
+
 	protected List<JobCombination> jobComboIdSet = new ArrayList<JobCombination>();
 
 	/*
@@ -71,13 +75,13 @@ public class ParallelLinearScheduler implements IScheduler {
 					id = jobComboIdSet.size();
 					jobComboIdSet.add(jc);
 				}
-				log("jobCombination " + id);
-				for (Job j : jc.jobs) {
-					log("job [" + j.lstmin + ".." + j.lstmax + "]: Proposal "
-							+ j.proposal.id);
-				}
-
 				String varname = getVar(t, id);
+				log.debug(varname + " -- jobCombination " + id + " at time "
+						+ t + " : " + " (prio " + jc.calculatePriority() + ")");
+				for (Job j : jc.jobs) {
+					log.debug("     job [" + j.lstmin + ".." + j.lstmax
+							+ "]: Proposal " + j.proposal.id);
+				}
 
 				varDefinition.append("bin " + varname + ";\n");
 
@@ -90,13 +94,13 @@ public class ParallelLinearScheduler implements IScheduler {
 						jobsum = new StringBuilder();
 						jobsumSet.put(j, jobsum);
 					}
-					jobsumSet.get(j).append(varname);
-					jobsumSet.get(j).append(" +");
+					jobsum.append(varname);
+					jobsum.append(" +");
 
-					// cost function
-					costFunction.append(j.proposal.priority + " " + varname
-							+ " + ");
 				}
+				// cost function
+				costFunction.append(jc.calculatePriority() + " " + varname
+						+ " + ");
 
 				/**
 				 * only allow one JobCombination at a time
@@ -104,7 +108,7 @@ public class ParallelLinearScheduler implements IScheduler {
 				constraints.append(varname);
 				constraints.append(" +");
 			}
-			constraints.append("0 <= 1");
+			constraints.append("0 <= 1;\n");
 		}
 		/**
 		 * overall time for the job
@@ -120,16 +124,16 @@ public class ParallelLinearScheduler implements IScheduler {
 		constraints.close();
 		varDefinition.close();
 		File lp = new File("schedule.lp");
-		log("concat  ... ");
+		log.debug("concat  ... ");
 		catFilesF(lp, new File("costs.lp"), new File("constraints.lp"),
 				new File("vardef.lp"));
-		log("concat  done");
+		log.debug("concat  done");
 
 		Schedule s;
 		try {
-			log("solving ...");
+			log.debug("solving ...");
 			s = lpsolve(lp);
-			log("solving done");
+			log.debug("solving done");
 		} catch (IOException e) {
 			throw new IllegalStateException("Install lp_solve", e);
 		}
@@ -170,15 +174,14 @@ public class ParallelLinearScheduler implements IScheduler {
 		cmd.add(lp.getAbsolutePath());
 
 		ProcessBuilder pb = new ProcessBuilder(cmd);
-		log("launching lp_solve");
+		log.debug("launching lp_solve");
 		Process p = pb.start();
 		LineNumberReader is = new LineNumberReader(new InputStreamReader(p
 				.getInputStream()));
 		return parseLpsolve(is);
 	}
 
-	private Schedule parseLpsolve(LineNumberReader is)
-			throws IOException {
+	private Schedule parseLpsolve(LineNumberReader is) throws IOException {
 		String line;
 		line = is.readLine();
 		if (line.length() != 0)
@@ -196,7 +199,7 @@ public class ParallelLinearScheduler implements IScheduler {
 		if (!line.startsWith("Actual values of the variables:"))
 			throw new IOException("unexpected response: " + line);
 
-		log("parsing output ...");
+		log.debug("parsing output ...");
 		Schedule s = new Schedule();
 
 		while (true) {
@@ -217,12 +220,8 @@ public class ParallelLinearScheduler implements IScheduler {
 				s.add(entry.getKey(), entry.getValue());
 			}
 		}
-		log("parsing output done");
+		log.debug("parsing output done");
 		return s;
-	}
-
-	private void log(String string) {
-		System.out.println("DEBUG: " + string);
 	}
 
 	private Entry<LSTTime, JobCombination> decodeVar(String var) {
@@ -237,12 +236,8 @@ public class ParallelLinearScheduler implements IScheduler {
 	}
 
 	private String getVar(LSTTime t, int jobCombinationId) {
-		return getVar(jobCombinationId, t.day
-				* ScheduleSpace.LST_SLOTS_PER_DAY + t.minute
-				/ ScheduleSpace.LST_SLOTS_MINUTES);
-	}
-
-	private String getVar(int j, long l) {
-		return "x_" + j + "_" + l;
+		long timeslotId = t.day * ScheduleSpace.LST_SLOTS_PER_DAY + t.minute
+				/ ScheduleSpace.LST_SLOTS_MINUTES;
+		return "x_" + jobCombinationId + "_" + timeslotId;
 	}
 }

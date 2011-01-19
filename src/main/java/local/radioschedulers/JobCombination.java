@@ -13,9 +13,12 @@ public class JobCombination {
 	public Set<Job> jobs = new HashSet<Job>();
 
 	public double calculatePriority() {
+		if (jobs.size() == 0)
+			return 0;
+
 		double expprio = 0;
 		for (Job j : jobs) {
-			expprio = Math.exp(expprio) + Math.exp(j.proposal.priority);
+			expprio = expprio + Math.exp(j.proposal.priority);
 		}
 		return Math.log(expprio);
 	}

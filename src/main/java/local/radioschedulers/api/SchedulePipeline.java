@@ -28,7 +28,7 @@ public class SchedulePipeline {
 	 */
 	public ScheduleSpace getScheduleSpace(Set<Proposal> proposals,
 			RequirementGuard req, int ndays) {
-		SimpleTimelineGenerator stg = new SimpleTimelineGenerator(ndays, req);
+		SimpleTimelineGenerator stg = new SimpleTimelineGenerator(req);
 		return stg.schedule(proposals, ndays);
 	}
 

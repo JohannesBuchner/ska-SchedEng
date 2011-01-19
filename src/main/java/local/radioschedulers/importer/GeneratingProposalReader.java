@@ -19,6 +19,7 @@ public class GeneratingProposalReader implements IProposalReader {
 		p1.name = "foo";
 		p1.start = new Date(System.currentTimeMillis());
 		p1.jobs = new ArrayList<Job>();
+		p1.priority = 1.;
 		proposals.add(p1);
 		
 		Proposal p2 = new Proposal();
@@ -26,6 +27,7 @@ public class GeneratingProposalReader implements IProposalReader {
 		p2.name = "bar";
 		p2.start = new Date(System.currentTimeMillis() +3 * 24*60*60*1000);
 		p2.jobs = new ArrayList<Job>();
+		p2.priority = 2.;
 		proposals.add(p2);
 		
 		Proposal p3 = new Proposal();
@@ -33,6 +35,7 @@ public class GeneratingProposalReader implements IProposalReader {
 		p3.name = "baz";
 		p3.start = new Date(System.currentTimeMillis());
 		p3.jobs = new ArrayList<Job>();
+		p3.priority = 1.;
 		proposals.add(p3);
 		
 		Job j = new Job();

@@ -24,7 +24,7 @@ public class RunGA {
 		for (Proposal p : proposals) {
 			System.out.println(p.toString());
 		}
-		ITimelineGenerator tlg = new SimpleTimelineGenerator(ndays,
+		ITimelineGenerator tlg = new SimpleTimelineGenerator(
 				new ParallelRequirementGuard());
 		ScheduleSpace template = tlg.schedule(proposals, ndays);
 		GeneticAlgorithmScheduler scheduler = new JGAPScheduler(

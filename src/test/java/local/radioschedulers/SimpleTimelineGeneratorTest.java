@@ -1,6 +1,8 @@
 package local.radioschedulers;
 
 import java.util.Collection;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import local.radioschedulers.importer.GeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
@@ -28,21 +30,47 @@ public class SimpleTimelineGeneratorTest {
 		gpr.fill();
 		proposals = gpr.readall();
 		Assert.assertTrue(proposals.size() > 0);
+
+		for (Proposal p : proposals) {
+			Assert.assertTrue(p.priority > 0);
+			Assert.assertFalse(p.jobs.isEmpty());
+		}
+	}
+
+	private void checkSchedule(ScheduleSpace template, boolean can_have_parallel) {
+		log.debug("last entry:" + template.findLastEntry());
+		Assert.assertTrue(template.findLastEntry().day >= ndays - 1);
+		for (Entry<LSTTime, Set<JobCombination>> e : template) {
+			Assert.assertFalse("No Combinations at " + e.getKey(), e.getValue()
+					.isEmpty());
+			int emptyCount = 0;
+
+			for (JobCombination jc : e.getValue()) {
+				if (jc.jobs.isEmpty()) {
+					emptyCount++;
+					Assert.assertTrue(jc.calculatePriority() == 0);
+				} else {
+					Assert.assertTrue(jc.calculatePriority() > 0);
+					if (!can_have_parallel) {
+						Assert.assertEquals(jc.jobs.size(), 1);
+					}
+				}
+			}
+			Assert.assertTrue(emptyCount == 1);
+		}
 	}
 
 	@Test
 	public void testSingle() throws Exception {
-		tlg = new SimpleTimelineGenerator(ndays, new SingleRequirementGuard());
+		tlg = new SimpleTimelineGenerator(new SingleRequirementGuard());
 		ScheduleSpace template = tlg.schedule(proposals, ndays);
-		log.debug("last entry:" + template.findLastEntry());
-		Assert.assertTrue(template.findLastEntry().day >= ndays - 1);
+		checkSchedule(template, false);
 	}
 
 	@Test
 	public void testParallel() throws Exception {
-		tlg = new SimpleTimelineGenerator(ndays, new ParallelRequirementGuard());
+		tlg = new SimpleTimelineGenerator(new ParallelRequirementGuard());
 		ScheduleSpace template = tlg.schedule(proposals, ndays);
-		log.debug("last entry:" + template.findLastEntry());
-		Assert.assertTrue(template.findLastEntry().day >= ndays - 1);
+		checkSchedule(template, true);
 	}
 }

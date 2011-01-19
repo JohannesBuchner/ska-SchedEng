@@ -28,7 +28,7 @@ public class RunMain {
 		for (Proposal p : proposals)
 			System.out.println(p.toString());
 		IScheduler s = getScheduler();
-		ITimelineGenerator tlg = new SimpleTimelineGenerator(ndays,
+		ITimelineGenerator tlg = new SimpleTimelineGenerator(
 				new ParallelRequirementGuard());
 		ScheduleSpace template = tlg.schedule(proposals, ndays);
 		Schedule schedule = s.schedule(template);

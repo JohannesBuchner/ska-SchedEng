@@ -17,15 +17,13 @@ import local.radioschedulers.preschedule.parallel.CompatibleJobFactory;
 public class SimpleTimelineGenerator implements ITimelineGenerator {
 	private RequirementGuard req;
 	private static Logger log = Logger.getLogger(SimpleTimelineGenerator.class);
-	private int ndays;
 
-	public SimpleTimelineGenerator(int ndays, RequirementGuard req) {
+	public SimpleTimelineGenerator(RequirementGuard req) {
 		this.req = req;
-		this.ndays = ndays;
 	}
 
 	private ScheduleSpace getPossibleSchedules(Collection<Proposal> proposals,
-			RequirementGuard requirementGuard) {
+			RequirementGuard requirementGuard, int ndays) {
 		List<Job> alljobs = new ArrayList<Job>();
 		for (Proposal p : proposals) {
 			alljobs.addAll(p.jobs);
@@ -36,7 +34,8 @@ public class SimpleTimelineGenerator implements ITimelineGenerator {
 		log.debug("got compatibleJobFactory with "
 				+ compatibles.getCombinations().size() + " combinations.");
 		// just a template for the first day
-		ScheduleSpace timelineConstruct = compatibles.getPossibleTimeLine(alljobs);
+		ScheduleSpace timelineConstruct = compatibles
+				.getPossibleTimeLine(alljobs);
 		log.debug("got schedule space construct.");
 		// repeat the construct
 		ScheduleSpace timeline = new ScheduleSpace();
@@ -44,8 +43,10 @@ public class SimpleTimelineGenerator implements ITimelineGenerator {
 		for (int minute = 0; minute < ScheduleSpace.LST_SLOTS_PER_DAY; minute++) {
 			LSTTime t = new LSTTime(0, minute * ScheduleSpace.LST_SLOTS_MINUTES);
 
+			Set<JobCombination> jcs = timelineConstruct.get(t);
+			// log.debug("at " + t.minute + ": " + jcs.size() +
+			// " combinations");
 			for (int day = 0; day < ndays; day++) {
-				Set<JobCombination> jcs = timelineConstruct.get(t);
 				t.day = Long.valueOf(day);
 
 				for (JobCombination jc : jcs) {
@@ -56,8 +57,9 @@ public class SimpleTimelineGenerator implements ITimelineGenerator {
 						}
 					}
 					if (gooddate)
-						timeline.add(t, jc);
+						timeline.add(new LSTTime(t.day, t.minute), jc);
 				}
+				// log.debug("   " + t.day + ": " + jcs.size());
 			}
 		}
 
@@ -66,7 +68,7 @@ public class SimpleTimelineGenerator implements ITimelineGenerator {
 
 	@Override
 	public ScheduleSpace schedule(Collection<Proposal> proposals, int ndays) {
-		return getPossibleSchedules(proposals, req);
+		return getPossibleSchedules(proposals, req, ndays);
 	}
 
 }
