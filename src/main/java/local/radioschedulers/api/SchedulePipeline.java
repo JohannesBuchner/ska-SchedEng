@@ -48,6 +48,7 @@ public class SchedulePipeline {
 		GeneticAlgorithmScheduler scheduler;
 		try {
 			scheduler = new JGAPScheduler(getFitnessFunction());
+			scheduler.setPopulation(priorSchedules);
 			scheduler.schedule(space);
 			return scheduler.getPopulation();
 		} catch (InvalidConfigurationException e) {
