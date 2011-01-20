@@ -18,6 +18,7 @@ import org.junit.Test;
 
 public class LinearSolverTest {
 
+	@SuppressWarnings("unused")
 	private static Logger log = Logger.getLogger(LinearSolverTest.class);
 
 	public static int ndays = 10;
