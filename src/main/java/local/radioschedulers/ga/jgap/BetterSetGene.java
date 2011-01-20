@@ -295,6 +295,10 @@ public class BetterSetGene<V> extends BaseGene implements
 			// ----------------------------------------------------------
 			return m_value == null ? 0 : 1;
 		} else {
+			if (m_value == null) {
+				// we already know the other value isn't null
+				return 1;
+			}
 			ICompareToHandler handler = getConfiguration().getJGAPFactory()
 					.getCompareToHandlerFor(m_value, m_value.getClass());
 			if (handler != null) {

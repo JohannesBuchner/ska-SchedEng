@@ -25,6 +25,12 @@ public class JGAPGeneScheduleConverter {
 		this.conf = conf;
 	}
 
+	public static LSTTime getLSTTimeFromGeneId(int i) {
+		return new LSTTime(i / Schedule.LST_SLOTS_PER_DAY,
+				(i % Schedule.LST_SLOTS_PER_DAY)
+						* Schedule.LST_SLOTS_MINUTES);
+	}
+	
 	/**
 	 * Converts a Chromosome back to a Schedule
 	 * 
@@ -37,10 +43,9 @@ public class JGAPGeneScheduleConverter {
 		Schedule s = new Schedule();
 
 		for (i = 0; i < genes.length; i++) {
-			LSTTime t = new LSTTime(i / Schedule.LST_SLOTS_PER_DAY, i
-					% Schedule.LST_SLOTS_PER_DAY);
 			JobCombination jc = (JobCombination) genes[i].getAllele();
-			s.add(t, jc);
+			LSTTime t = getLSTTimeFromGeneId(i);
+			s.add(t , jc);
 		}
 
 		return s;
@@ -80,7 +85,7 @@ public class JGAPGeneScheduleConverter {
 							+ jc);
 				g.addAllele(jc);
 
-				if (s == null || jc.equals(s.get(t)))
+				if (s != null && jc.equals(s.get(t)))
 					g.setAllele(jc);
 
 			}

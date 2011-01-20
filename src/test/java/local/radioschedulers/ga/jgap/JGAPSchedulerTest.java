@@ -59,14 +59,13 @@ public class JGAPSchedulerTest {
 		for (Entry<LSTTime, JobCombination> e : s) {
 			Set<JobCombination> ref = template.get(e.getKey());
 			JobCombination actual = e.getValue();
-			Assert.assertTrue("Schedule is outside ScheduleSpace at " + i, ref
-					.contains(actual));
-			if (actual.jobs.size() > 0)
+			if (actual != null) {
+				Assert.assertTrue("Schedule is outside ScheduleSpace at " + i,
+						ref.contains(actual));
 				i++;
-			else
-				Assert.fail();
-			for (Job j : actual.jobs) {
-				scheduledJobs.add(j.proposal);
+				for (Job j : actual.jobs) {
+					scheduledJobs.add(j.proposal);
+				}
 			}
 		}
 

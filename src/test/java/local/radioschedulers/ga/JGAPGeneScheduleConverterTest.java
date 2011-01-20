@@ -3,6 +3,7 @@ package local.radioschedulers.ga;
 import java.util.Collection;
 import java.util.Map.Entry;
 
+import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.Proposal;
@@ -17,6 +18,7 @@ import local.radioschedulers.preschedule.SimpleTimelineGenerator;
 import local.radioschedulers.preschedule.SingleRequirementGuard;
 import local.radioschedulers.preschedule.parallel.ParallelRequirementGuard;
 
+import org.apache.log4j.Logger;
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.IChromosome;
@@ -26,6 +28,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class JGAPGeneScheduleConverterTest {
+	private static Logger log = Logger
+			.getLogger(JGAPGeneScheduleConverterTest.class);
 
 	private Collection<Proposal> proposals;
 	private ScheduleSpace template;
@@ -55,16 +59,11 @@ public class JGAPGeneScheduleConverterTest {
 				schedule);
 		int i = 0;
 		for (Gene g : chromo.getGenes()) {
-			LSTTime t = new LSTTime(i / Schedule.LST_SLOTS_PER_DAY, i
-					* Schedule.LST_SLOTS_MINUTES);
+			LSTTime t = JGAPGeneScheduleConverter.getLSTTimeFromGeneId(i);
 			JobCombination scheduleJc = schedule.get(t);
-			Assert.assertNotNull("Schedule should not be empty at " + t,
-					scheduleJc);
-
 			JobCombination geneJc = (JobCombination) g.getAllele();
-			Assert.assertNotNull(geneJc);
 
-			Assert.assertEquals(scheduleJc, geneJc);
+			Assert.assertEquals("Should be same at " + t, scheduleJc, geneJc);
 			i++;
 		}
 
@@ -78,10 +77,10 @@ public class JGAPGeneScheduleConverterTest {
 			JobCombination geneJc = (JobCombination) chromo.getGene(i)
 					.getAllele();
 
-			Assert.assertEquals(scheduleJc, geneJc);
-			Assert.assertEquals(jc, scheduleJc);
+			Assert.assertEquals("Should be same at " + t, scheduleJc, geneJc);
+			Assert.assertEquals("Should be same at " + t, jc, scheduleJc);
 			// it would be odd if the next would fail
-			Assert.assertEquals(jc, geneJc);
+			Assert.assertEquals("Should be same at " + t, jc, geneJc);
 
 			i++;
 		}

@@ -27,7 +27,7 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 
 	private double crossoverProbability = 0.1;
 	private double mutationProbability = 0.3;
-	private int populationSize = 100;
+	private int populationSize = 10;
 	private int eliteSize = 1;
 
 	private List<Schedule> population = new ArrayList<Schedule>();

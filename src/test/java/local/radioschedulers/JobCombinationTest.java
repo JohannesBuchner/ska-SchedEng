@@ -48,11 +48,30 @@ public class JobCombinationTest {
 		Assert.assertTrue(jc.calculatePriority() > j1.proposal.priority);
 		Assert.assertTrue(jc.calculatePriority() > j2.proposal.priority);
 	}
-	
+
 	@Test
-	public void testCalculatePriority0(){ 
-		JobCombination jc = new JobCombination();
-		Assert.assertEquals(0, jc.calculatePriority(), 1e-2);
+	public void testCalculatePriority0() {
+		try {
+			JobCombination jc = new JobCombination();
+			jc.calculatePriority();
+			Assert.fail();
+		} catch (IllegalStateException e) {
+
+		}
 	}
 
+	@Test
+	public void testEquals() throws Exception {
+		JobCombination jc1 = new JobCombination();
+		jc1.jobs.add(j1);
+		jc1.jobs.add(j2);
+		JobCombination jc2 = new JobCombination();
+		jc2.jobs.add(j2);
+		Assert.assertNotSame(jc1, jc2);
+		Assert.assertFalse(jc1.equals(jc2));
+		jc2.jobs.add(j1);
+		Assert.assertNotSame(jc1, jc2);
+		Assert.assertEquals(jc1, jc2);
+
+	}
 }

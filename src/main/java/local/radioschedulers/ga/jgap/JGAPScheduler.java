@@ -21,7 +21,7 @@ import org.jgap.impl.MutationOperator;
 public class JGAPScheduler extends GeneticAlgorithmScheduler {
 	// private static Logger log = Logger.getLogger(JGAPScheduler.class);
 
-	private int NUMBER_OF_EVOLUTIONS = 100;
+	private int NUMBER_OF_EVOLUTIONS = 10;
 
 	private Configuration conf;
 	private JGAPGeneScheduleConverter conv;
