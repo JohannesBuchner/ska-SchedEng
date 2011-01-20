@@ -1,7 +1,9 @@
 package local.radioschedulers.ga.jgap;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
 
@@ -11,6 +13,9 @@ import local.radioschedulers.LSTTime;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
+import local.radioschedulers.cpu.CPULikeScheduler;
+import local.radioschedulers.cpu.FirstSelector;
+import local.radioschedulers.cpu.RandomizedSelector;
 import local.radioschedulers.ga.GeneticAlgorithmScheduler;
 import local.radioschedulers.ga.fitness.SimpleScheduleFitnessFunction;
 import local.radioschedulers.importer.GeneratingProposalReader;
@@ -76,5 +81,16 @@ public class JGAPSchedulerTest {
 		Assert.assertTrue("Job slots filled: " + i, i > ndays);
 		Assert.assertTrue("Jobs scheduled: " + scheduledJobs.size() + " of "
 				+ proposals.size(), scheduledJobs.size() > 1);
+	}
+
+	@Test
+	public void testWithInitialPopulation() throws Exception {
+		List<Schedule> schedules = new ArrayList<Schedule>();
+		CPULikeScheduler s = new CPULikeScheduler(new FirstSelector());
+		schedules.add(s.schedule(template));
+		s = new CPULikeScheduler(new RandomizedSelector());
+		schedules.add(s.schedule(template));
+		scheduler.setPopulation(schedules);
+		testGA();
 	}
 }
