@@ -69,8 +69,6 @@ public class JGAPGeneScheduleConverter {
 		for (Entry<LSTTime, Set<JobCombination>> e : possibles) {
 			LSTTime t = e.getKey();
 			Set<JobCombination> jcs = e.getValue();
-			if (jcs.isEmpty())
-				throw new IllegalArgumentException("no JobCombinations in " + t);
 
 			BetterSetGene<JobCombination> g = new BetterSetGene<JobCombination>(
 					conf);
