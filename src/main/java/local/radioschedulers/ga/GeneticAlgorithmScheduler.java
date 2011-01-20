@@ -22,7 +22,6 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 
 	protected HashMap<LSTTime, Vector<Job>> possibles = new HashMap<LSTTime, Vector<Job>>();
 	protected RequirementGuard requirementGuard;
-	protected int ndays;
 	protected int ngenes;
 
 	private double crossoverProbability = 0.1;
@@ -39,7 +38,7 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 	 * @see IScheduler#schedule(java.util.Collection)
 	 */
 	public Schedule schedule(ScheduleSpace possibles) {
-		this.ndays = possibles.findLastEntry().day.intValue();
+		int ndays = possibles.findLastEntry().day.intValue() + 1;
 		this.ngenes = calculateNGenes(possibles);
 		log.debug("got ndays=" + ndays + " plus last minute="
 				+ possibles.findLastEntry().minute);
