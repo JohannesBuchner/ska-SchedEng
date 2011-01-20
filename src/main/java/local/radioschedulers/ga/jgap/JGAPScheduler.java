@@ -25,18 +25,21 @@ public class JGAPScheduler extends GeneticAlgorithmScheduler {
 
 	private Configuration conf;
 	private JGAPGeneScheduleConverter conv;
+	private JGAPFitnessFunction fitness;
 
 	public JGAPScheduler(ScheduleFitnessFunction f)
 			throws InvalidConfigurationException {
-		conf = new DefaultConfiguration();
-		conf.setFitnessFunction(new JGAPFitnessFunction(f));
-		conf.setPopulationSize(2);
-		conv = new JGAPGeneScheduleConverter(conf);
+		fitness = new JGAPFitnessFunction(f);
 	}
 
 	@Override
 	protected List<Schedule> evolveSchedules(ScheduleSpace possibles,
 			Collection<Schedule> ss) throws Exception {
+		Configuration.reset();
+		conf = new DefaultConfiguration();
+		conf.setFitnessFunction(fitness);
+		conv = new JGAPGeneScheduleConverter(conf);
+
 		Genotype genotype;
 		// population = Genotype.randomInitialGenotype(conf);
 		Population pop = new Population(conf);

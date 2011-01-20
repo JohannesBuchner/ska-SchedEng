@@ -43,6 +43,8 @@ public class JGAPSchedulerTest {
 				new ParallelRequirementGuard());
 		template = tlg.schedule(proposals, ndays);
 		scheduler = new JGAPScheduler(new SimpleScheduleFitnessFunction());
+		scheduler.setPopulationSize(10);
+		scheduler.setNumberOfGenerations(10);
 	}
 
 	@Test

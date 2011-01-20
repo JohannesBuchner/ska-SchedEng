@@ -29,6 +29,7 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 	private double mutationProbability = 0.3;
 	private int populationSize = 10;
 	private int eliteSize = 1;
+	private int numberOfGenerations = 10;
 
 	private List<Schedule> population = new ArrayList<Schedule>();
 
@@ -123,5 +124,13 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 
 	public int getEliteSize() {
 		return eliteSize;
+	}
+
+	public int getNumberOfGenerations() {
+		return numberOfGenerations;
+	}
+
+	public void setNumberOfGenerations(int numberOfGenerations) {
+		this.numberOfGenerations = numberOfGenerations;
 	}
 }
