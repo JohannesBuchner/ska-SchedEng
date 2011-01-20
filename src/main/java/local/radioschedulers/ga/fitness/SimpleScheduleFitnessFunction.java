@@ -15,6 +15,13 @@ import local.radioschedulers.ga.ScheduleFitnessFunction;
 
 public final class SimpleScheduleFitnessFunction implements
 		ScheduleFitnessFunction {
+	
+	private int switchLostMinutes = 5;
+	
+	public void setSwitchLostMinutes(int switchLostMinutes) {
+		this.switchLostMinutes = switchLostMinutes;
+	}
+	
 	@Override
 	public double evaluate(Schedule s) {
 		double v = 0.;
@@ -41,7 +48,7 @@ public final class SimpleScheduleFitnessFunction implements
 						time = Schedule.LST_SLOTS_MINUTES;
 					} else {
 						// some time lost for new observation
-						time = Schedule.LST_SLOTS_MINUTES * 0.7;
+						time = Schedule.LST_SLOTS_MINUTES - this.switchLostMinutes;
 					}
 					if (timeleft < 0) {
 						/* we are over desired limit already, no benefits */
