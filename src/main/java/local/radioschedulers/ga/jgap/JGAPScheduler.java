@@ -42,17 +42,19 @@ public class JGAPScheduler extends GeneticAlgorithmScheduler {
 		// population = Genotype.randomInitialGenotype(conf);
 		Population pop = new Population(conf);
 
+		IChromosome lastChromo = null;
 		for (Schedule s : ss) {
 			IChromosome chromo = conv.getChromosomeFromSpecificSchedule(
 					possibles, s);
 			pop.addChromosome(chromo);
+			lastChromo = chromo;
 		}
 		if (ss.isEmpty()) {
-			IChromosome chromo = conv.getChromosomeFromSpecificSchedule(
-					possibles, null);
-			pop.addChromosome(chromo);
-			conf.setSampleChromosome(chromo);
+			lastChromo = conv
+					.getChromosomeFromSpecificSchedule(possibles, null);
+			pop.addChromosome(lastChromo);
 		}
+		conf.setSampleChromosome(lastChromo);
 
 		conf.setPopulationSize(getPopulationSize());
 
