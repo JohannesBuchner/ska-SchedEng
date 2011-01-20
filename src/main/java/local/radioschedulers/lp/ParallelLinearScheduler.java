@@ -69,53 +69,56 @@ public class ParallelLinearScheduler implements IScheduler {
 		for (Entry<LSTTime, Set<JobCombination>> entry : scheduleTemplate) {
 			LSTTime t = entry.getKey();
 			Set<JobCombination> jcs = entry.getValue();
-			for (JobCombination jc : jcs) {
-				Integer id = jobComboIdSet.lastIndexOf(jc);
-				if (id == -1) {
-					id = jobComboIdSet.size();
-					jobComboIdSet.add(jc);
-				}
-				String varname = getVar(t, id);
-				log.debug(varname + " -- jobCombination " + id + " at time "
-						+ t + " : " + " (prio " + jc.calculatePriority() + ")");
-				for (Job j : jc.jobs) {
-					log.debug("     job [" + j.lstmin + ".." + j.lstmax
-							+ "]: Proposal " + j.proposal.id);
-				}
-
-				varDefinition.append("bin " + varname + ";\n");
-
-				for (Job j : jc.jobs) {
-					/**
-					 * 4) A job gets its hours:
-					 */
-					StringBuilder jobsum = jobsumSet.get(j);
-					if (jobsum == null) {
-						jobsum = new StringBuilder();
-						jobsumSet.put(j, jobsum);
+			if (!jcs.isEmpty()) {
+				for (JobCombination jc : jcs) {
+					Integer id = jobComboIdSet.lastIndexOf(jc);
+					if (id == -1) {
+						id = jobComboIdSet.size();
+						jobComboIdSet.add(jc);
 					}
-					jobsum.append(varname);
-					jobsum.append(" +");
+					String varname = getVar(t, id);
+					log.debug(varname + " -- jobCombination " + id
+							+ " at time " + t + " : " + " (prio "
+							+ jc.calculatePriority() + ")");
+					for (Job j : jc.jobs) {
+						log.debug("     job [" + j.lstmin + ".." + j.lstmax
+								+ "]: Proposal " + j.proposal.id);
+					}
 
+					varDefinition.append("bin " + varname + ";\n");
+
+					for (Job j : jc.jobs) {
+						/**
+						 * 4) A job gets its hours:
+						 */
+						StringBuilder jobsum = jobsumSet.get(j);
+						if (jobsum == null) {
+							jobsum = new StringBuilder();
+							jobsumSet.put(j, jobsum);
+						}
+						jobsum.append(varname);
+						jobsum.append(" +");
+
+					}
+					// cost function
+					costFunction.append(jc.calculatePriority() + " " + varname
+							+ " + ");
+
+					/**
+					 * only allow one JobCombination at a time
+					 */
+					constraints.append(varname);
+					constraints.append(" +");
 				}
-				// cost function
-				costFunction.append(jc.calculatePriority() + " " + varname
-						+ " + ");
-
-				/**
-				 * only allow one JobCombination at a time
-				 */
-				constraints.append(varname);
-				constraints.append(" +");
+				constraints.append("0 <= 1;\n");
 			}
-			constraints.append("0 <= 1;\n");
 		}
 		/**
 		 * overall time for the job
 		 */
-		for (Job j : jobsumSet.keySet()) {
-			constraints.append(jobsumSet.get(j));
-			constraints.append("0 <= " + j.hours
+		for (Entry<Job, StringBuilder> e : jobsumSet.entrySet()) {
+			constraints.append(e.getValue());
+			constraints.append("0 <= " + e.getKey().hours
 					* ScheduleSpace.LST_SLOTS_PER_DAY + ";\n");
 		}
 		costFunction.append("0;\n");
