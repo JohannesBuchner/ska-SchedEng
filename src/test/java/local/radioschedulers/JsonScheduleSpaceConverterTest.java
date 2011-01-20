@@ -13,6 +13,7 @@ import local.radioschedulers.preschedule.ITimelineGenerator;
 import local.radioschedulers.preschedule.SimpleTimelineGenerator;
 import local.radioschedulers.preschedule.SingleRequirementGuard;
 
+import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.After;
 import org.junit.Assert;
@@ -20,6 +21,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class JsonScheduleSpaceConverterTest {
+
+	private static Logger log = Logger
+			.getLogger(JsonScheduleSpaceConverterTest.class);
 
 	private ScheduleSpace template;
 	public static int ndays = 10;
@@ -43,7 +47,7 @@ public class JsonScheduleSpaceConverterTest {
 		StringWriter sw = new StringWriter();
 		mapper.writeValue(sw, template);
 		StringBuffer s = sw.getBuffer();
-		System.out.println(s);
+		log.debug(s);
 		// mapper.registerModule(getLSTModule());
 		ScheduleSpace space = mapper.readValue(s.toString(),
 				ScheduleSpace.class);

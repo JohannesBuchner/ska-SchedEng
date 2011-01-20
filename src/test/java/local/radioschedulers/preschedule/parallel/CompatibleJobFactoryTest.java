@@ -44,7 +44,7 @@ public class CompatibleJobFactoryTest {
 		cjf = new CompatibleJobFactory(alljobs, req);
 		Collection<JobCombination> combinations = cjf.getCombinations();
 		int ncomb = combinations.size();
-		Assert.assertEquals("all jobs plus the idle job", njobs + 1, ncomb);
+		Assert.assertEquals("all single jobs", njobs, ncomb);
 	}
 
 	@Test
@@ -53,8 +53,8 @@ public class CompatibleJobFactoryTest {
 		cjf = new CompatibleJobFactory(alljobs, req);
 		Collection<JobCombination> combinations = cjf.getCombinations();
 		int ncomb = combinations.size();
-		Assert.assertEquals("tuples, singles and the idle job",
-				(njobs * (njobs - 1)) / 2 + njobs + 1, ncomb);
+		Assert.assertEquals("tuples, singles ", (njobs * (njobs - 1)) / 2
+				+ njobs, ncomb);
 	}
 
 	@Test
@@ -63,7 +63,7 @@ public class CompatibleJobFactoryTest {
 		cjf = new CompatibleJobFactory(alljobs, req);
 		Collection<JobCombination> combinations = cjf.getCombinations();
 		int ncomb = combinations.size();
-		Assert.assertEquals("full combination", (1 << njobs), ncomb);
+		Assert.assertEquals("full combination", (1 << njobs) - 1, ncomb);
 	}
 
 }

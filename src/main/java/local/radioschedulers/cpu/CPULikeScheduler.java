@@ -54,8 +54,9 @@ public class CPULikeScheduler implements IScheduler {
 
 		for (Entry<LSTTime, Set<JobCombination>> e : timeline) {
 			cleanup(timeleft);
-			if (timeleft.isEmpty())
+			if (timeleft.isEmpty()) {
 				break;
+			}
 
 			Set<JobCombination> list = e.getValue();
 			LSTTime t = e.getKey();
@@ -105,11 +106,11 @@ public class CPULikeScheduler implements IScheduler {
 	}
 
 	protected JobCombination selectJobs(Collection<JobCombination> list) {
-		Collection<JobCombination> jc = this.jobselector.select(list);
-		if (jc.isEmpty())
+		Collection<JobCombination> jcs = this.jobselector.select(list);
+		if (jcs.isEmpty())
 			return null;
 		else
-			return jc.iterator().next();
+			return jcs.iterator().next();
 	}
 
 	private void cleanup(HashMap<Job, Double> timeleft) {

@@ -26,35 +26,39 @@ public final class SimpleScheduleFitnessFunction implements
 		for (Entry<LSTTime, JobCombination> entry : s) {
 			JobCombination jc = entry.getValue();
 
-			for (Job j : jc.jobs) {
-				if (timeleftMap.containsKey(j)) {
-					timeleftMap.put(j, j.hours);
-				}
-				timeleft = timeleftMap.get(j)
-						- Schedule.LST_SLOTS_MINUTES;
-				timeleftMap.put(j, timeleft);
+			if (jc == null) {
+				// no points for doing nothing
+			} else {
+				for (Job j : jc.jobs) {
+					if (!timeleftMap.containsKey(j)) {
+						timeleftMap.put(j, j.hours);
+					}
+					timeleft = timeleftMap.get(j) - Schedule.LST_SLOTS_MINUTES;
+					timeleftMap.put(j, timeleft);
 
-				if (previousEntry != null && previousEntry.jobs.contains(j)) {
-					// full time for continued
-					time = Schedule.LST_SLOTS_MINUTES;
-				} else {
-					// some time lost for new observation
-					time = Schedule.LST_SLOTS_MINUTES * 0.7;
-				}
-				if (timeleft < 0) {
-					/* we are over desired limit already, no benefits */
-					time = 0;
-				}
-				
-				// TODO: add checks that the observation can actually be made
-				if (!j.isAvailable(entry.getKey())) {
-					time = 0;
-				}
+					if (previousEntry != null && previousEntry.jobs.contains(j)) {
+						// full time for continued
+						time = Schedule.LST_SLOTS_MINUTES;
+					} else {
+						// some time lost for new observation
+						time = Schedule.LST_SLOTS_MINUTES * 0.7;
+					}
+					if (timeleft < 0) {
+						/* we are over desired limit already, no benefits */
+						time = 0;
+					}
 
-				// TODO: add benefit based on observation conditions
+					// TODO: add checks that the observation can actually be
+					// made
+					if (!j.isAvailable(entry.getKey())) {
+						time = 0;
+					}
 
-				v = Math
-						.log(Math.exp(v) + Math.exp(j.proposal.priority * time));
+					// TODO: add benefit based on observation conditions
+
+					v = Math.log(Math.exp(v)
+							+ Math.exp(j.proposal.priority * time));
+				}
 			}
 			previousEntry = jc;
 

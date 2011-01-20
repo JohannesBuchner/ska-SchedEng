@@ -31,10 +31,6 @@ public class CompatibleJobFactory {
 	private void generateAllCombinations() {
 		combinations = new HashSet<JobCombination>();
 
-		// the idle-job
-		log.debug("adding idle job");
-		combinations.add(new JobCombination());
-
 		// the single jobs
 		log.debug("adding single jobs");
 		Set<JobCombination> extensions = new HashSet<JobCombination>();
@@ -49,7 +45,7 @@ public class CompatibleJobFactory {
 		while (true) {
 			// this could be improved, but hey
 			log.debug("extending ...");
-			extensions = extend(combinations, base);
+			extensions = extend(extensions, base);
 			log.debug("extending ... got " + extensions.size() + " extensions");
 			if (extensions.size() == 0)
 				break;
@@ -126,7 +122,7 @@ public class CompatibleJobFactory {
 
 		HashMap<LSTTime, Set<Job>> possibles = new HashMap<LSTTime, Set<Job>>();
 
-		System.out.println("Possibles:");
+		log.debug("Possibles:");
 		for (Job j : alljobs) {
 			for (long minute = Math.round(j.lstmin) * 60;; minute = (minute + LST_SLOTS_MINUTES)
 					% (24 * 60)) {
@@ -149,7 +145,7 @@ public class CompatibleJobFactory {
 					possibles.put(t, list);
 				}
 				list.add(j);
-				System.out.println("@" + t + " : " + j);
+				log.debug("@" + t + " : " + j);
 			}
 		}
 

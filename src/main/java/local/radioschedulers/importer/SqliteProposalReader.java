@@ -1,4 +1,5 @@
 package local.radioschedulers.importer;
+
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -9,10 +10,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import local.radioschedulers.Job;
 import local.radioschedulers.Proposal;
 
 public class SqliteProposalReader implements IProposalReader {
+	private static Logger log = Logger.getLogger(SqliteProposalReader.class);
 
 	private static final String DB = "jdbc:sqlite:/home/user/test.db";
 
@@ -130,6 +134,6 @@ public class SqliteProposalReader implements IProposalReader {
 		SqliteProposalReader pr = new SqliteProposalReader();
 		pr.fill();
 		for (Proposal p : pr.readall())
-			System.out.println(p.toString());
+			log.debug(p.toString());
 	}
 }

@@ -43,20 +43,13 @@ public class SimpleTimelineGeneratorTest {
 		for (Entry<LSTTime, Set<JobCombination>> e : template) {
 			Assert.assertFalse("No Combinations at " + e.getKey(), e.getValue()
 					.isEmpty());
-			int emptyCount = 0;
 
 			for (JobCombination jc : e.getValue()) {
-				if (jc.jobs.isEmpty()) {
-					emptyCount++;
-					Assert.assertTrue(jc.calculatePriority() == 0);
-				} else {
-					Assert.assertTrue(jc.calculatePriority() > 0);
-					if (!can_have_parallel) {
-						Assert.assertEquals(jc.jobs.size(), 1);
-					}
+				Assert.assertTrue(jc.calculatePriority() > 0);
+				if (!can_have_parallel) {
+					Assert.assertEquals(jc.jobs.size(), 1);
 				}
 			}
-			Assert.assertTrue(emptyCount == 1);
 		}
 	}
 

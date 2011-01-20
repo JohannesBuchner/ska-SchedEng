@@ -54,7 +54,7 @@ public class Schedule implements Iterable<Entry<LSTTime, JobCombination>> {
 
 			@Override
 			public boolean hasNext() {
-				if (t.day <= lastEntry.day)
+				if (t.compareTo(lastEntry) <= 0)
 					return true;
 				else
 					return false;

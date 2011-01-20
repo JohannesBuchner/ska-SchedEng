@@ -13,8 +13,9 @@ public class JobCombination {
 	public Set<Job> jobs = new HashSet<Job>();
 
 	public double calculatePriority() {
-		if (jobs.size() == 0)
-			return 0;
+		if (jobs.size() == 0) {
+			throw new IllegalStateException("do not create an idle job");
+		}
 
 		double expprio = 0;
 		for (Job j : jobs) {

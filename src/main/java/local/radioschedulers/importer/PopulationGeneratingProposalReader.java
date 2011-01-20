@@ -6,11 +6,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.log4j.Logger;
+
 import local.radioschedulers.Job;
 import local.radioschedulers.Proposal;
 
 public class PopulationGeneratingProposalReader implements IProposalReader {
-
+	private static Logger log = Logger.getLogger(PopulationGeneratingProposalReader.class);
+	
 	List<Proposal> proposals = new ArrayList<Proposal>();
 
 	public void fill(int ndays) throws Exception {
@@ -51,10 +54,10 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 			
 			// TODO: something
 			
-			System.out.println(j);
+			log.debug(j);
 			p.jobs.add(j);
 		}
-		System.out.println(i - 1 + " proposals issued.");
+		log.debug((i - 1) + " proposals issued.");
 	}
 
 	/*

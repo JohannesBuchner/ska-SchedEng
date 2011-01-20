@@ -1,29 +1,37 @@
-package local.radioschedulers;
+package local.radioschedulers.ga.jgap;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import local.radioschedulers.Job;
+import local.radioschedulers.JobCombination;
+import local.radioschedulers.LSTTime;
+import local.radioschedulers.Proposal;
+import local.radioschedulers.Schedule;
+import local.radioschedulers.ScheduleSpace;
+import local.radioschedulers.ga.GeneticAlgorithmScheduler;
+import local.radioschedulers.ga.fitness.SimpleScheduleFitnessFunction;
 import local.radioschedulers.importer.GeneratingProposalReader;
-import local.radioschedulers.lp.ParallelLinearScheduler;
 import local.radioschedulers.preschedule.ITimelineGenerator;
 import local.radioschedulers.preschedule.SimpleTimelineGenerator;
-import local.radioschedulers.preschedule.SingleRequirementGuard;
+import local.radioschedulers.preschedule.parallel.ParallelRequirementGuard;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class LinearSolverTest {
+public class JGAPSchedulerTest {
 
-	private static Logger log = Logger.getLogger(LinearSolverTest.class);
+	private static Logger log = Logger.getLogger(JGAPSchedulerTest.class);
 
 	public static int ndays = 10;
 
 	private ScheduleSpace template;
-	Collection<Proposal> proposals;
+	private Collection<Proposal> proposals;
+	private GeneticAlgorithmScheduler scheduler;
 
 	@Before
 	public void setUp() throws Exception {
@@ -32,18 +40,16 @@ public class LinearSolverTest {
 		proposals = gpr.readall();
 		Assert.assertTrue(proposals.size() > 0);
 		ITimelineGenerator tlg = new SimpleTimelineGenerator(
-				new SingleRequirementGuard());
+				new ParallelRequirementGuard());
 		template = tlg.schedule(proposals, ndays);
-		for (Entry<LSTTime, Set<JobCombination>> e : template) {
-			Assert.assertFalse("Combinations at " + e.getKey(), e.getValue()
-					.isEmpty());
-		}
+		scheduler = new JGAPScheduler(new SimpleScheduleFitnessFunction());
 	}
 
 	@Test
-	public void testSingle() throws Exception {
-		ParallelLinearScheduler ls = new ParallelLinearScheduler();
-		Schedule s = ls.schedule(template);
+	public void testGA() throws Exception {
+		Schedule s = scheduler.schedule(template);
+
+		Assert.assertNotNull(s);
 
 		Assert.assertEquals("ScheduleSpace and Schedule have the same length",
 				template.findLastEntry().day, s.findLastEntry().day);

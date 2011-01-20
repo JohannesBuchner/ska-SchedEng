@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
+
 import local.radioschedulers.IScheduler;
 import local.radioschedulers.Job;
 import local.radioschedulers.LSTTime;
@@ -14,6 +16,10 @@ import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.preschedule.RequirementGuard;
 
 public abstract class GeneticAlgorithmScheduler implements IScheduler {
+
+	private static Logger log = Logger
+			.getLogger(GeneticAlgorithmScheduler.class);
+
 	protected HashMap<LSTTime, Vector<Job>> possibles = new HashMap<LSTTime, Vector<Job>>();
 	protected RequirementGuard requirementGuard;
 	protected int ndays;
@@ -33,11 +39,14 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 	 */
 	public Schedule schedule(ScheduleSpace possibles) {
 		this.ndays = possibles.findLastEntry().day.intValue();
-		this.ngenes = ndays * ScheduleSpace.LST_SLOTS_PER_DAY;
+		this.ngenes = calculateNGenes(possibles);
+		log.debug("got ndays=" + ndays + " plus last minute="
+				+ possibles.findLastEntry().minute);
+		log.debug("so I'd reckon we need " + ngenes + " Genes");
 
 		if (population == null)
 			population = new ArrayList<Schedule>();
-		
+
 		Schedule bestschedule;
 		try {
 			population = evolveSchedules(possibles, population);
@@ -48,6 +57,12 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 		}
 
 		return bestschedule;
+	}
+
+	public static int calculateNGenes(ScheduleSpace possibles) {
+		LSTTime last = possibles.findLastEntry();
+		return (int) (last.day.intValue() * ScheduleSpace.LST_SLOTS_PER_DAY
+				+ last.minute / ScheduleSpace.LST_SLOTS_MINUTES + 1);
 	}
 
 	/**

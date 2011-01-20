@@ -117,17 +117,22 @@ public class CPUSchedulersTest {
 		Assert.assertEquals("ScheduleSpace and Schedule have the same length",
 				template.findLastEntry().day, s.findLastEntry().day);
 		int i = 0;
+		int emptyCount = 0;
 		Set<Proposal> scheduledJobs = new HashSet<Proposal>();
 		// Test correctness
 		for (Entry<LSTTime, JobCombination> e : s) {
 			Set<JobCombination> ref = template.get(e.getKey());
 			JobCombination actual = e.getValue();
-			Assert.assertTrue("Schedule is outside ScheduleSpace at " + i, ref
-					.contains(actual));
-			if (actual.jobs.size() > 0)
+			if (actual == null)
+				emptyCount++;
+			else {
+				Assert.assertTrue("Schedule is outside ScheduleSpace at " + i,
+						ref.contains(actual));
+
 				i++;
-			for (Job j : actual.jobs) {
-				scheduledJobs.add(j.proposal);
+				for (Job j : actual.jobs) {
+					scheduledJobs.add(j.proposal);
+				}
 			}
 		}
 

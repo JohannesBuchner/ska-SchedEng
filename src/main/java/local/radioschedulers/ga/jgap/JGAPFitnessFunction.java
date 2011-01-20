@@ -20,6 +20,6 @@ public final class JGAPFitnessFunction extends FitnessFunction {
 
 	@Override
 	protected double evaluate(IChromosome c) {
-		return this.fitnessFunction.evaluate(JGAPScheduler.getScheduleFromChromosome(c));
+		return this.fitnessFunction.evaluate(JGAPGeneScheduleConverter.getScheduleFromChromosome(c));
 	}
 }

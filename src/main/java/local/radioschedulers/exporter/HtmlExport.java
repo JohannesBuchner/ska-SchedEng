@@ -64,7 +64,7 @@ public class HtmlExport implements IExport {
 							break;
 					}
 				String params = "";
-				if (jc == null || jc.jobs.isEmpty())
+				if (jc == null)
 					params += " class=\"free\" ";
 
 				if (ncells > 1) {
