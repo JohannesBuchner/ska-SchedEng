@@ -21,8 +21,6 @@ import org.jgap.impl.MutationOperator;
 public class JGAPScheduler extends GeneticAlgorithmScheduler {
 	// private static Logger log = Logger.getLogger(JGAPScheduler.class);
 
-	private int NUMBER_OF_EVOLUTIONS = 10;
-
 	private Configuration conf;
 	private JGAPGeneScheduleConverter conv;
 	private JGAPFitnessFunction fitness;
@@ -63,7 +61,7 @@ public class JGAPScheduler extends GeneticAlgorithmScheduler {
 			conf.setPreservFittestIndividual(true);
 
 		genotype = new Genotype(conf, pop);
-		genotype.evolve(NUMBER_OF_EVOLUTIONS);
+		genotype.evolve(getNumberOfGenerations());
 		List<Schedule> survivers = new ArrayList<Schedule>();
 		for (Object chrome : genotype.getPopulation().getChromosomes()) {
 			survivers.add(JGAPGeneScheduleConverter
