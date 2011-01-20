@@ -25,6 +25,7 @@ import org.junit.Test;
 
 public class JGAPSchedulerTest {
 
+	@SuppressWarnings("unused")
 	private static Logger log = Logger.getLogger(JGAPSchedulerTest.class);
 
 	public static int ndays = 10;

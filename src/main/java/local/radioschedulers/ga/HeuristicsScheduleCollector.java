@@ -16,7 +16,6 @@ import local.radioschedulers.cpu.RandomizedSelector;
 import local.radioschedulers.cpu.ShortestFirstSelector;
 import local.radioschedulers.exporter.HtmlExport;
 import local.radioschedulers.lp.ParallelLinearScheduler;
-import local.radioschedulers.preschedule.parallel.ParallelRequirementGuard;
 
 import org.apache.log4j.Logger;
 
@@ -30,15 +29,11 @@ public class HeuristicsScheduleCollector {
 
 		List<IScheduler> schedulers = new ArrayList<IScheduler>();
 
-		schedulers.add(new CPULikeScheduler(new FairPrioritizedSelector(),
-				new ParallelRequirementGuard()));
-		schedulers.add(new CPULikeScheduler(new PrioritizedSelector(),
-				new ParallelRequirementGuard()));
-		schedulers.add(new CPULikeScheduler(new ShortestFirstSelector(),
-				new ParallelRequirementGuard()));
+		schedulers.add(new CPULikeScheduler(new FairPrioritizedSelector()));
+		schedulers.add(new CPULikeScheduler(new PrioritizedSelector()));
+		schedulers.add(new CPULikeScheduler(new ShortestFirstSelector()));
 
-		CPULikeScheduler rand = new CPULikeScheduler(new RandomizedSelector(),
-				new ParallelRequirementGuard());
+		CPULikeScheduler rand = new CPULikeScheduler(new RandomizedSelector());
 		schedulers.add(rand);
 		schedulers.add(rand);
 		schedulers.add(rand);

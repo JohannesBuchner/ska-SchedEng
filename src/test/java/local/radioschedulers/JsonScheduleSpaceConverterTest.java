@@ -57,8 +57,7 @@ public class JsonScheduleSpaceConverterTest {
 
 	@Test
 	public void testExportToHtml() throws Exception {
-		IScheduler scheduler = new CPULikeScheduler(new FirstSelector(),
-				new SingleRequirementGuard());
+		IScheduler scheduler = new CPULikeScheduler(new FirstSelector());
 		IExport export = new HtmlExport(f);
 
 		Schedule s = scheduler.schedule(template);

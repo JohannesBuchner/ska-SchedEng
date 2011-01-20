@@ -3,7 +3,6 @@ package local.radioschedulers.ga;
 import java.util.Collection;
 import java.util.Map.Entry;
 
-import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.Proposal;
@@ -15,7 +14,6 @@ import local.radioschedulers.ga.jgap.JGAPGeneScheduleConverter;
 import local.radioschedulers.importer.GeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
 import local.radioschedulers.preschedule.SimpleTimelineGenerator;
-import local.radioschedulers.preschedule.SingleRequirementGuard;
 import local.radioschedulers.preschedule.parallel.ParallelRequirementGuard;
 
 import org.apache.log4j.Logger;
@@ -28,6 +26,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class JGAPGeneScheduleConverterTest {
+	@SuppressWarnings("unused")
 	private static Logger log = Logger
 			.getLogger(JGAPGeneScheduleConverterTest.class);
 
@@ -47,7 +46,7 @@ public class JGAPGeneScheduleConverterTest {
 				new ParallelRequirementGuard());
 		template = tlg.schedule(proposals, ndays);
 		CPULikeScheduler scheduler = new CPULikeScheduler(
-				new RandomizedSelector(), new SingleRequirementGuard());
+				new RandomizedSelector());
 		schedule = scheduler.schedule(template);
 		conf = new DefaultConfiguration();
 	}

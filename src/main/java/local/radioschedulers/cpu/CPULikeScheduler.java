@@ -6,15 +6,14 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
-
 import local.radioschedulers.IScheduler;
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
-import local.radioschedulers.preschedule.RequirementGuard;
+
+import org.apache.log4j.Logger;
 
 public class CPULikeScheduler implements IScheduler {
 	public static final int LST_SLOTS = 24 * 4;
@@ -29,8 +28,7 @@ public class CPULikeScheduler implements IScheduler {
 
 	protected JobSelector jobselector;
 
-	public CPULikeScheduler(JobSelector jobselector,
-			RequirementGuard requirementGuard) {
+	public CPULikeScheduler(JobSelector jobselector) {
 		this.jobselector = jobselector;
 		this.jobselector.setTimeleft(timeleft);
 	}

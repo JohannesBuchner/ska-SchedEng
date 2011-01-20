@@ -12,7 +12,6 @@ import local.radioschedulers.ga.fitness.SimpleScheduleFitnessFunction;
 import local.radioschedulers.importer.GeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
 import local.radioschedulers.preschedule.SimpleTimelineGenerator;
-import local.radioschedulers.preschedule.SingleRequirementGuard;
 import local.radioschedulers.preschedule.parallel.ParallelRequirementGuard;
 
 import org.junit.Assert;
@@ -36,11 +35,9 @@ public class FitnessFunctionTest {
 		ITimelineGenerator tlg = new SimpleTimelineGenerator(
 				new ParallelRequirementGuard());
 		template = tlg.schedule(proposals, ndays);
-		CPULikeScheduler scheduler = new CPULikeScheduler(new FirstSelector(),
-				new SingleRequirementGuard());
+		CPULikeScheduler scheduler = new CPULikeScheduler(new FirstSelector());
 		schedule1 = scheduler.schedule(template);
-		scheduler = new CPULikeScheduler(new PrioritizedSelector(),
-				new SingleRequirementGuard());
+		scheduler = new CPULikeScheduler(new PrioritizedSelector());
 		schedule2 = scheduler.schedule(template);
 	}
 

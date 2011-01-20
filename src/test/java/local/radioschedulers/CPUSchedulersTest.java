@@ -1,9 +1,7 @@
 package local.radioschedulers;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
 
@@ -18,7 +16,6 @@ import local.radioschedulers.preschedule.ITimelineGenerator;
 import local.radioschedulers.preschedule.RequirementGuard;
 import local.radioschedulers.preschedule.SimpleTimelineGenerator;
 import local.radioschedulers.preschedule.SingleRequirementGuard;
-import local.radioschedulers.preschedule.parallel.ParallelRequirementGuard;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -27,6 +24,7 @@ import org.junit.Test;
 
 public class CPUSchedulersTest {
 
+	@SuppressWarnings("unused")
 	private static Logger log = Logger.getLogger(CPUSchedulersTest.class);
 
 	public static int ndays = 10;
@@ -41,7 +39,7 @@ public class CPUSchedulersTest {
 		proposals = gpr.readall();
 		Assert.assertTrue(proposals.size() > 0);
 		ITimelineGenerator tlg = new SimpleTimelineGenerator(
-				new SingleRequirementGuard());
+				getRequirementGuard());
 		template = tlg.schedule(proposals, ndays);
 		for (Entry<LSTTime, Set<JobCombination>> e : template) {
 			Assert.assertFalse("Combinations at " + e.getKey(), e.getValue()
@@ -49,10 +47,13 @@ public class CPUSchedulersTest {
 		}
 	}
 
+	protected RequirementGuard getRequirementGuard() {
+		return new SingleRequirementGuard();
+	}
+
 	@Test
 	public void testSingleFirst() throws Exception {
-		CPULikeScheduler scheduler = new CPULikeScheduler(new FirstSelector(),
-				new SingleRequirementGuard());
+		CPULikeScheduler scheduler = new CPULikeScheduler(new FirstSelector());
 		Schedule s = scheduler.schedule(template);
 		checkSchedule(s);
 	}
@@ -60,7 +61,7 @@ public class CPUSchedulersTest {
 	@Test
 	public void testSingleFair() throws Exception {
 		CPULikeScheduler scheduler = new CPULikeScheduler(
-				new FairPrioritizedSelector(), new SingleRequirementGuard());
+				new FairPrioritizedSelector());
 		Schedule s = scheduler.schedule(template);
 		checkSchedule(s);
 	}
@@ -68,7 +69,7 @@ public class CPUSchedulersTest {
 	@Test
 	public void testSinglePrio() throws Exception {
 		CPULikeScheduler scheduler = new CPULikeScheduler(
-				new PrioritizedSelector(), new SingleRequirementGuard());
+				new PrioritizedSelector());
 		Schedule s = scheduler.schedule(template);
 		checkSchedule(s);
 	}
@@ -76,7 +77,7 @@ public class CPUSchedulersTest {
 	@Test
 	public void testSingleShortest() throws Exception {
 		CPULikeScheduler scheduler = new CPULikeScheduler(
-				new ShortestFirstSelector(), new SingleRequirementGuard());
+				new ShortestFirstSelector());
 		Schedule s = scheduler.schedule(template);
 		checkSchedule(s);
 	}
@@ -84,33 +85,9 @@ public class CPUSchedulersTest {
 	@Test
 	public void testSingleRand() throws Exception {
 		CPULikeScheduler scheduler = new CPULikeScheduler(
-				new RandomizedSelector(), new SingleRequirementGuard());
+				new RandomizedSelector());
 		Schedule s = scheduler.schedule(template);
 		checkSchedule(s);
-	}
-
-	@Test
-	public void testAllParallel() throws Exception {
-		RequirementGuard req = new ParallelRequirementGuard();
-		List<IScheduler> schedulers = new ArrayList<IScheduler>();
-
-		schedulers.add(new CPULikeScheduler(new FairPrioritizedSelector(),
-				new ParallelRequirementGuard()));
-		schedulers.add(new CPULikeScheduler(new PrioritizedSelector(),
-				new ParallelRequirementGuard()));
-		schedulers.add(new CPULikeScheduler(new ShortestFirstSelector(),
-				new ParallelRequirementGuard()));
-
-		CPULikeScheduler rand = new CPULikeScheduler(new RandomizedSelector(),
-				req);
-		schedulers.add(rand);
-
-		for (IScheduler s : schedulers) {
-			log.debug("scheduling using " + s);
-
-			Schedule schedule = s.schedule(template);
-			checkSchedule(schedule);
-		}
 	}
 
 	private void checkSchedule(Schedule s) {

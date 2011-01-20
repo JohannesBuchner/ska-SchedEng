@@ -47,8 +47,7 @@ public class RunMain {
 	}
 
 	private static IScheduler getScheduler() {
-		return new CPULikeScheduler(new ShortestFirstSelector(),
-				new ParallelRequirementGuard());
+		return new CPULikeScheduler(new ShortestFirstSelector());
 		// return new LinearScheduler2();
 	}
 
