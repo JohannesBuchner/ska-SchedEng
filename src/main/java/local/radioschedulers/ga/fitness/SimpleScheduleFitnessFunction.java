@@ -15,61 +15,75 @@ import local.radioschedulers.ga.ScheduleFitnessFunction;
 
 public final class SimpleScheduleFitnessFunction implements
 		ScheduleFitnessFunction {
-	
+
 	private int switchLostMinutes = 5;
-	
+
 	public void setSwitchLostMinutes(int switchLostMinutes) {
 		this.switchLostMinutes = switchLostMinutes;
 	}
-	
+
 	@Override
 	public double evaluate(Schedule s) {
-		double v = 0.;
+		double value = 0.;
 		JobCombination previousEntry = null;
-		double time;
-		Long timeleft;
 		Map<Job, Long> timeleftMap = new HashMap<Job, Long>();
 
 		for (Entry<LSTTime, JobCombination> entry : s) {
 			JobCombination jc = entry.getValue();
-
-			if (jc == null) {
-				// no points for doing nothing
-			} else {
-				for (Job j : jc.jobs) {
-					if (!timeleftMap.containsKey(j)) {
-						timeleftMap.put(j, j.hours);
-					}
-					timeleft = timeleftMap.get(j) - Schedule.LST_SLOTS_MINUTES;
-					timeleftMap.put(j, timeleft);
-
-					if (previousEntry != null && previousEntry.jobs.contains(j)) {
-						// full time for continued
-						time = Schedule.LST_SLOTS_MINUTES;
-					} else {
-						// some time lost for new observation
-						time = Schedule.LST_SLOTS_MINUTES - this.switchLostMinutes;
-					}
-					if (timeleft < 0) {
-						/* we are over desired limit already, no benefits */
-						time = 0;
-					}
-
-					// TODO: add checks that the observation can actually be
-					// made
-					if (!j.isAvailable(entry.getKey())) {
-						time = 0;
-					}
-
-					// TODO: add benefit based on observation conditions
-
-					v = Math.log(Math.exp(v)
-							+ Math.exp(j.proposal.priority * time));
-				}
-			}
+			value += evaluateSlot(previousEntry, timeleftMap, jc);
 			previousEntry = jc;
-
 		}
-		return v;
+		return value;
+	}
+
+	protected double evaluateSlot(JobCombination previousEntry,
+			Map<Job, Long> timeleftMap, JobCombination jc) {
+		Long timeleft;
+		double expvalue = 0;
+
+		if (jc == null) {
+			// no points for doing nothing
+		} else {
+			for (Job j : jc.jobs) {
+				if (!timeleftMap.containsKey(j)) {
+					timeleftMap.put(j, j.hours * Schedule.LST_SLOTS_MINUTES);
+				}
+				timeleft = timeleftMap.get(j) - Schedule.LST_SLOTS_MINUTES;
+				timeleftMap.put(j, timeleft);
+
+				boolean inPreviousSlot = previousEntry != null
+						&& previousEntry.jobs.contains(j);
+
+				expvalue += Math.log(evaluateSlotJob(timeleft, j,
+						inPreviousSlot));
+			}
+		}
+		return Math.exp(expvalue);
+	}
+
+	private double evaluateSlotJob(Long timeleft, Job j, boolean inPreviousSlot) {
+		double time;
+		if (inPreviousSlot) {
+			// full time for continued
+			time = Schedule.LST_SLOTS_MINUTES;
+		} else {
+			// some time lost for new observation
+			time = Schedule.LST_SLOTS_MINUTES - this.switchLostMinutes;
+		}
+		if (timeleft < 0) {
+			/* we are over desired limit already, no benefits */
+			time = 0;
+		}
+
+		// TODO: add checks that the observation can actually be
+		// made
+		// if (!j.isAvailable(entry.getKey())) {
+		// time = 0;
+		// }
+
+		// TODO: add benefit based on observation conditions
+
+		return Math.exp(j.proposal.priority) * time
+				/ Schedule.LST_SLOTS_MINUTES;
 	}
 }
