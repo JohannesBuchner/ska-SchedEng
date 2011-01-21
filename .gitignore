@@ -1,0 +1,6 @@
+*.html
+*.lp
+*.log*
+.project
+.classpath
+target/
