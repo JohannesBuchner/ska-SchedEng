@@ -8,7 +8,6 @@ import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.cpu.CPULikeScheduler;
 import local.radioschedulers.cpu.FirstSelector;
-import local.radioschedulers.cpu.PrioritizedSelector;
 import local.radioschedulers.ga.fitness.SimpleScheduleFitnessFunction;
 import local.radioschedulers.importer.GeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;

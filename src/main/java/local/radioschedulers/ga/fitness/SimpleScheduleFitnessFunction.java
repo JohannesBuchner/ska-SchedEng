@@ -22,6 +22,10 @@ public class SimpleScheduleFitnessFunction implements
 		this.switchLostMinutes = switchLostMinutes;
 	}
 
+	public int getSwitchLostMinutes() {
+		return switchLostMinutes;
+	}
+	
 	@Override
 	public double evaluate(Schedule s) {
 		double value = 0.;
@@ -61,7 +65,7 @@ public class SimpleScheduleFitnessFunction implements
 		return Math.exp(expvalue);
 	}
 
-	private double evaluateSlotJob(Job j, Long timeleft, boolean inPreviousSlot) {
+	protected double evaluateSlotJob(Job j, Long timeleft, boolean inPreviousSlot) {
 		double time;
 		if (inPreviousSlot) {
 			// full time for continued
