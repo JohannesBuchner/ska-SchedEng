@@ -30,14 +30,14 @@ public final class SimpleScheduleFitnessFunction implements
 
 		for (Entry<LSTTime, JobCombination> entry : s) {
 			JobCombination jc = entry.getValue();
-			value += evaluateSlot(previousEntry, timeleftMap, jc);
+			value += evaluateSlot(jc, previousEntry, timeleftMap);
 			previousEntry = jc;
 		}
 		return value;
 	}
 
-	protected double evaluateSlot(JobCombination previousEntry,
-			Map<Job, Long> timeleftMap, JobCombination jc) {
+	protected double evaluateSlot(JobCombination jc,
+			JobCombination previousEntry, Map<Job, Long> timeleftMap) {
 		Long timeleft;
 		double expvalue = 0;
 
@@ -54,14 +54,14 @@ public final class SimpleScheduleFitnessFunction implements
 				boolean inPreviousSlot = previousEntry != null
 						&& previousEntry.jobs.contains(j);
 
-				expvalue += Math.log(evaluateSlotJob(timeleft, j,
+				expvalue += Math.log(evaluateSlotJob(j, timeleft,
 						inPreviousSlot));
 			}
 		}
 		return Math.exp(expvalue);
 	}
 
-	private double evaluateSlotJob(Long timeleft, Job j, boolean inPreviousSlot) {
+	private double evaluateSlotJob(Job j, Long timeleft, boolean inPreviousSlot) {
 		double time;
 		if (inPreviousSlot) {
 			// full time for continued
