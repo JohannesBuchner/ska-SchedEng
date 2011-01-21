@@ -13,7 +13,7 @@ import local.radioschedulers.LSTTime;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ga.ScheduleFitnessFunction;
 
-public final class SimpleScheduleFitnessFunction implements
+public class SimpleScheduleFitnessFunction implements
 		ScheduleFitnessFunction {
 
 	private int switchLostMinutes = 5;
