@@ -1,0 +1,21 @@
+SchedulingEngine
+=================
+
+SchedulingEngine is a flexible scheduling engine for large-scale radio telescope arrays, or, more generally, a scheduling framework for scheduling independent, but possibly compatibly jobs (running at the same time).
+
+=== Building ===
+ * go into directory
+   $  mvn package
+   Then you should see jars in the target directory, notably engine-0.1-SNAPSHOT-jar-with-dependencies.jar
+
+==== Developing ===
+I recommend Eclipse to browse the source code.
+ Add the 
+   git plugin http://download.eclipse.org/egit/ and the
+   maven plugin http://m2eclipse.sonatype.org/
+Then Import > Maven Project
+
+The maven documentation can be found at http://maven.apache.org/
+JGAP is the Genetic Algorithm library used.
+
+
