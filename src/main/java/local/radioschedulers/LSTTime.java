@@ -11,12 +11,20 @@ public class LSTTime implements Comparable<LSTTime> {
 		super();
 		this.day = day;
 		this.minute = minute;
+		if (this.minute > Schedule.LST_SLOTS_MINUTES
+				* Schedule.LST_SLOTS_PER_DAY)
+			throw new IllegalArgumentException("minute argument too large: "
+					+ this.minute);
 	}
 
 	public LSTTime(String s) {
 		String[] parts = s.split(":", 2);
 		this.day = Long.parseLong(parts[0]);
 		this.minute = Long.parseLong(parts[1]);
+		if (this.minute > Schedule.LST_SLOTS_MINUTES
+				* Schedule.LST_SLOTS_PER_DAY)
+			throw new IllegalArgumentException("minute argument too large: "
+					+ this.minute);
 	}
 
 	public LSTTime(int day, int minute) {

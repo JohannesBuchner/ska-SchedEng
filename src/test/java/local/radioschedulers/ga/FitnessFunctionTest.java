@@ -2,6 +2,7 @@ package local.radioschedulers.ga;
 
 import java.util.Collection;
 
+import local.radioschedulers.LSTTime;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
@@ -37,8 +38,14 @@ public class FitnessFunctionTest {
 		template = tlg.schedule(proposals, ndays);
 		CPULikeScheduler scheduler = new CPULikeScheduler(new FirstSelector());
 		schedule1 = scheduler.schedule(template);
-		scheduler = new CPULikeScheduler(new PrioritizedSelector());
+		scheduler = new CPULikeScheduler(new FirstSelector());
 		schedule2 = scheduler.schedule(template);
+		schedule2.clear(new LSTTime(0, 4 * 60 + 0));
+		schedule2.clear(new LSTTime(0, 4 * 60 + 15));
+		schedule2.clear(new LSTTime(0, 4 * 60 + 30));
+		schedule2.clear(new LSTTime(0, 4 * 60 + 0));
+		schedule2.clear(new LSTTime(0, 4 * 60 + 15));
+		schedule2.clear(new LSTTime(0, 4 * 60 + 30));
 	}
 
 	@Test
@@ -46,7 +53,8 @@ public class FitnessFunctionTest {
 		ScheduleFitnessFunction fitness = new SimpleScheduleFitnessFunction();
 		double v = fitness.evaluate(schedule1);
 		double w = fitness.evaluate(schedule2);
-		Assert.assertTrue(v < w);
+		Assert.assertTrue("Expecting schedule1: " + v + " < schedule2: " + w,
+				v < w);
 	}
 
 }
