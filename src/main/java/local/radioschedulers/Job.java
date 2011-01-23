@@ -1,29 +1,34 @@
 package local.radioschedulers;
 
-
 /**
  * a unit of execution. Jobs have no interdependencies.
  * 
  * @author Johannes Buchner
  */
 public class Job implements Comparable<Job> {
+	/**
+	 * (optional) id
+	 */
+	public String id;
+
+	/**
+	 * reference to the proposal this job belongs to
+	 */
 	public Proposal proposal;
+
 	/**
 	 * total hours needed
 	 */
 	public Long hours;
+
 	/**
-	 * declination in degrees
-	 */
-	public Double dec;
-	/**
-	 * rect ascention in hours
-	 */
-	public Double ra;
-	/**
-	 * minimum LST range
+	 * start of LST time that can be used
 	 */
 	public Double lstmin;
+
+	/**
+	 * end of LST time that can be used
+	 */
 	public Double lstmax;
 
 	public Job() {
@@ -32,15 +37,14 @@ public class Job implements Comparable<Job> {
 	public Job(Job j) {
 		this.proposal = j.proposal;
 		this.hours = j.hours;
-		this.dec = j.dec;
-		this.ra = j.ra;
+		this.id = j.id;
 		this.lstmax = j.lstmax;
 		this.lstmin = j.lstmin;
 	}
 
 	@Override
 	public String toString() {
-		return "Job " + hours + " (" + ra + "," + dec + ")=[" + lstmin + ".."
+		return "Job " + id + " [" + hours + " in " + lstmin + ".."
 				+ lstmax + "] of " + proposal;
 	}
 

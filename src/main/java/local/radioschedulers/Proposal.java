@@ -7,22 +7,28 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 
 /**
  * A proposal is a collection of jobs
- *  
+ * 
  * @author Johannes Buchner.
  */
 public class Proposal implements Comparable<Proposal> {
 	/**
-	 * some id
+	 * (optional) id
 	 */
 	public String id;
+
 	/**
-	 * name telling about the project
+	 * (optional) name telling about the project
 	 */
 	public String name;
+
 	/**
-	 * at which point became we aware of this proposal
+	 * (optional) at which point became we aware of this proposal
 	 */
 	public Date start;
+
+	/**
+	 * Jobs this Proposal is composed of
+	 */
 	@JsonIgnore
 	public Collection<Job> jobs;
 
@@ -30,6 +36,7 @@ public class Proposal implements Comparable<Proposal> {
 	 * how much is completing the project worth
 	 **/
 	public double priority;
+
 	/**
 	 * We are committed to this project. It has to be done (highest priority).
 	 **/
