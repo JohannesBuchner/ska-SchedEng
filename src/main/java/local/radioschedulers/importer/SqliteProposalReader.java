@@ -108,18 +108,17 @@ public class SqliteProposalReader implements IProposalReader {
 			p.id = res.getString(3);
 			p.jobs = new ArrayList<Job>();
 			PreparedStatement stmt2 = conn
-					.prepareStatement("SELECT hours, dec, ra from jobs where proposalid = ?");
+					.prepareStatement("SELECT id, hours, lstmin, lstmax from jobs where proposalid = ?");
 			stmt2.setString(1, p.id);
 
 			ResultSet res2 = stmt2.executeQuery();
 			while (res2.next()) {
 				Job j = new Job();
+				j.id = res2.getString(1);
 				j.proposal = p;
-				j.hours = res2.getLong(1);
-				j.dec = res2.getDouble(2);
-				j.ra = res2.getDouble(3);
-				j.lstmin = (j.ra - 2) % 24;
-				j.lstmax = (j.ra + 2) % 24;
+				j.hours = res2.getLong(2);
+				j.lstmin = res2.getDouble(3);
+				j.lstmax = res2.getDouble(4);
 
 				p.jobs.add(j);
 			}

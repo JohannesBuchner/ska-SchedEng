@@ -37,8 +37,8 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 			proposals.add(p);
 
 			Job j = new Job();
-			j.dec = r.nextDouble() * 360 - 180;
-			j.ra = r.nextDouble() * 24 - 12;
+			j.lstmin = r.nextDouble() * 24;
+			j.lstmax = r.nextDouble() * 24;
 			j.hours = 0L;
 			while (j.hours < 4)
 				j.hours = Math.round((1. / (r.nextDouble() * 200 + 1)) * 6000);
