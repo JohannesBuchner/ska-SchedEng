@@ -28,4 +28,8 @@ public class SimpleEntry<K, V> implements Entry<K, V> {
 		return this.v;
 	}
 
+	@Override
+	public String toString() {
+		return SimpleEntry.class + "(" + getKey() + "," + getValue() + ")";
+	}
 }
