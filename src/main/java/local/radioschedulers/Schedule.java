@@ -15,7 +15,8 @@ import java.util.Map.Entry;
  */
 public class Schedule implements Iterable<Entry<LSTTime, JobCombination>> {
 	public static final int LST_SLOTS_MINUTES = 15;
-	public static final int LST_SLOTS_PER_DAY = 60 * 24 / LST_SLOTS_MINUTES;
+	public static final int LST_SLOTS_PER_HOUR = 60 / LST_SLOTS_MINUTES;
+	public static final int LST_SLOTS_PER_DAY = LST_SLOTS_PER_HOUR * 24;
 
 	private Map<LSTTime, JobCombination> schedule = new TreeMap<LSTTime, JobCombination>();
 
