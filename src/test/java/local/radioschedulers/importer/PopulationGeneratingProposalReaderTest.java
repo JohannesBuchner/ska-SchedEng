@@ -11,6 +11,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 import local.radioschedulers.Job;
+import local.radioschedulers.JobWithResources;
 import local.radioschedulers.Proposal;
 
 import org.junit.Before;
@@ -30,11 +31,18 @@ public class PopulationGeneratingProposalReaderTest {
 	public void testConvergence() throws Exception {
 		Collection<Proposal> proposals = reader.readall();
 		Collection<Job> jobs = getallJobs(proposals);
-		Histogram<Integer> hourhist = new Histogram<Integer>();
-		Histogram<Double> durationhist = new Histogram<Double>();
+		Histogram<Integer> histhours = new Histogram<Integer>();
+		Histogram<Double> histdurations = new Histogram<Double>();
+		Histogram<Double> histdurationsw = new Histogram<Double>();
+		Histogram<Integer> histantennas = new Histogram<Integer>();
+		Histogram<Integer> histantennasw = new Histogram<Integer>();
 
-		calculateDurationBins(durationhist);
-		calculateHourBins(hourhist);
+		calculateDurationBins(histdurations);
+		calculateDurationBins(histdurationsw);
+		calculateHourBins(histhours);
+		calculateAntennaBins(histantennas);
+		calculateAntennaBins(histantennasw);
+
 		// hourhist.addBin(lastborder, 10000);
 		for (Job j : jobs) {
 			Assert.assertNotNull(j.lstmax);
@@ -50,17 +58,22 @@ public class PopulationGeneratingProposalReaderTest {
 			Assert.assertNotNull(j.proposal.priority);
 			Assert.assertTrue(j.proposal.priority > 0);
 
-			hourhist.addItem(j.hours.intValue());
+			histhours.addItem(j.hours.intValue());
 			if (j.lstmax == null || j.lstmin == null)
 				System.out.println(j);
 			double diff = j.lstmax - j.lstmin;
 			if (diff < 0)
 				diff = j.lstmax - j.lstmin + 24;
-			durationhist.addItem(diff);
+			histdurations.addItem(diff);
+			histdurationsw.addItem(diff, j.hours * 1.);
+			JobWithResources jwr = (JobWithResources) j;
+			histantennas.addItem(jwr.resources.get("antennas").numberrequired);
+			histantennasw.addItem(jwr.resources.get("antennas").numberrequired,
+					j.hours * 1.);
 		}
 
 		System.out.println("hours:");
-		for (Bin<Integer> bin : hourhist) {
+		for (Bin<Integer> bin : histhours) {
 			int c = round(bin.getCount());
 			System.out.print(bin.getLow() + " .. " + bin.getHigh() + "  \t");
 			while (c >= 100) {
@@ -70,7 +83,7 @@ public class PopulationGeneratingProposalReaderTest {
 			System.out.println(" | " + bin.getCount());
 		}
 		System.out.println("duration:");
-		for (Bin<Double> bin : durationhist) {
+		for (Bin<Double> bin : histdurations) {
 			int c = round(bin.getCount());
 			System.out.print(bin.getLow() + " .. " + bin.getHigh() + "  \t");
 			while (c >= 100) {
@@ -90,29 +103,62 @@ public class PopulationGeneratingProposalReaderTest {
 
 			System.out.println(" | " + bin.getCount());
 		}
-		durationhist.normalize();
-		hourhist.normalize();
-		FileWriter fw;
-		fw = new FileWriter("/tmp/histdurationsgen.txt");
+		histdurations.normalize();
+		histdurationsw.normalize();
+		histhours.normalize();
+		histantennas.normalize();
+		histantennasw.normalize();
+
+		dumpHistogram(histdurations, "/tmp/histdurationsgen.txt");
+		dumpHistogram(histdurationsw, "/tmp/histdurationswgen.txt");
+		dumpHistogramInt(histhours, "/tmp/histhoursgen.txt");
+		dumpHistogramInt(histantennas, "/tmp/histantennasgen.txt");
+		dumpHistogramInt(histantennasw, "/tmp/histantennaswgen.txt");
+	}
+
+	private void dumpHistogram(Histogram<Double> durationhist, String filename)
+			throws IOException {
+		FileWriter fw2;
+		fw2 = new FileWriter(filename);
 		for (Bin<Double> bin : durationhist) {
-			fw.write((bin.getHigh() + bin.getLow()) / 2. + "\t"
+			fw2.write((bin.getHigh() + bin.getLow()) / 2. + "\t"
 					+ bin.getCount() + "\t" + bin.getLow() + "\t"
 					+ bin.getHigh() + "\n");
 		}
-		fw.close();
-		fw = new FileWriter("/tmp/histhoursgen.txt");
-		for (Bin<Integer> bin : hourhist) {
-			fw.write((bin.getHigh() + bin.getLow()) / 2. + "\t"
+		fw2.close();
+	}
+
+	private void dumpHistogramInt(Histogram<Integer> durationhist, String filename)
+			throws IOException {
+		FileWriter fw2;
+		fw2 = new FileWriter(filename);
+		for (Bin<Integer> bin : durationhist) {
+			fw2.write((bin.getHigh() + bin.getLow()) / 2. + "\t"
 					+ bin.getCount() + "\t" + bin.getLow() + "\t"
 					+ bin.getHigh() + "\n");
 		}
-		fw.close();
+		fw2.close();
 	}
 
 	private void calculateDurationBins(Histogram<Double> durationhist) {
 		for (int i = 0; i <= 24; i += 4) {
 			durationhist.addBin(i * 1., i + 4.);
 		}
+	}
+
+	private void calculateAntennaBins(Histogram<Integer> histantennas) {
+		histantennas.addBin(0, 1);
+		histantennas.addBin(1, 2);
+		histantennas.addBin(2, 5);
+		histantennas.addBin(5, 8);
+		histantennas.addBin(8, 11);
+		histantennas.addBin(11, 17);
+		histantennas.addBin(17, 24);
+		histantennas.addBin(24, 30);
+		histantennas.addBin(30, 35);
+		histantennas.addBin(35, 40);
+		histantennas.addBin(40, 42);
+		histantennas.addBin(42, 100);
 	}
 
 	private void calculateHourBins(Histogram<Integer> hourhist) {
@@ -132,8 +178,8 @@ public class PopulationGeneratingProposalReaderTest {
 		// List<Double> end = new ArrayList<Double>();
 		List<Double> duration = new ArrayList<Double>();
 		List<Double> visibility = new ArrayList<Double>();
-		List<Double> antennas = new ArrayList<Double>();
-		List<Double> hours = new ArrayList<Double>();
+		List<Integer> antennas = new ArrayList<Integer>();
+		List<Integer> hours = new ArrayList<Integer>();
 		LineNumberReader r = new LineNumberReader(new FileReader(f));
 		// skipping first line, header
 		String line = r.readLine();
@@ -155,15 +201,19 @@ public class PopulationGeneratingProposalReaderTest {
 			// start, end, duration, antennas, hours
 			duration.add(Math.abs(partsd[2]));
 			visibility.add(Math.abs(partsd[0] - partsd[1]));
-			antennas.add(partsd[3]);
-			hours.add(partsd[4]);
+			antennas.add((int) Math.round(partsd[3]));
+			hours.add((int) Math.round(partsd[4]));
 		}
-		Histogram<Double> histduration = new Histogram<Double>();
-		Histogram<Double> histdurationw = new Histogram<Double>();
+		Histogram<Double> histdurations = new Histogram<Double>();
+		Histogram<Double> histdurationsw = new Histogram<Double>();
 		Histogram<Integer> histhours = new Histogram<Integer>();
-		calculateDurationBins(histduration);
-		calculateDurationBins(histdurationw);
+		Histogram<Integer> histantennas = new Histogram<Integer>();
+		Histogram<Integer> histantennasw = new Histogram<Integer>();
+		calculateDurationBins(histdurations);
+		calculateDurationBins(histdurationsw);
 		calculateHourBins(histhours);
+		calculateAntennaBins(histantennas);
+		calculateAntennaBins(histantennasw);
 
 		for (int i = 0; i < duration.size(); i++) {
 			if (Double.isNaN(duration.get(i))) {
@@ -171,35 +221,22 @@ public class PopulationGeneratingProposalReaderTest {
 				continue;
 			}
 			Assert.assertEquals(duration.get(i), visibility.get(i), 0.001);
-			histduration.addItem(duration.get(i));
-			histdurationw.addItem(duration.get(i), hours.get(i));
+			histdurations.addItem(duration.get(i));
+			histdurationsw.addItem(duration.get(i), hours.get(i) * 1.);
 			histhours.addItem(round(hours.get(i)));
+			histantennas.addItem(antennas.get(i));
+			histantennasw.addItem(antennas.get(i), hours.get(i) * 1.);
 		}
-		histduration.normalize();
-		histdurationw.normalize();
+		histdurations.normalize();
+		histdurationsw.normalize();
 		histhours.normalize();
-		FileWriter fw;
-		fw = new FileWriter("/tmp/histdurationsw.txt");
-		for (Bin<Double> bin : histdurationw) {
-			fw.write((bin.getHigh() + bin.getLow()) / 2. + "\t"
-					+ bin.getCount() + "\t" + bin.getLow() + "\t"
-					+ bin.getHigh() + "\n");
-		}
-		fw.close();
-		fw = new FileWriter("/tmp/histdurations.txt");
-		for (Bin<Double> bin : histduration) {
-			fw.write((bin.getHigh() + bin.getLow()) / 2. + "\t"
-					+ bin.getCount() + "\t" + bin.getLow() + "\t"
-					+ bin.getHigh() + "\n");
-		}
-		fw.close();
-		fw = new FileWriter("/tmp/histhours.txt");
-		for (Bin<Integer> bin : histhours) {
-			fw.write((bin.getHigh() + bin.getLow()) / 2. + "\t"
-					+ bin.getCount() + "\t" + bin.getLow() + "\t"
-					+ bin.getHigh() + "\n");
-		}
-		fw.close();
+		histantennas.normalize();
+		histantennasw.normalize();
+		dumpHistogram(histdurations, "/tmp/histdurations.txt");
+		dumpHistogram(histdurationsw, "/tmp/histdurationsw.txt");
+		dumpHistogramInt(histhours, "/tmp/histhours.txt");
+		dumpHistogramInt(histantennas, "/tmp/histantennas.txt");
+		dumpHistogramInt(histantennasw, "/tmp/histantennasw.txt");
 	}
 
 	private Integer round(double d) {

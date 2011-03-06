@@ -27,5 +27,5 @@ public class JobWithResources extends Job {
 	 * 
 	 * key: resource type (e.g. "antennas"
 	 */
-	public Map<String, ResourceRequirements> resources = new HashMap<String, ResourceRequirements>();
+	public Map<String, ResourceRequirement> resources = new HashMap<String, ResourceRequirement>();
 }

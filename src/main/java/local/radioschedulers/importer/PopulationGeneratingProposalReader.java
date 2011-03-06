@@ -3,13 +3,17 @@ package local.radioschedulers.importer;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import local.radioschedulers.Job;
 import local.radioschedulers.JobWithResources;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.Proposal;
+import local.radioschedulers.ResourceRequirement;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.SolarDateRangeRequirements;
 
@@ -42,7 +46,7 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 		p.name = name + " " + p.id;
 		p.priority = prio;
 		p.jobs = new ArrayList<Job>();
-		Job j = new Job();
+		Job j = newJob();
 		j.hours = totalhours;
 		j.lstmax = endlst;
 		j.lstmin = startlst;
@@ -50,6 +54,71 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 		j.proposal = p;
 		p.jobs.add(j);
 		return p;
+	}
+
+	private void needsFullArray(JobWithResources j) {
+		needsAntennas(j, 42);
+	}
+
+	private void needsAntennas(JobWithResources j, int nantennas) {
+		ResourceRequirement rr = new ResourceRequirement();
+		for (Integer i = 0; i < nantennas; i++)
+			rr.possibles.add(i);
+		rr.numberrequired = nantennas;
+		j.resources.put("antennas", rr);
+	}
+
+	private void needsOneAntenna(JobWithResources j) {
+		ResourceRequirement rr = new ResourceRequirement();
+		rr.possibles.add(r.nextInt(42));
+		rr.numberrequired = 1;
+		j.resources.put("antennas", rr);
+	}
+
+	public static int NANTENNAS = 42;
+
+	public static Set<Integer> allAntennas = new HashSet<Integer>();
+	static {
+		for (Integer i = 0; i < NANTENNAS; i++)
+			allAntennas.add(i);
+	}
+
+	/**
+	 * if false, any subset of antennas of sufficient size can be chosen.
+	 */
+	public static boolean SPECIFIC_RANDOM_GROUP = false;
+
+	private void attachAntennaRequirementsFromProbabilityModel(
+			JobWithResources j) {
+		ResourceRequirement rr = new ResourceRequirement();
+		int n = nantennaProbabilityModel();
+		// TODO: a specific antenna could be selected for maintenance tasks.
+		if (SPECIFIC_RANDOM_GROUP) {
+			ArrayList<Integer> a = new ArrayList<Integer>(allAntennas);
+			Collections.shuffle(a);
+			rr.possibles.addAll(a.subList(0, n));
+		} else {
+			rr.possibles.addAll(allAntennas);
+		}
+		rr.numberrequired = n;
+		j.resources.put("antennas", rr);
+	}
+
+	private int nantennaProbabilityModel() {
+		double d = r.nextDouble() * 100;
+		if (d < 5) {
+			return 1;
+		} else {
+			double v = d - 5;
+			for (int i = 1; i < NANTENNAS; i *= 2) {
+				v--;
+				if (v < 0) {
+					log.debug(" ### drew " + d + " --> nantennas = " + i);
+					return i;
+				}
+			}
+			return NANTENNAS;
+		}
 	}
 
 	public Proposal createDaytimeProposal(String name, double prio,
@@ -60,7 +129,7 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 		p.name = name + " " + p.id;
 		p.priority = prio;
 		p.jobs = new ArrayList<Job>();
-		JobWithResources jwr = new JobWithResources();
+		JobWithResources jwr = newJob();
 		jwr.date = new SolarDateRangeRequirements(new LSTTime(startday,
 				starthour * Schedule.LST_SLOTS_PER_HOUR), new LSTTime(endday,
 				(endhour) * Schedule.LST_SLOTS_PER_HOUR));
@@ -82,7 +151,7 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 		p.priority = r.nextDouble() * 5;
 		p.jobs = new ArrayList<Job>();
 
-		Job j = new Job();
+		Job j = newJob();
 		j.lstmin = r.nextDouble() * 24;
 		j.lstmax = j.lstmin + 6 + r.nextInt(4);
 		if (j.lstmax > 24)
@@ -106,7 +175,7 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 		p.jobs = new ArrayList<Job>();
 		int n = 8;
 		for (int i = 0; i < n; i++) {
-			Job j = new Job();
+			Job j = newJob();
 			j.hours = totalhours / n;
 			j.lstmin = ((i * 24. / n) % 24) * 1.;
 			j.lstmax = (((i + 1) * 24. / n) % 24) * 1.;
@@ -117,10 +186,16 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 		return p;
 	}
 
-	public static double PROPORTION_FULLSKY = 0.3;
-	public static double PROPORTION_MILKYWAY = 0.5;
-	public static double PROPORTION_DAYTIME = 0.2 * (16 - 9) / 24.;
-	public static double PROPORTION_RANDOM = 0.4;
+	private JobWithResources newJob() {
+		JobWithResources j = new JobWithResources();
+		attachAntennaRequirementsFromProbabilityModel(j);
+		return j;
+	}
+
+	public static double PROPORTION_FULLSKY = 0.23;
+	public static double PROPORTION_MILKYWAY = 0.4;
+	public static double PROPORTION_DAYTIME = 0.16 * (16 - 9) / 24.;
+	public static double PROPORTION_RANDOM = 0.32;
 
 	List<Proposal> proposals = new ArrayList<Proposal>();
 
