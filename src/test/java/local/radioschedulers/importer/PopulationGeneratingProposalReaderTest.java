@@ -19,6 +19,8 @@ import org.junit.Test;
 
 public class PopulationGeneratingProposalReaderTest {
 
+	private static final String PROPOSALS_CSV = "/home/user/Downloads/ata-proposals.csv";
+	private static final String TMPDIR = "testoutput";
 	private PopulationGeneratingProposalReader reader;
 
 	@Before
@@ -109,17 +111,17 @@ public class PopulationGeneratingProposalReaderTest {
 		histantennas.normalize();
 		histantennasw.normalize();
 
-		dumpHistogram(histdurations, "/tmp/histdurationsgen.txt");
-		dumpHistogram(histdurationsw, "/tmp/histdurationswgen.txt");
-		dumpHistogramInt(histhours, "/tmp/histhoursgen.txt");
-		dumpHistogramInt(histantennas, "/tmp/histantennasgen.txt");
-		dumpHistogramInt(histantennasw, "/tmp/histantennaswgen.txt");
+		dumpHistogram(histdurations, "histdurationsgen.txt");
+		dumpHistogram(histdurationsw, "histdurationswgen.txt");
+		dumpHistogramInt(histhours, "histhoursgen.txt");
+		dumpHistogramInt(histantennas, "histantennasgen.txt");
+		dumpHistogramInt(histantennasw, "histantennaswgen.txt");
 	}
 
 	private void dumpHistogram(Histogram<Double> durationhist, String filename)
 			throws IOException {
 		FileWriter fw2;
-		fw2 = new FileWriter(filename);
+		fw2 = new FileWriter(getOutputFile(filename));
 		for (Bin<Double> bin : durationhist) {
 			fw2.write((bin.getHigh() + bin.getLow()) / 2. + "\t"
 					+ bin.getCount() + "\t" + bin.getLow() + "\t"
@@ -128,10 +130,14 @@ public class PopulationGeneratingProposalReaderTest {
 		fw2.close();
 	}
 
+	private File getOutputFile(String filename) {
+		return new File(TMPDIR, filename);
+	}
+
 	private void dumpHistogramInt(Histogram<Integer> durationhist, String filename)
 			throws IOException {
 		FileWriter fw2;
-		fw2 = new FileWriter(filename);
+		fw2 = new FileWriter(getOutputFile(filename));
 		for (Bin<Integer> bin : durationhist) {
 			fw2.write((bin.getHigh() + bin.getLow()) / 2. + "\t"
 					+ bin.getCount() + "\t" + bin.getLow() + "\t"
@@ -173,7 +179,7 @@ public class PopulationGeneratingProposalReaderTest {
 
 	@Test
 	public void fetchDataHistogram() throws IOException {
-		File f = new File("/home/user/Downloads/ata-proposals.csv");
+		File f = new File(PROPOSALS_CSV);
 		// List<Double> start = new ArrayList<Double>();
 		// List<Double> end = new ArrayList<Double>();
 		List<Double> duration = new ArrayList<Double>();
@@ -232,11 +238,11 @@ public class PopulationGeneratingProposalReaderTest {
 		histhours.normalize();
 		histantennas.normalize();
 		histantennasw.normalize();
-		dumpHistogram(histdurations, "/tmp/histdurations.txt");
-		dumpHistogram(histdurationsw, "/tmp/histdurationsw.txt");
-		dumpHistogramInt(histhours, "/tmp/histhours.txt");
-		dumpHistogramInt(histantennas, "/tmp/histantennas.txt");
-		dumpHistogramInt(histantennasw, "/tmp/histantennasw.txt");
+		dumpHistogram(histdurations, "histdurations.txt");
+		dumpHistogram(histdurationsw, "histdurationsw.txt");
+		dumpHistogramInt(histhours, "histhours.txt");
+		dumpHistogramInt(histantennas, "histantennas.txt");
+		dumpHistogramInt(histantennasw, "histantennasw.txt");
 	}
 
 	private Integer round(double d) {
