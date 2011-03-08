@@ -52,7 +52,7 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 			population = evolveSchedules(possibles, population);
 			bestschedule = population.get(0);
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e);
 			return null;
 		}
 

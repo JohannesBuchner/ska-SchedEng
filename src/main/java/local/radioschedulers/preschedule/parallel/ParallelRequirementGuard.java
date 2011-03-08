@@ -16,6 +16,23 @@ import local.radioschedulers.preschedule.RequirementGuard;
 
 public class ParallelRequirementGuard extends RequirementGuard {
 
+	private Integer maxParallel;
+
+	/**
+	 * infinite number of tasks are allowed in parallel as long as the
+	 * ressources work out.
+	 */
+	public ParallelRequirementGuard() {
+	}
+
+	/**
+	 * @param maxParallel
+	 *            maximum number of tasks to allow in parallel
+	 */
+	public ParallelRequirementGuard(int maxParallel) {
+		this.maxParallel = maxParallel;
+	}
+
 	/**
 	 * ensures that all the elements in the JobCombination like the date
 	 * 
@@ -35,6 +52,8 @@ public class ParallelRequirementGuard extends RequirementGuard {
 
 	@Override
 	public boolean compatible(Collection<Job> list) {
+		if (maxParallel != null && list.size() > maxParallel)
+			return false;
 		Map<String, Integer> nresources = new HashMap<String, Integer>();
 		Map<String, Set<Object>> res = new HashMap<String, Set<Object>>();
 

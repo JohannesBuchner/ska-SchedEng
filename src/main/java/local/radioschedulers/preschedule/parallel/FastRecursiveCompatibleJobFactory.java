@@ -1,8 +1,10 @@
 package local.radioschedulers.preschedule.parallel;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -15,89 +17,44 @@ import local.radioschedulers.preschedule.RequirementGuard;
 
 import org.apache.log4j.Logger;
 
-public class CompatibleJobFactory {
-	private static Logger log = Logger.getLogger(CompatibleJobFactory.class);
+public class FastRecursiveCompatibleJobFactory {
+	private static Logger log = Logger
+			.getLogger(FastRecursiveCompatibleJobFactory.class);
 
-	private Collection<Job> base;
+	private List<Job> base;
 	private Set<JobCombination> combinations;
 	private RequirementGuard guard;
 
-	public CompatibleJobFactory(Collection<Job> base, RequirementGuard req) {
-		this.base = base;
+	public FastRecursiveCompatibleJobFactory(Collection<Job> base,
+			RequirementGuard req) {
+		this.base = new ArrayList<Job>(base);
 		this.guard = req;
 		generateAllCombinations();
 	}
 
-	private Set<JobCombination> all;
-
 	private void generateAllCombinations() {
 		combinations = new HashSet<JobCombination>();
-		all = new HashSet<JobCombination>();
 
-		// the single jobs
-		log.debug("adding single jobs");
-		Set<JobCombination> extensions = new HashSet<JobCombination>();
-		for (Job j : base) {
-			JobCombination c = new JobCombination();
-			c.jobs.add(j);
-			extensions.add(c);
-		}
-		combinations.addAll(extensions);
-
-		// enrich
-		while (true) {
-			// this could be improved, but hey
-			log.debug("extending ...");
-			extensions = extend(extensions, base);
-			log.debug("extending ... got " + extensions.size() + " extensions");
-			if (extensions.size() == 0)
-				break;
-			else
-				combinations.addAll(extensions);
+		for (int i = 0; i < base.size(); i++) {
+			JobCombination jc = new JobCombination();
+			jc.jobs.add(base.get(i));
+			combinations.add(jc);
+			expand(jc, i + 1, 1);
 		}
 	}
 
-	/**
-	 * calculate a x b (crossproduct), without repetition
-	 * 
-	 * @param a
-	 * @param b
-	 * @param productSize
-	 * @return crossproduct of a x b
-	 */
-	private Set<JobCombination> extend(Collection<JobCombination> a,
-			Collection<Job> b) {
-		Set<JobCombination> successful = new HashSet<JobCombination>();
-
-		log.debug("extension size: " + a.size());
-		log.debug("base size: " + b.size());
-		int ncombinations = 0;
-		for (JobCombination la : a) {
-			for (Job j : b) {
-				if (la.jobs.contains(j)) {
-					// log.debug("already in there");
-					continue;
-				}
-
-				JobCombination lab = new JobCombination();
-				lab.jobs.addAll(la.jobs);
-				lab.jobs.add(j);
-				if (all.add(lab)) {
-					// log.debug("adding " + la.jobs.size()
-					// + " from existing + 1 == " + lab.jobs.size());
-					ncombinations++;
-					if (!a.contains(lab) && guard.compatible(lab.jobs)) {
-						guard.compatible(lab.jobs);
-						successful.add(lab);
-					}
-					// } else {
-					// log.debug("skipping because already done");
-				}
+	private void expand(JobCombination jc, int i, int nelements) {
+		// log.debug(" nelements:" + nelements + " i:" + i);
+		for (; i < base.size(); i++) {
+			JobCombination jc1 = new JobCombination();
+			jc1.jobs.addAll(jc.jobs);
+			jc1.jobs.add(base.get(i));
+			if (guard.compatible(jc1.jobs)) {
+				// good. recurse into it
+				expand(jc1, i + 1, nelements + 1);
+				combinations.add(jc1);
 			}
 		}
-		log.debug("tried out " + ncombinations);
-
-		return successful;
 	}
 
 	protected Set<JobCombination> getCombinationsInternal(Set<Job> jobs) {
@@ -163,7 +120,7 @@ public class CompatibleJobFactory {
 					possibles.put(t, list);
 				}
 				list.add(j);
-				log.debug("@" + t + " : " + j);
+				//log.debug("@" + t + " : " + j);
 			}
 		}
 

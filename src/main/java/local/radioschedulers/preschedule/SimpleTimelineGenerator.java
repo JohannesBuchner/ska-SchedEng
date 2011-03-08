@@ -13,6 +13,7 @@ import local.radioschedulers.LSTTime;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.preschedule.parallel.CompatibleJobFactory;
+import local.radioschedulers.preschedule.parallel.FastRecursiveCompatibleJobFactory;
 
 public class SimpleTimelineGenerator implements ITimelineGenerator {
 	private RequirementGuard req;
@@ -29,9 +30,13 @@ public class SimpleTimelineGenerator implements ITimelineGenerator {
 			alljobs.addAll(p.jobs);
 		}
 		log.debug("found all jobs: " + alljobs.size());
-		CompatibleJobFactory compatibles = new CompatibleJobFactory(alljobs,
-				requirementGuard);
-		log.debug("got compatibleJobFactory with "
+		//CompatibleJobFactory compatibles1 = new CompatibleJobFactory(
+		//		alljobs, requirementGuard);
+		//log.debug("got compatibleJobFactory with "
+		//		+ compatibles1.getCombinations().size() + " combinations.");
+		FastRecursiveCompatibleJobFactory compatibles = new FastRecursiveCompatibleJobFactory(
+				alljobs, requirementGuard);
+		log.debug("got FRcompatibleJobFactory with "
 				+ compatibles.getCombinations().size() + " combinations.");
 		// just a template for the first day
 		ScheduleSpace timelineConstruct = compatibles

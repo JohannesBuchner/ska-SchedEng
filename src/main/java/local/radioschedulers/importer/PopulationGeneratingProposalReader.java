@@ -50,7 +50,7 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 		j.hours = totalhours;
 		j.lstmax = endlst;
 		j.lstmin = startlst;
-		j.id = name;
+		j.id = p.name;
 		j.proposal = p;
 		p.jobs.add(j);
 		return p;
@@ -133,13 +133,21 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 		jwr.date = new SolarDateRangeRequirements(new LSTTime(startday,
 				starthour * Schedule.LST_SLOTS_PER_HOUR), new LSTTime(endday,
 				(endhour) * Schedule.LST_SLOTS_PER_HOUR));
+		/*
+		 * require the staff to be focused on this --> only 1 maintenance task
+		 * at a time.
+		 */
+		ResourceRequirement rr = new ResourceRequirement();
+		rr.possibles.add("staff");
+		rr.numberrequired = 1;
+		jwr.resources.put("operators", rr);
 
 		Job j = jwr;
 		j.hours = totalhours;
 		j.lstmax = 23.99;
 		j.lstmin = 0.;
 		log.debug("Daytime: " + (j.lstmax - j.lstmin));
-		j.id = name;
+		j.id = p.name;
 		j.proposal = p;
 		p.jobs.add(j);
 		return p;
@@ -172,7 +180,7 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 			Long totalhours) {
 		Proposal p = new Proposal();
 		p.id = getNextIdAsString();
-		p.name = name;
+		p.name = name + " " + p.id;
 		p.priority = prio;
 		p.jobs = new ArrayList<Job>();
 		int n = 8;
@@ -182,7 +190,7 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 			j.lstmin = ((i * 24. / n) % 24) * 1.;
 			j.lstmax = (((i + 1) * 24. / n) % 24) * 1.;
 			log.debug("FullSky: " + (j.lstmax - j.lstmin));
-			j.id = name + i;
+			j.id = p.name + i;
 			j.proposal = p;
 			p.jobs.add(j);
 		}
@@ -237,9 +245,8 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 			int hours = r.nextInt(1) * 10 + r.nextInt(10) + 1;
 			totalhours += hours;
 
-			proposals.add(createDaytimeProposal("Maintainance",
-					calcPriority(), 0, ndays, starthour, endhour,
-					hours * 1L));
+			proposals.add(createDaytimeProposal("Maintainance", calcPriority(),
+					0, ndays, starthour, endhour, hours * 1L));
 		}
 
 		log.debug(getCurrentId() + " proposals issued.");
