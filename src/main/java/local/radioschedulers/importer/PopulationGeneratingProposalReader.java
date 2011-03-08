@@ -68,7 +68,7 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 		j.resources.put("antennas", rr);
 	}
 
-	private void needsOneAntenna(JobWithResources j) {
+	private void needsOneSpecificAntenna(JobWithResources j) {
 		ResourceRequirement rr = new ResourceRequirement();
 		rr.possibles.add(r.nextInt(42));
 		rr.numberrequired = 1;
@@ -136,8 +136,9 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 
 		Job j = jwr;
 		j.hours = totalhours;
-		j.lstmax = 0.;
-		j.lstmin = 23.99;
+		j.lstmax = 23.99;
+		j.lstmin = 0.;
+		log.debug("Daytime: " + (j.lstmax - j.lstmin));
 		j.id = name;
 		j.proposal = p;
 		p.jobs.add(j);
@@ -148,7 +149,7 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 		Proposal p = new Proposal();
 		p.id = getNextIdAsString();
 		p.name = "Proposal" + p.id;
-		p.priority = r.nextDouble() * 5;
+		p.priority = calcPriority();
 		p.jobs = new ArrayList<Job>();
 
 		Job j = newJob();
@@ -156,6 +157,7 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 		j.lstmax = j.lstmin + 6 + r.nextInt(4);
 		if (j.lstmax > 24)
 			j.lstmax -= 24;
+		log.debug("Random: " + (j.lstmax - j.lstmin));
 		j.hours = 0L;
 		while (j.hours < 4)
 			j.hours = Math.round((1. / (r.nextDouble() * 200 + 1)) * 6000);
@@ -179,6 +181,7 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 			j.hours = totalhours / n;
 			j.lstmin = ((i * 24. / n) % 24) * 1.;
 			j.lstmax = (((i + 1) * 24. / n) % 24) * 1.;
+			log.debug("FullSky: " + (j.lstmax - j.lstmin));
 			j.id = name + i;
 			j.proposal = p;
 			p.jobs.add(j);
@@ -205,7 +208,7 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 		while (totalhours < ndays * 24 * PROPORTION_FULLSKY) {
 			int hours = 100 + r.nextInt(1000);
 			totalhours += hours;
-			proposals.add(createFullSkyProposal("FullSky", r.nextDouble() * 5,
+			proposals.add(createFullSkyProposal("FullSky", calcPriority(),
 					hours * 1L));
 		}
 
@@ -214,7 +217,7 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 			int startlst = 8 + r.nextInt(4);
 			int hours = r.nextInt(50) + 4;
 			totalhours += hours;
-			proposals.add(createSimpleProposal("Galaxy", r.nextDouble() * 5,
+			proposals.add(createSimpleProposal("Galaxy", calcPriority(),
 					startlst, startlst + 8, hours * 1L));
 		}
 
@@ -235,11 +238,15 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 			totalhours += hours;
 
 			proposals.add(createDaytimeProposal("Maintainance",
-					r.nextDouble() * 5, 0, ndays, starthour, endhour,
+					calcPriority(), 0, ndays, starthour, endhour,
 					hours * 1L));
 		}
 
 		log.debug(getCurrentId() + " proposals issued.");
+	}
+
+	private double calcPriority() {
+		return 1 + r.nextDouble() * 4;
 	}
 
 	/*

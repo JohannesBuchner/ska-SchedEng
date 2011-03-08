@@ -147,12 +147,12 @@ public class PopulationGeneratingProposalReaderTest {
 	}
 
 	private void calculateDurationBins(Histogram<Double> durationhist) {
-		for (int i = 0; i <= 24; i += 4) {
-			durationhist.addBin(i * 1., i + 4.);
+		for (int i = 0; i + 2 <= 24; i += 2) {
+			durationhist.addBin(i * 1., i + 2.);
 		}
 	}
 
-	private void calculateAntennaBins(Histogram<Integer> histantennas) {
+	private void calculateAntennaBins2(Histogram<Integer> histantennas) {
 		histantennas.addBin(0, 1);
 		histantennas.addBin(1, 2);
 		histantennas.addBin(2, 5);
@@ -164,7 +164,15 @@ public class PopulationGeneratingProposalReaderTest {
 		histantennas.addBin(30, 35);
 		histantennas.addBin(35, 40);
 		histantennas.addBin(40, 42);
-		histantennas.addBin(42, 100);
+		histantennas.addBin(42, 45);
+	}
+
+	private void calculateAntennaBins(Histogram<Integer> histantennas) {
+		histantennas.addBin(0, 1);
+		histantennas.addBin(1, 2);
+		for (int i = 2; i <= 42; i+=2) {
+			histantennas.addBin(i, i+2);
+		}
 	}
 
 	private void calculateHourBins(Histogram<Integer> hourhist) {
