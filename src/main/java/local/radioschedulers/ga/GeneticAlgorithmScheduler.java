@@ -40,9 +40,9 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 	public Schedule schedule(ScheduleSpace possibles) {
 		int ndays = possibles.findLastEntry().day.intValue() + 1;
 		this.ngenes = calculateNGenes(possibles);
-		log.debug("got ndays=" + ndays + " plus last minute="
-				+ possibles.findLastEntry().minute);
-		log.debug("so I'd reckon we need " + ngenes + " Genes");
+		// log.debug("got ndays=" + ndays + " plus last minute="
+		// + possibles.findLastEntry().minute);
+		// log.debug("so I'd reckon we need " + ngenes + " Genes");
 
 		if (population == null)
 			population = new ArrayList<Schedule>();

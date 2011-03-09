@@ -55,5 +55,10 @@ public class JobSelector {
 		}
 		return selected;
 	}
+	
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
+	}
 
 }

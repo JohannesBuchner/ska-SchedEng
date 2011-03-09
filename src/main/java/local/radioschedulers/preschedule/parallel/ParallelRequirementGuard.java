@@ -20,7 +20,7 @@ public class ParallelRequirementGuard extends RequirementGuard {
 
 	/**
 	 * infinite number of tasks are allowed in parallel as long as the
-	 * ressources work out.
+	 * resources work out.
 	 */
 	public ParallelRequirementGuard() {
 	}
