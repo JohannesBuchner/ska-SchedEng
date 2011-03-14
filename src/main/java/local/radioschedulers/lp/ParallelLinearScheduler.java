@@ -43,10 +43,22 @@ public class ParallelLinearScheduler implements IScheduler {
 		PrintStream varDefinition;
 		PrintStream constraints;
 		PrintStream costFunction;
+		File vardefFile;
+		File constraintsFile;
+		File costsFile;
+		File lp;
 		try {
-			varDefinition = new PrintStream(new File("vardef.lp"));
-			constraints = new PrintStream(new File("constraints.lp"));
-			costFunction = new PrintStream(new File("costs.lp"));
+			vardefFile = File.createTempFile("vardef", "lp");
+			constraintsFile = File.createTempFile("constraints", "lp");
+			costsFile = File.createTempFile("costs", "lp");
+			lp = File.createTempFile("schedule", "lp");
+		} catch (IOException e1) {
+			throw new IllegalStateException(e1);
+		}
+		try {
+			varDefinition = new PrintStream(vardefFile);
+			constraints = new PrintStream(constraintsFile);
+			costFunction = new PrintStream(costsFile);
 		} catch (FileNotFoundException e1) {
 			throw new IllegalStateException(e1);
 		}
@@ -126,10 +138,11 @@ public class ParallelLinearScheduler implements IScheduler {
 		costFunction.close();
 		constraints.close();
 		varDefinition.close();
-		File lp = new File("schedule.lp");
 		log.debug("concat  ... ");
-		catFilesF(lp, new File("costs.lp"), new File("constraints.lp"),
-				new File("vardef.lp"));
+		catFilesF(lp, costsFile, constraintsFile, vardefFile);
+		costsFile.delete();
+		constraintsFile.delete();
+		vardefFile.delete();
 		log.debug("concat  done");
 
 		Schedule s;
@@ -140,6 +153,7 @@ public class ParallelLinearScheduler implements IScheduler {
 		} catch (IOException e) {
 			throw new IllegalStateException("Install lp_solve", e);
 		}
+		lp.delete();
 		return s;
 	}
 

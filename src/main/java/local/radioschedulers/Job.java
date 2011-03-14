@@ -1,5 +1,7 @@
 package local.radioschedulers;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 /**
  * a unit of execution. Jobs have no interdependencies.
  * 
@@ -14,6 +16,7 @@ public class Job implements Comparable<Job> {
 	/**
 	 * reference to the proposal this job belongs to
 	 */
+	@JsonIgnore
 	public Proposal proposal;
 
 	/**

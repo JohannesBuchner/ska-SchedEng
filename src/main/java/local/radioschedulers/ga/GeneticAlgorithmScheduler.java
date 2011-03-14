@@ -38,7 +38,6 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 	 * @see IScheduler#schedule(java.util.Collection)
 	 */
 	public Schedule schedule(ScheduleSpace possibles) {
-		int ndays = possibles.findLastEntry().day.intValue() + 1;
 		this.ngenes = calculateNGenes(possibles);
 		// log.debug("got ndays=" + ndays + " plus last minute="
 		// + possibles.findLastEntry().minute);
@@ -47,16 +46,14 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 		if (population == null)
 			population = new ArrayList<Schedule>();
 
-		Schedule bestschedule;
 		try {
 			population = evolveSchedules(possibles, population);
-			bestschedule = population.get(0);
+			Schedule bestschedule = population.get(0);
+			return bestschedule;
 		} catch (Exception e) {
 			log.error(e);
 			return null;
 		}
-
-		return bestschedule;
 	}
 
 	public static int calculateNGenes(ScheduleSpace possibles) {

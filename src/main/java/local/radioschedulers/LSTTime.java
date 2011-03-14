@@ -1,5 +1,8 @@
 package local.radioschedulers;
 
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
+
 /**
  * Fundamental time unit, made up of hours and minutes. LST = Local Sidereal
  * Time
@@ -7,7 +10,9 @@ package local.radioschedulers;
  * @author Johannes Buchner
  */
 public class LSTTime implements Comparable<LSTTime> {
-	public LSTTime(Long day, Long minute) {
+	@JsonCreator
+	public LSTTime(@JsonProperty("day") Long day,
+			@JsonProperty("minute") Long minute) {
 		super();
 		this.day = day;
 		this.minute = minute;

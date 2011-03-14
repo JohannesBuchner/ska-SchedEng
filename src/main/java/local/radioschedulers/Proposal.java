@@ -3,8 +3,6 @@ package local.radioschedulers;
 import java.util.Collection;
 import java.util.Date;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-
 /**
  * A proposal is a collection of jobs
  * 
@@ -29,8 +27,7 @@ public class Proposal implements Comparable<Proposal> {
 	/**
 	 * Jobs this Proposal is composed of
 	 */
-	@JsonIgnore
-	public Collection<Job> jobs;
+	public Collection<JobWithResources> jobs;
 
 	/**
 	 * how much is completing the project worth

@@ -1,17 +1,32 @@
 package local.radioschedulers;
 
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
+
 public class SolarDateRangeRequirements implements DateRequirements {
-	private final LSTTime end;
 	private final LSTTime start;
-	private final Long rangesize;
+	private final LSTTime end;
+	@JsonIgnore
+	private Long rangesize;
 	// how many minutes per day are difference between LST and normal date
 	// calculations
-	public final static int conversion = (24 * 60 - (23 * 60 + 56));
+	public static int conversion = (24 * 60 - (23 * 60 + 56));
 
-	public SolarDateRangeRequirements(LSTTime start, LSTTime end) {
+	@JsonCreator
+	public SolarDateRangeRequirements(@JsonProperty("start") LSTTime start,
+			@JsonProperty("end") LSTTime end) {
 		this.start = start;
 		this.end = end;
 		this.rangesize = end.day - start.day;
+	}
+
+	public LSTTime getStart() {
+		return start;
+	}
+
+	public LSTTime getEnd() {
+		return end;
 	}
 
 	@Override

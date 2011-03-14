@@ -1,5 +1,6 @@
 package local.radioschedulers.run;
 
+import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,6 +20,7 @@ import local.radioschedulers.ga.ScheduleFitnessFunction;
 import local.radioschedulers.ga.fitness.SimpleScheduleFitnessFunction;
 import local.radioschedulers.ga.jgap.JGAPScheduler;
 import local.radioschedulers.importer.IProposalReader;
+import local.radioschedulers.importer.JsonProposalReader;
 import local.radioschedulers.importer.PopulationGeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
 import local.radioschedulers.preschedule.SimpleTimelineGenerator;
@@ -33,22 +35,25 @@ public class EvaluateGA {
 	private static Logger log = Logger.getLogger(EvaluateGA.class);
 
 	public static void main(String[] args) throws Exception {
+		String prefix = "";
 		if (args.length > 1)
-			oversubscriptionFactor = Double.parseDouble(args[0]);
-		int maxParallel = 4;
+			prefix = args[0];
 		if (args.length > 2)
-			maxParallel = Integer.parseInt(args[1]);
-		int populationSize = 100;
+			oversubscriptionFactor = Double.parseDouble(args[1]);
+		int maxParallel = 4;
 		if (args.length > 3)
-			populationSize = Integer.parseInt(args[2]);
+			maxParallel = Integer.parseInt(args[2]);
+		int populationSize = 100;
+		if (args.length > 4)
+			populationSize = Integer.parseInt(args[3]);
 		log.info("populationSize: " + populationSize);
 		double crossoverProb = 0.3;
-		if (args.length > 4)
-			crossoverProb = Double.parseDouble(args[3]);
-		double mutationProb = 0.3;
 		if (args.length > 5)
-			mutationProb = Double.parseDouble(args[4]);
-		PrintStream ps = new PrintStream("ga-settings.txt");
+			crossoverProb = Double.parseDouble(args[4]);
+		double mutationProb = 0.3;
+		if (args.length > 6)
+			mutationProb = Double.parseDouble(args[5]);
+		PrintStream ps = new PrintStream(prefix + "ga-settings.txt");
 		ps.println("ndays: " + ndays);
 		ps.println("oversubscriptionFactor: " + oversubscriptionFactor);
 		ps.println("populationSize: " + populationSize);
@@ -82,13 +87,14 @@ public class EvaluateGA {
 		GeneticAlgorithmScheduler scheduler = new JGAPScheduler(f);
 		scheduler.setNumberOfGenerations(1);
 		scheduler.setEliteSize(0);
-		scheduler.setCrossoverProbability(0.01);
-		scheduler.setMutationProbability(0.01);
-		scheduler.setPopulationSize(30);
+		scheduler.setCrossoverProbability(crossoverProb);
+		scheduler.setMutationProbability(mutationProb);
+		scheduler.setPopulationSize(populationSize);
 		scheduler.setPopulation(new ArrayList<Schedule>(schedules.values()));
 
-		PrintStream p = new PrintStream("ga-population-development.txt");
-		for (int i = 0; i < 100 / scheduler.getPopulationSize(); i++) {
+		PrintStream p = new PrintStream(prefix
+				+ "ga-population-development.txt");
+		for (int i = 0; i < 10000 / scheduler.getPopulationSize(); i++) {
 			scheduler.schedule(template);
 			double avg = 0;
 			double best = Double.NaN;
@@ -110,7 +116,7 @@ public class EvaluateGA {
 		}
 		p.close();
 
-		p = new PrintStream("ga-final-population-similarity.txt");
+		p = new PrintStream(prefix + "ga-final-population-similarity.txt");
 		p.println("{");
 		p.println();
 		p.println("\"initial\": {");
@@ -183,8 +189,11 @@ public class EvaluateGA {
 
 	private static IProposalReader getProposalReader() throws Exception {
 		// SqliteProposalReader pr = new SqliteProposalReader();
-		PopulationGeneratingProposalReader pr = new PopulationGeneratingProposalReader();
-		pr.fill((int) (ndays * oversubscriptionFactor));
+		//PopulationGeneratingProposalReader pr = new PopulationGeneratingProposalReader();
+		//pr.fill((int) (ndays * oversubscriptionFactor));
+		JsonProposalReader pr = new JsonProposalReader(new File(
+				"proposals_testset_ndays-" + ndays + "_oversubs-"
+						+ oversubscriptionFactor + ".json"));
 		return pr;
 	}
 
