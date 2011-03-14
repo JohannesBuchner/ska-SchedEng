@@ -1,12 +1,14 @@
 package local.radioschedulers;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
 
 /**
  * a unit of execution. Jobs have no interdependencies.
  * 
  * @author Johannes Buchner
  */
+@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include=JsonTypeInfo.As.PROPERTY, property="@class")
 public class Job implements Comparable<Job> {
 	/**
 	 * (optional) id

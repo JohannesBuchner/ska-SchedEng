@@ -56,6 +56,7 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 		return p;
 	}
 
+	@SuppressWarnings("unused")
 	private void needsFullArray(JobWithResources j) {
 		needsAntennas(j, 42);
 	}
@@ -68,6 +69,7 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 		j.resources.put("antennas", rr);
 	}
 
+	@SuppressWarnings("unused")
 	private void needsOneSpecificAntenna(JobWithResources j) {
 		ResourceRequirement rr = new ResourceRequirement();
 		rr.possibles.add(r.nextInt(42));

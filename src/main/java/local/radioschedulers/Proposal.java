@@ -27,7 +27,7 @@ public class Proposal implements Comparable<Proposal> {
 	/**
 	 * Jobs this Proposal is composed of
 	 */
-	public Collection<JobWithResources> jobs;
+	public Collection<Job> jobs;
 
 	/**
 	 * how much is completing the project worth

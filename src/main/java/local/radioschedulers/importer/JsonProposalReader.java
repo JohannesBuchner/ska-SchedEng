@@ -10,12 +10,10 @@ import local.radioschedulers.Job;
 import local.radioschedulers.Proposal;
 
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.impl.Indenter;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectWriter;
 import org.codehaus.jackson.map.ObjectMapper.DefaultTyping;
 import org.codehaus.jackson.util.DefaultPrettyPrinter;
-import org.codehaus.jackson.util.DefaultPrettyPrinter.Lf2SpacesIndenter;
 
 public class JsonProposalReader implements IProposalReader {
 	private static Logger log = Logger.getLogger(JsonProposalReader.class);
@@ -25,7 +23,10 @@ public class JsonProposalReader implements IProposalReader {
 	public JsonProposalReader(File f) {
 		this.file = f;
 		mapper = new ObjectMapper();
-		mapper.enableDefaultTyping(DefaultTyping.OBJECT_AND_NON_CONCRETE);
+		mapper.enableDefaultTyping(DefaultTyping.JAVA_LANG_OBJECT);
+		//mapper.enableDefaultTyping(DefaultTyping.OBJECT_AND_NON_CONCRETE);
+		//mapper.enableDefaultTyping(DefaultTyping.NON_CONCRETE_AND_ARRAYS);
+		//mapper.enableDefaultTyping(DefaultTyping.NON_FINAL);
 	}
 
 	public void write(Collection<Proposal> proposals) throws Exception {

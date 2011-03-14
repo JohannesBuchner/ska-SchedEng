@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.List;
 
 import local.radioschedulers.Job;
-import local.radioschedulers.JobWithResources;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.importer.JsonProposalReader;
 import local.radioschedulers.importer.PopulationGeneratingProposalReader;
@@ -52,8 +51,8 @@ public class StoreProposals {
 			if (p1.jobs.size() != p2.jobs.size())
 				log.warn("jobs of proposal are different!" + p1 + " vs " + p2);
 
-			List<JobWithResources> c = new ArrayList<JobWithResources>(p1.jobs);
-			List<JobWithResources> d = new ArrayList<JobWithResources>(p2.jobs);
+			List<Job> c = new ArrayList<Job>(p1.jobs);
+			List<Job> d = new ArrayList<Job>(p2.jobs);
 			for (int j = 0; j < p1.jobs.size(); j++) {
 				Job j1 = c.get(j);
 				Job j2 = d.get(j);

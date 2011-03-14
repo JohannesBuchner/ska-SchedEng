@@ -21,7 +21,6 @@ import local.radioschedulers.ga.fitness.SimpleScheduleFitnessFunction;
 import local.radioschedulers.ga.jgap.JGAPScheduler;
 import local.radioschedulers.importer.IProposalReader;
 import local.radioschedulers.importer.JsonProposalReader;
-import local.radioschedulers.importer.PopulationGeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
 import local.radioschedulers.preschedule.SimpleTimelineGenerator;
 import local.radioschedulers.preschedule.parallel.ParallelRequirementGuard;
