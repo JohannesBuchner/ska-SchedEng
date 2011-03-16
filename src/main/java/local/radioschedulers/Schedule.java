@@ -7,46 +7,53 @@ import java.util.TreeMap;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
+
 /**
  * A schedule is a timeline that, for each time slot, assigns a JobCombination
  * that is planned to be executed.
  * 
  * @author Johannes Buchner
  */
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class Schedule implements Iterable<Entry<LSTTime, JobCombination>> {
 	public static final int LST_SLOTS_MINUTES = 15;
 	public static final int LST_SLOTS_PER_HOUR = 60 / LST_SLOTS_MINUTES;
 	public static final int LST_SLOTS_PER_DAY = LST_SLOTS_PER_HOUR * 24;
 
-	private Map<LSTTime, JobCombination> schedule = new TreeMap<LSTTime, JobCombination>();
+	@JsonProperty
+	private Map<LSTTime, JobCombination> content = new TreeMap<LSTTime, JobCombination>();
 
 	public void clear(LSTTime t) {
-		schedule.remove(t);
+		content.remove(t);
 	}
 
 	public void add(LSTTime t, JobCombination jc) {
-		schedule.put(t, jc);
+		content.put(t, jc);
 	}
 
 	public boolean isEmpty(LSTTime t) {
-		if (schedule.containsKey(t))
+		if (content.containsKey(t))
 			return false;
 		else
 			return true;
 	}
 
 	public JobCombination get(LSTTime t) {
-		return schedule.get(t);
+		return content.get(t);
 	}
 
 	public LSTTime findLastEntry() {
-		if (schedule.isEmpty()) {
+		if (content.isEmpty()) {
 			return new LSTTime(0, 0);
 		} else {
-			return Collections.max(schedule.keySet());
+			return Collections.max(content.keySet());
 		}
 	}
 
+	@JsonIgnore
 	@Override
 	public Iterator<Entry<LSTTime, JobCombination>> iterator() {
 		return new Iterator<Entry<LSTTime, JobCombination>>() {

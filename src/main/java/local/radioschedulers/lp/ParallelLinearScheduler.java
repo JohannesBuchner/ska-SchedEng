@@ -48,10 +48,10 @@ public class ParallelLinearScheduler implements IScheduler {
 		File costsFile;
 		File lp;
 		try {
-			vardefFile = File.createTempFile("vardef", "lp");
-			constraintsFile = File.createTempFile("constraints", "lp");
-			costsFile = File.createTempFile("costs", "lp");
-			lp = File.createTempFile("schedule", "lp");
+			vardefFile = File.createTempFile("vardef", ".lp");
+			constraintsFile = File.createTempFile("constraints", ".lp");
+			costsFile = File.createTempFile("costs", ".lp");
+			lp = File.createTempFile("schedule", ".lp");
 		} catch (IOException e1) {
 			throw new IllegalStateException(e1);
 		}
@@ -152,8 +152,9 @@ public class ParallelLinearScheduler implements IScheduler {
 			log.debug("solving done");
 		} catch (IOException e) {
 			throw new IllegalStateException("Install lp_solve", e);
+		} finally {
+			lp.delete();
 		}
-		lp.delete();
 		return s;
 	}
 

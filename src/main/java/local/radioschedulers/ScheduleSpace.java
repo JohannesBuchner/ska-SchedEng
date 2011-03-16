@@ -9,57 +9,64 @@ import java.util.TreeMap;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
+
 /**
  * A schedule space is a timeline that, for each time slot, defines a list of
  * JobCombinations that could be executed.
  * 
  * @author Johannes Buchner
  */
+@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include=JsonTypeInfo.As.PROPERTY, property="@class")
 public class ScheduleSpace implements Iterable<Entry<LSTTime, Set<JobCombination>>> {
 	public static final int LST_SLOTS_MINUTES = 15;
 	public static final int LST_SLOTS_PER_DAY = 60 * 24 / LST_SLOTS_MINUTES;
 
-	private Map<LSTTime, Set<JobCombination>> schedule = new TreeMap<LSTTime, Set<JobCombination>>();
+	@JsonProperty
+	private Map<LSTTime, Set<JobCombination>> possibles = new TreeMap<LSTTime, Set<JobCombination>>();
 
 	private void createIfNeeded(LSTTime t) {
-		if (!schedule.containsKey(t)) {
-			schedule.put(t, new HashSet<JobCombination>());
+		if (!possibles.containsKey(t)) {
+			possibles.put(t, new HashSet<JobCombination>());
 		}
 	}
 
 	public void clear(LSTTime t) {
-		schedule.remove(t);
+		possibles.remove(t);
 	}
 
 	public void add(LSTTime t, JobCombination jc) {
 		createIfNeeded(t);
-		schedule.get(t).add(jc);
+		possibles.get(t).add(jc);
 	}
 
 	public boolean isEmpty(LSTTime t) {
-		if (schedule.containsKey(t))
-			return schedule.get(t).isEmpty();
+		if (possibles.containsKey(t))
+			return possibles.get(t).isEmpty();
 		else
 			return true;
 	}
 
 	public Set<JobCombination> get(LSTTime t) {
 		createIfNeeded(t);
-		return schedule.get(t);
+		return possibles.get(t);
 	}
 
 	public LSTTime findLastEntry() {
-		return Collections.max(schedule.keySet());
+		return Collections.max(possibles.keySet());
 	}
 	
 	public Map<LSTTime, Set<JobCombination>> getSchedule() {
-		return schedule;
+		return possibles;
 	}
 	
 	public void setSchedule(Map<LSTTime, Set<JobCombination>> schedule) {
-		this.schedule = schedule;
+		this.possibles = schedule;
 	}
 
+	@JsonIgnore
 	@Override
 	public Iterator<Entry<LSTTime, Set<JobCombination>>> iterator() {
 		return new Iterator<Entry<LSTTime, Set<JobCombination>>>() {
