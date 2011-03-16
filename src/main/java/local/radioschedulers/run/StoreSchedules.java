@@ -11,9 +11,9 @@ import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.ga.ParallelizedHeuristicsScheduleCollector;
+import local.radioschedulers.importer.CsvScheduleReader;
 import local.radioschedulers.importer.IProposalReader;
 import local.radioschedulers.importer.JsonProposalReader;
-import local.radioschedulers.importer.JsonScheduleReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
 import local.radioschedulers.preschedule.SimpleTimelineGenerator;
 import local.radioschedulers.preschedule.parallel.ParallelRequirementGuard;
@@ -50,16 +50,16 @@ public class StoreSchedules {
 		}
 		log.debug("created heuristic initial population");
 
-		JsonScheduleReader json = new JsonScheduleReader(new File(
-				"schedules.json"), new File("schedulespace.json"), proposals);
-		json.write(template);
-		json.write(schedules);
+		CsvScheduleReader csv = new CsvScheduleReader(new File(
+				"schedules.csv"), new File("schedulespace.csv"), proposals);
+		csv.write(template);
+		csv.write(schedules);
 
-		ScheduleSpace space = json.readspace();
+		ScheduleSpace space = csv.readspace();
 		if (!space.findLastEntry().equals(template.findLastEntry()))
 			log.error("findLastEntry different");
 
-		Map<String, Schedule> schedules3 = json.readall();
+		Map<String, Schedule> schedules3 = csv.readall();
 		for (Entry<String, Schedule> s : schedules3.entrySet()) {
 			String name = s.getKey();
 			Schedule schedule = s.getValue();

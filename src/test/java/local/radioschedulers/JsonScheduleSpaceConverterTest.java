@@ -51,7 +51,7 @@ public class JsonScheduleSpaceConverterTest {
 		// mapper.registerModule(getLSTModule());
 		ScheduleSpace space = mapper.readValue(s.toString(),
 				ScheduleSpace.class);
-		Assert.assertEquals(template.getSchedule().size(), space.getSchedule()
+		Assert.assertEquals(template.getPossibles().size(), space.getPossibles()
 				.size());
 	}
 

@@ -48,5 +48,10 @@ public class JobCombination {
 			return false;
 		return true;
 	}
+	
+	@Override
+	public String toString() {
+		return jobs.toString();
+	}
 
 }

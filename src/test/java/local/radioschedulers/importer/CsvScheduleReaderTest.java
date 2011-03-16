@@ -16,19 +16,22 @@ import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 
+import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class JsonScheduleReaderTest {
+public class CsvScheduleReaderTest {
 
-	private JsonScheduleReader reader;
+	private CsvScheduleReader reader;
 	private File schedFile;
 	private File spaceFile;
 	private Collection<Proposal> proposals;
 	private ScheduleSpace space;
 	private Schedule schedule;
 	private Map<String, Schedule> schedules;
+
+	private static Logger log = Logger.getLogger(CsvScheduleReaderTest.class);
 
 	@Before
 	public void setUp() throws Exception {
@@ -51,19 +54,21 @@ public class JsonScheduleReaderTest {
 
 		space = new ScheduleSpace();
 		space.add(new LSTTime(0, 0), jc);
-		space.add(new LSTTime(0, 1), jc);
+		space.add(new LSTTime(0, 15), jc);
 
 		schedule = new Schedule();
 		schedule.add(new LSTTime(0, 0), jc);
-		schedule.add(new LSTTime(0, 1), jc);
+		schedule.add(new LSTTime(0, 15), jc);
 
 		schedules = new HashMap<String, Schedule>();
 		schedules.put("mysched", schedule);
 
-		schedFile = File.createTempFile("testsched", ".json");
-		spaceFile = File.createTempFile("testspace", ".json");
-
-		reader = new JsonScheduleReader(schedFile, spaceFile, proposals);
+		schedFile = File.createTempFile("testsched", ".dir");
+		schedFile.delete();
+		spaceFile = File.createTempFile("testspace", ".dir");
+		spaceFile.delete();
+		
+		reader = new CsvScheduleReader(schedFile, spaceFile, proposals);
 	}
 
 	@Test
@@ -74,20 +79,17 @@ public class JsonScheduleReaderTest {
 				space.findLastEntry()));
 		for (Entry<LSTTime, Set<JobCombination>> e : readspace) {
 			Set<JobCombination> ref = space.get(e.getKey());
+			log.debug("ref value: " + ref);
+			log.debug("actual value: " + e.getValue());
+			for (JobCombination jc : e.getValue()) {
+				log.debug("checking for: " + jc);
+				Assert.assertTrue(ref.contains(jc));
+			}
 			Assert.assertTrue(ref.equals(e.getValue()));
 			Assert.assertEquals(ref, e.getValue());
 		}
 
 	}
-
-	@Test
-	public void testSchedule() throws Exception {
-		reader.writeone(schedule);
-		Schedule readschedule = reader.readone();
-		Assert.assertTrue(readschedule.findLastEntry().equals(
-				schedule.findLastEntry()));
-	}
-
 
 	@Test
 	public void testSchedules() throws Exception {

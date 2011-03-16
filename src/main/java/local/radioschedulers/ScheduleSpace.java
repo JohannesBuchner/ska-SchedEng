@@ -10,7 +10,6 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 
 /**
@@ -24,12 +23,18 @@ public class ScheduleSpace implements Iterable<Entry<LSTTime, Set<JobCombination
 	public static final int LST_SLOTS_MINUTES = 15;
 	public static final int LST_SLOTS_PER_DAY = 60 * 24 / LST_SLOTS_MINUTES;
 
-	@JsonProperty
-	private Map<LSTTime, Set<JobCombination>> possibles = new TreeMap<LSTTime, Set<JobCombination>>();
+	private Map<LSTTime, JobCombinationChoice> possibles = new TreeMap<LSTTime, JobCombinationChoice>();
 
+	/*
+	 * this stupid intermediate class is needed for JSON export. Sorry.
+	 */
+	@SuppressWarnings("serial")
+	public static class JobCombinationChoice extends HashSet<JobCombination> {
+	}
+	
 	private void createIfNeeded(LSTTime t) {
 		if (!possibles.containsKey(t)) {
-			possibles.put(t, new HashSet<JobCombination>());
+			possibles.put(t, new JobCombinationChoice());
 		}
 	}
 
@@ -58,14 +63,10 @@ public class ScheduleSpace implements Iterable<Entry<LSTTime, Set<JobCombination
 		return Collections.max(possibles.keySet());
 	}
 	
-	public Map<LSTTime, Set<JobCombination>> getSchedule() {
+	public Map<LSTTime, JobCombinationChoice> getPossibles() {
 		return possibles;
 	}
 	
-	public void setSchedule(Map<LSTTime, Set<JobCombination>> schedule) {
-		this.possibles = schedule;
-	}
-
 	@JsonIgnore
 	@Override
 	public Iterator<Entry<LSTTime, Set<JobCombination>>> iterator() {
