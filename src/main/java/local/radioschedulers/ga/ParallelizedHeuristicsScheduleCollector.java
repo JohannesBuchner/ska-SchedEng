@@ -35,6 +35,7 @@ public class ParallelizedHeuristicsScheduleCollector {
 		schedulers.add(new ParallelLinearScheduler());
 
 		schedulers.add(new CPULikeScheduler(new FairPrioritizedSelector()));
+		schedulers.add(new CPULikeScheduler(new FairPrioritizedSelector()));
 		schedulers.add(new CPULikeScheduler(new PrioritizedSelector()));
 		schedulers.add(new CPULikeScheduler(new ShortestFirstSelector()));
 		schedulers.add(new CPULikeScheduler(new RandomizedSelector()));
@@ -61,7 +62,7 @@ public class ParallelizedHeuristicsScheduleCollector {
 			try {
 				log.debug("waiting for scheduling to complete ... "
 						+ tpe.getActiveCount() + " active");
-				if (tpe.awaitTermination(10, TimeUnit.SECONDS)) {
+				if (tpe.awaitTermination(30, TimeUnit.SECONDS)) {
 					break;
 				}
 			} catch (InterruptedException e) {

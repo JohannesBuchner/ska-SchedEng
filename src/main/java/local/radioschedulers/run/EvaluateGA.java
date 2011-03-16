@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import local.radioschedulers.IScheduler;
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
@@ -15,15 +14,12 @@ import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.ga.GeneticAlgorithmScheduler;
-import local.radioschedulers.ga.ParallelizedHeuristicsScheduleCollector;
 import local.radioschedulers.ga.ScheduleFitnessFunction;
 import local.radioschedulers.ga.fitness.SimpleScheduleFitnessFunction;
 import local.radioschedulers.ga.jgap.JGAPScheduler;
+import local.radioschedulers.importer.CsvScheduleReader;
 import local.radioschedulers.importer.IProposalReader;
 import local.radioschedulers.importer.JsonProposalReader;
-import local.radioschedulers.preschedule.ITimelineGenerator;
-import local.radioschedulers.preschedule.SimpleTimelineGenerator;
-import local.radioschedulers.preschedule.parallel.ParallelRequirementGuard;
 
 import org.apache.log4j.Logger;
 
@@ -66,23 +62,17 @@ public class EvaluateGA {
 
 		IProposalReader pr = getProposalReader();
 		Collection<Proposal> proposals = pr.readall();
-		// for (Proposal p : proposals) {
-		// System.out.println(p.toString());
-		// }
+
+		log.debug("loading schedule space");
+		CsvScheduleReader sr = getScheduleReader(maxParallel, proposals);
+		ScheduleSpace template = sr.readspace();
+		log.debug("loaded schedule space");
+
+		log.debug("loading heuristic initial population");
+		Map<String, Schedule> schedules = sr.readall();
+		log.debug("loaded heuristic initial population");
+
 		ScheduleFitnessFunction f = getFitnessFunction();
-
-		log.debug("creating schedule space");
-		ITimelineGenerator tlg = new SimpleTimelineGenerator(
-				new ParallelRequirementGuard(maxParallel));
-		ScheduleSpace template = tlg.schedule(proposals, ndays);
-
-		log.debug("created schedule space");
-
-		log.debug("creating heuristic initial population");
-		Map<IScheduler, Schedule> schedules = ParallelizedHeuristicsScheduleCollector
-				.getStartSchedules(template);
-		log.debug("created heuristic initial population");
-
 		GeneticAlgorithmScheduler scheduler = new JGAPScheduler(f);
 		scheduler.setNumberOfGenerations(1);
 		scheduler.setEliteSize(0);
@@ -93,7 +83,7 @@ public class EvaluateGA {
 
 		PrintStream p = new PrintStream(prefix
 				+ "ga-population-development.txt");
-		for (int i = 0; i < 10000 / scheduler.getPopulationSize(); i++) {
+		for (int i = 0; i < 200 / scheduler.getPopulationSize(); i++) {
 			scheduler.schedule(template);
 			double avg = 0;
 			double best = Double.NaN;
@@ -115,15 +105,15 @@ public class EvaluateGA {
 		}
 		p.close();
 
-		p = new PrintStream(prefix + "ga-final-population-similarity.txt");
+		p = new PrintStream(prefix + "ga-final-population-similarity.json");
 		p.println("{");
 		p.println();
 		p.println("\"initial\": {");
-		for (Entry<IScheduler, Schedule> e : schedules.entrySet()) {
-			IScheduler scheduler1 = e.getKey();
+		for (Entry<String, Schedule> e : schedules.entrySet()) {
+			String scheduler1 = e.getKey();
 			Schedule s1 = e.getValue();
 			double v = f.evaluate(s1);
-			p.println("\t\"" + scheduler1.toString() + "\":" + v + ",");
+			p.println("\t\"" + scheduler1 + "\":" + v + ",");
 		}
 		p.println("\t\"thats it\":3.14");
 		p.println("},");
@@ -135,11 +125,11 @@ public class EvaluateGA {
 			p.println("\t\t\"value\":" + v + ",");
 			p.println("\t\t\"schedulers\": {");
 
-			for (Entry<IScheduler, Schedule> e : schedules.entrySet()) {
-				IScheduler scheduler1 = e.getKey();
+			for (Entry<String, Schedule> e : schedules.entrySet()) {
+				String scheduler1 = e.getKey();
 				Schedule s1 = e.getValue();
 				double commonality = compareSchedules(s, s1);
-				p.println("\t\t\t\"" + scheduler1.toString() + "\":"
+				p.println("\t\t\t\"" + scheduler1 + "\":"
 						+ commonality + ",");
 			}
 			p.println("\t\t\t\"thats it\":3.14");
@@ -194,6 +184,20 @@ public class EvaluateGA {
 				"proposals_testset_ndays-" + ndays + "_oversubs-"
 						+ oversubscriptionFactor + ".json"));
 		return pr;
+	}
+
+	private static CsvScheduleReader getScheduleReader(int maxParallel,
+			Collection<Proposal> proposals) {
+		File schedulesFile = new File("schedule_testset_ndays-" + ndays
+				+ "_oversubs-" + oversubscriptionFactor + "_parallel-"
+				+ maxParallel + ".csv");
+		File spaceFile = new File("space_testset_ndays-" + ndays
+				+ "_oversubs-" + oversubscriptionFactor + "_parallel-"
+				+ maxParallel + ".csv");
+
+		CsvScheduleReader csv = new CsvScheduleReader(schedulesFile, spaceFile,
+				proposals);
+		return csv;
 	}
 
 }

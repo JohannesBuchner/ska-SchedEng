@@ -35,7 +35,7 @@ public class CPULikeScheduler implements IScheduler {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + " with jobselector " + jobselector;
+		return getClass().getSimpleName() + " with jobselector " + jobselector + " instance " + hashCode();
 	}
 
 	/*

@@ -50,8 +50,7 @@ public class StoreSchedules {
 		}
 		log.debug("created heuristic initial population");
 
-		CsvScheduleReader csv = new CsvScheduleReader(new File(
-				"schedules.csv"), new File("schedulespace.csv"), proposals);
+		CsvScheduleReader csv = getScheduleReader(maxParallel, proposals);
 		csv.write(template);
 		csv.write(schedules);
 
@@ -69,6 +68,20 @@ public class StoreSchedules {
 				log.error("findLastEntry different for '" + name + "'");
 
 		}
+	}
+
+	private static CsvScheduleReader getScheduleReader(int maxParallel,
+			Collection<Proposal> proposals) {
+		File schedulesFile = new File("schedule_testset_ndays-" + ndays
+				+ "_oversubs-" + oversubscriptionFactor + "_parallel-"
+				+ maxParallel + ".csv");
+		File spaceFile = new File("space_testset_ndays-" + ndays
+				+ "_oversubs-" + oversubscriptionFactor + "_parallel-"
+				+ maxParallel + ".csv");
+
+		CsvScheduleReader csv = new CsvScheduleReader(schedulesFile, spaceFile,
+				proposals);
+		return csv;
 	}
 
 	private static IProposalReader getProposalReader() throws Exception {
