@@ -67,7 +67,7 @@ public class CsvScheduleReaderTest {
 		schedFile.delete();
 		spaceFile = File.createTempFile("testspace", ".dir");
 		spaceFile.delete();
-		
+
 		reader = new CsvScheduleReader(schedFile, spaceFile, proposals);
 	}
 
@@ -102,9 +102,18 @@ public class CsvScheduleReaderTest {
 
 	@After
 	public void teardown() {
-		// schedFile.deleteOnExit();
-		// spaceFile.deleteOnExit();
-		// schedFile.delete();
-		// spaceFile.delete();
+		if (schedFile.exists()) {
+			for (File f : schedFile.listFiles()) {
+				if (f.isFile()) {
+					f.deleteOnExit();
+					f.delete();
+				}
+			}
+			Assert.assertTrue(schedFile.delete());
+		}
+		if (spaceFile.exists()) {
+			spaceFile.deleteOnExit();
+			spaceFile.delete();
+		}
 	}
 }

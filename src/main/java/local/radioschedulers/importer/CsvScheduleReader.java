@@ -19,14 +19,9 @@ import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.ObjectWriter;
-import org.codehaus.jackson.util.DefaultPrettyPrinter;
 
 public class CsvScheduleReader {
 	private static Logger log = Logger.getLogger(CsvScheduleReader.class);
-	private ObjectMapper mapper;
 	private File spaceFile;
 	private File schedulesFile;
 	private Map<String, Job> jobmap = new HashMap<String, Job>();
@@ -40,10 +35,6 @@ public class CsvScheduleReader {
 				jobmap.put(j.id, j);
 			}
 		}
-	}
-
-	private Job lookup(Job j) {
-		return jobmap.get(j.id);
 	}
 
 	private Job lookup(String jobid) {

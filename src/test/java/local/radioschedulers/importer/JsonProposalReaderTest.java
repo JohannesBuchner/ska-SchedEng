@@ -19,8 +19,6 @@ public class JsonProposalReaderTest {
 	private ArrayList<Proposal> proposals;
 	private File proposalFile;
 
-	private static Logger log = Logger.getLogger(JsonProposalReaderTest.class);
-
 	@Before
 	public void setUp() throws Exception {
 		proposals = new ArrayList<Proposal>();
@@ -66,5 +64,6 @@ public class JsonProposalReaderTest {
 	@After
 	public void teardown() {
 		this.proposalFile.deleteOnExit();
+		this.proposalFile.delete();
 	}
 }
