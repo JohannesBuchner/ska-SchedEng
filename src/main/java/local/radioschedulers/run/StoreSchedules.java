@@ -26,10 +26,10 @@ public class StoreSchedules {
 	private static Logger log = Logger.getLogger(StoreSchedules.class);
 
 	public static void main(String[] args) throws Exception {
-		if (args.length > 1)
+		if (args.length >= 1)
 			oversubscriptionFactor = Double.parseDouble(args[0]);
 		int maxParallel = 4;
-		if (args.length > 2)
+		if (args.length >= 2)
 			maxParallel = Integer.parseInt(args[1]);
 
 		IProposalReader pr = getProposalReader();

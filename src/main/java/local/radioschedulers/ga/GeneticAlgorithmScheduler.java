@@ -2,25 +2,21 @@ package local.radioschedulers.ga;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Vector;
-
-import org.apache.log4j.Logger;
 
 import local.radioschedulers.IScheduler;
-import local.radioschedulers.Job;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.preschedule.RequirementGuard;
+
+import org.apache.log4j.Logger;
 
 public abstract class GeneticAlgorithmScheduler implements IScheduler {
 
 	private static Logger log = Logger
 			.getLogger(GeneticAlgorithmScheduler.class);
 
-	protected HashMap<LSTTime, Vector<Job>> possibles = new HashMap<LSTTime, Vector<Job>>();
 	protected RequirementGuard requirementGuard;
 	protected int ngenes;
 
@@ -46,8 +42,11 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 		if (population == null)
 			population = new ArrayList<Schedule>();
 
+		List<Schedule> lastPopulation = population;
+		population = null;
+		
 		try {
-			population = evolveSchedules(possibles, population);
+			population = evolveSchedules(possibles, lastPopulation);
 			Schedule bestschedule = population.get(0);
 			return bestschedule;
 		} catch (Exception e) {
