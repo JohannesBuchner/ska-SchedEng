@@ -54,14 +54,17 @@ public class WFSchedulerTest {
 		scheduler.setNumberOfGenerations(10);
 	}
 
+	public void testCrossover() throws Exception {
+	}
+
 	@Test
 	public void testGA() throws Exception {
 		Schedule s = scheduler.schedule(template);
 
 		Assert.assertNotNull(s);
 
-		Assert.assertEquals("ScheduleSpace and Schedule have the same length",
-				template.findLastEntry().day, s.findLastEntry().day);
+		WFScheduleFactoryTest
+				.assertScheduleIsWithinTemplate(s, template, ndays);
 		int i = 0;
 		Set<Proposal> scheduledJobs = new HashSet<Proposal>();
 		// Test correctness

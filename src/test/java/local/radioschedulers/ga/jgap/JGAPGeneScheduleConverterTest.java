@@ -48,6 +48,7 @@ public class JGAPGeneScheduleConverterTest {
 		CPULikeScheduler scheduler = new CPULikeScheduler(
 				new RandomizedSelector());
 		schedule = scheduler.schedule(template);
+		Configuration.reset();
 		conf = new DefaultConfiguration();
 	}
 
