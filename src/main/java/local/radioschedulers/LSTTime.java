@@ -1,6 +1,7 @@
 package local.radioschedulers;
 
 import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 
@@ -10,7 +11,7 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
  * 
  * @author Johannes Buchner
  */
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include=JsonTypeInfo.As.PROPERTY, property="@class")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class LSTTime implements Comparable<LSTTime> {
 	@JsonCreator
 	public LSTTime(@JsonProperty("day") Long day,
@@ -48,6 +49,15 @@ public class LSTTime implements Comparable<LSTTime> {
 			return minute.compareTo(o.minute);
 		else
 			return v;
+	}
+
+	@JsonIgnore
+	public boolean isBefore(LSTTime o) {
+		return compareTo(o) < 0;
+	}
+	@JsonIgnore
+	public boolean isAfter(LSTTime o) {
+		return compareTo(o) > 0;
 	}
 
 	@Override

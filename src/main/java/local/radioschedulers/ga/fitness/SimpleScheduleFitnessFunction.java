@@ -44,6 +44,7 @@ public class SimpleScheduleFitnessFunction implements
 			JobCombination previousEntry, Map<Job, Long> timeleftMap) {
 		Long timeleft;
 		double expvalue = 0;
+		boolean inPreviousSlot;
 
 		if (jc == null) {
 			// no points for doing nothing
@@ -55,7 +56,7 @@ public class SimpleScheduleFitnessFunction implements
 				timeleft = timeleftMap.get(j) - Schedule.LST_SLOTS_MINUTES;
 				timeleftMap.put(j, timeleft);
 
-				boolean inPreviousSlot = previousEntry != null
+				inPreviousSlot = previousEntry != null
 						&& previousEntry.jobs.contains(j);
 
 				expvalue += Math.log(evaluateSlotJob(j, timeleft,
