@@ -1,4 +1,4 @@
-package local.radioschedulers.ga;
+package local.radioschedulers.ga.jgap;
 
 import java.util.Collection;
 import java.util.Map.Entry;
