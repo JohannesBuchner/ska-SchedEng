@@ -2,9 +2,10 @@ package local.radioschedulers.run;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -55,7 +56,7 @@ public abstract class EvaluateGA {
 	}
 
 	public void run() throws Exception {
-		PrintStream ps = new PrintStream(prefix + "ga-settings.txt");
+		PrintStream ps = getOutputFile("ga-settings.txt");
 		ps.println("ndays: " + ndays);
 		ps.println("oversubscriptionFactor: " + oversubscriptionFactor);
 		ps.println("populationSize: " + populationSize);
@@ -66,7 +67,7 @@ public abstract class EvaluateGA {
 		log.info("{ populationSize: " + populationSize + " }");
 		log.info("{ mutationProb: " + mutationProb + " }");
 		log.info("{ crossoverProb: " + crossoverProb + " }");
-		
+
 		IProposalReader pr = getProposalReader();
 		Collection<Proposal> proposals = pr.readall();
 
@@ -76,28 +77,46 @@ public abstract class EvaluateGA {
 		log.debug("loaded schedule space");
 
 		log.debug("loading heuristic initial population");
-		Map<String, Schedule> schedules = sr.readall();
+		Map<String, Schedule> schedules = readSchedules(sr);
 		log.debug("loaded heuristic initial population");
 
 		ScheduleFitnessFunction f = getFitnessFunction();
 
-		List<Schedule> lastPopulation = new ArrayList<Schedule>(schedules
-				.values());
-		PrintStream p = new PrintStream(prefix
-				+ "ga-population-development.txt");
-		lastPopulation = evolveGA(ps, template, lastPopulation, f, p);
+		List<Schedule> lastPopulation;
+		PrintStream p = getOutputFile("ga-population-development.txt");
+		lastPopulation = evolveGA(ps, template, schedules, f, p);
 		p.close();
 		if (lastPopulation == null)
-			throw new IllegalStateException("scheduler returned null as population");
+			throw new IllegalStateException(
+					"scheduler returned null as population");
 
 		compareInitialAndFinalPopulations(schedules, f, lastPopulation);
+	}
+
+	private Map<String, Schedule> readSchedules(CsvScheduleReader sr)
+			throws IOException {
+
+		Map<String, Schedule> schedules = sr.readall();
+		Map<String, Schedule> selectedSchedules = new HashMap<String, Schedule>();
+		for (Entry<String, Schedule> e : schedules.entrySet()) {
+			if (!e.getKey().contains("RandomizedSelector")) {
+				selectedSchedules.put(e.getKey(), e.getValue());
+			}
+		}
+
+		return selectedSchedules;
+	}
+
+	protected PrintStream getOutputFile(String suffix)
+			throws FileNotFoundException {
+		return new PrintStream(prefix + suffix);
 	}
 
 	private void compareInitialAndFinalPopulations(
 			Map<String, Schedule> schedules, ScheduleFitnessFunction f,
 			List<Schedule> lastPopulation) throws FileNotFoundException {
 		PrintStream p;
-		p = new PrintStream(prefix + "ga-final-population-similarity.json");
+		p = getOutputFile("ga-final-population-similarity.json");
 		p.println("{");
 		p.println();
 		p.println("\"initial\": {");
@@ -132,7 +151,7 @@ public abstract class EvaluateGA {
 	}
 
 	abstract protected List<Schedule> evolveGA(PrintStream ps,
-			ScheduleSpace template, List<Schedule> population,
+			ScheduleSpace template, Map<String, Schedule> schedules,
 			ScheduleFitnessFunction f, PrintStream p) throws Exception;
 
 	private double compareSchedules(Schedule s, Schedule s1) {

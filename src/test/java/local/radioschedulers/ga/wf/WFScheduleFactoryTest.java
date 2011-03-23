@@ -53,7 +53,10 @@ public class WFScheduleFactoryTest {
 
 	public static void assertScheduleIsWithinTemplate(Schedule schedule,
 			ScheduleSpace template, int ndays) {
-		Assert.assertEquals(schedule.findLastEntry().day.intValue(), template.findLastEntry().day.intValue(), 1);
+		Assert.assertEquals(schedule.findLastEntry().day.intValue(), template
+				.findLastEntry().day.intValue(), 1);
+		Assert.assertTrue(schedule.findLastEntry().compareTo(
+				template.findLastEntry()) <= 0);
 		Assert.assertEquals(schedule.findLastEntry().day.intValue(), ndays, 1);
 
 		for (Entry<LSTTime, JobCombination> e : schedule) {
@@ -61,6 +64,9 @@ public class WFScheduleFactoryTest {
 			JobCombination jc = schedule.get(t);
 			Set<JobCombination> jcs = template.get(t);
 
+			if (jc != null && !jcs.contains(jc)) {
+				System.out.println(jc + " should be in " + jcs);
+			}
 			if (jc != null)
 				Assert
 						.assertTrue(jc + " should be in " + jcs, jcs

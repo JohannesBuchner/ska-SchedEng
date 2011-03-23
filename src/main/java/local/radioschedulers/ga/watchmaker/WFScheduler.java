@@ -17,10 +17,9 @@ import org.uncommons.maths.random.Probability;
 import org.uncommons.watchmaker.framework.EvaluatedCandidate;
 import org.uncommons.watchmaker.framework.EvolutionObserver;
 import org.uncommons.watchmaker.framework.EvolutionaryOperator;
-import org.uncommons.watchmaker.framework.GenerationalEvolutionEngine;
 import org.uncommons.watchmaker.framework.SelectionStrategy;
 import org.uncommons.watchmaker.framework.operators.EvolutionPipeline;
-import org.uncommons.watchmaker.framework.selection.TruncationSelection;
+import org.uncommons.watchmaker.framework.selection.RouletteWheelSelection;
 import org.uncommons.watchmaker.framework.termination.GenerationCount;
 
 public class WFScheduler extends GeneticAlgorithmScheduler {
@@ -28,6 +27,15 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 
 	private WFFitnessFunction fitness;
 	private EvolutionObserver<Schedule> observer;
+	private GeneticHistory<Schedule, String> history;
+
+	public void setHistory(GeneticHistory<Schedule, String> history) {
+		this.history = history;
+	}
+
+	public GeneticHistory<Schedule, String> getHistory() {
+		return history;
+	}
 
 	public WFScheduler(ScheduleFitnessFunction f) {
 		fitness = new WFFitnessFunction(f);
@@ -39,26 +47,38 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 
 		EvolutionaryOperator<Schedule> pipeline = getOperators(possibles);
 
-		// SelectionStrategy<Object> selection = new RouletteWheelSelection();
+		SelectionStrategy<Object> selection = new RouletteWheelSelection();
 		// SelectionStrategy<Object> selection = new TournamentSelection(
 		// new Probability(0.99));
-		SelectionStrategy<Object> selection = new TruncationSelection(0.5);
+		// SelectionStrategy<Object> selection = new TruncationSelection(0.5);
 
 		Random rng = new MersenneTwisterRNG();
 
 		ScheduleFactory factory = new ScheduleFactory(possibles);
+		factory.setHistory(history);
 
-		GenerationalEvolutionEngine<Schedule> engine = new GenerationalEvolutionEngine<Schedule>(
+		PopulationEvolutionEngine<Schedule> engine = new PopulationEvolutionEngine<Schedule>(
 				factory, pipeline, fitness, selection, rng);
 
 		if (observer != null)
 			engine.addEvolutionObserver(observer);
 
+		engine.addPopulationObserver(new PopulationObserver<Schedule>() {
+
+			@Override
+			public void updatePopulation(List<EvaluatedCandidate<Schedule>> pop) {
+				if (history != null)
+					history.retain(pop);
+			}
+		});
+
 		log.debug("# of generations: " + getNumberOfGenerations());
 		log.debug("# of chromosomes: " + getPopulationSize());
+
 		List<EvaluatedCandidate<Schedule>> pop = engine.evolvePopulation(
-				getPopulationSize(), getEliteSize(), getPopulation(), new GenerationCount(
+				getPopulationSize(), getEliteSize(), ss, new GenerationCount(
 						getNumberOfGenerations()));
+
 		log.debug("# in final population: " + pop.size());
 
 		List<Schedule> survivers = new ArrayList<Schedule>();
@@ -75,10 +95,15 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 		List<EvolutionaryOperator<Schedule>> operators = new LinkedList<EvolutionaryOperator<Schedule>>();
 		// new StringMutation(null, new NumberGener);
 
-		operators.add(new ScheduleCrossover(1, new Probability(
-				getCrossoverProbability())));
-		operators.add(new ScheduleMutation(possibles, new Probability(
-				getMutationProbability())));
+		ScheduleCrossover crossover = new ScheduleCrossover(1, new Probability(
+				getCrossoverProbability()));
+		crossover.setHistory(history);
+		operators.add(crossover);
+
+		ScheduleMutation mutation = new ScheduleMutation(possibles,
+				new Probability(getMutationProbability()));
+		mutation.setHistory(history);
+		operators.add(mutation);
 		// operators.add(new StringExchangeMutation(new Probability(0.001)));
 		EvolutionaryOperator<Schedule> pipeline = new EvolutionPipeline<Schedule>(
 				operators);

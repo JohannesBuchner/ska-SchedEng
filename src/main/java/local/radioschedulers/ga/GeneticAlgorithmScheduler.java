@@ -51,6 +51,7 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 			return bestschedule;
 		} catch (Exception e) {
 			log.error(e);
+			e.printStackTrace();
 			return null;
 		}
 	}

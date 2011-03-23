@@ -16,6 +16,11 @@ import org.uncommons.watchmaker.framework.CandidateFactory;
 
 public class ScheduleFactory implements CandidateFactory<Schedule> {
 	private ScheduleSpace possibles;
+	private GeneticHistory<Schedule, String> history;
+
+	public void setHistory(GeneticHistory<Schedule, String> history) {
+		this.history = history;
+	}
 
 	public ScheduleFactory(ScheduleSpace possibles) {
 		this.possibles = possibles;
@@ -32,7 +37,9 @@ public class ScheduleFactory implements CandidateFactory<Schedule> {
 			Collection<Schedule> seedCandidates, Random rng) {
 		List<Schedule> list = new ArrayList<Schedule>();
 		if (seedCandidates != null && !seedCandidates.isEmpty()) {
-			list.addAll(seedCandidates);
+			while (list.size() < populationSize) {
+				list.addAll(seedCandidates);
+			}
 		}
 		while (list.size() < populationSize) {
 			list.add(generateRandomCandidate(rng));
@@ -51,6 +58,9 @@ public class ScheduleFactory implements CandidateFactory<Schedule> {
 						.nextInt(jcs.size())];
 				s.add(t, jc);
 			}
+		}
+		if (history != null) {
+			history.initiated(s, getClass().getSimpleName().toString());
 		}
 		return s;
 	}

@@ -20,6 +20,12 @@ public class ScheduleMutation implements EvolutionaryOperator<Schedule> {
 	private final NumberGenerator<Probability> mutationProbability;
 	private ScheduleSpace possibles;
 
+	public GeneticHistory<Schedule, ?> history;
+
+	public void setHistory(GeneticHistory<Schedule, ?> history) {
+		this.history = history;
+	}
+
 	public ScheduleMutation(ScheduleSpace possibles, Probability probability) {
 		this(possibles, new ConstantGenerator<Probability>(probability));
 	}
@@ -40,20 +46,32 @@ public class ScheduleMutation implements EvolutionaryOperator<Schedule> {
 		return mutatedPopulation;
 	}
 
-	private Schedule mutateSchedule(Schedule s, Random rng) {
-		for (Entry<LSTTime, JobCombination> e : s) {
+	private Schedule mutateSchedule(Schedule s1, Random rng) {
+		Schedule s2 = new Schedule();
+		int i = 0;
+		int n = 0;
+		for (Entry<LSTTime, JobCombination> e : s1) {
+			LSTTime t = e.getKey();
 			if (mutationProbability.nextValue().nextEvent(rng)) {
-				LSTTime t = e.getKey();
-				s.clear(t);
 				Set<JobCombination> jcs = possibles.get(t);
 				if (jcs != null && jcs.size() > 0) {
 					JobCombination jc = (JobCombination) jcs.toArray()[rng
 							.nextInt(jcs.size())];
-					s.add(t, jc);
+					s2.add(t, jc);
 				}
+				i++;
+			} else {
+				s2.add(t, s1.get(t));
+
 			}
+			n++;
 		}
-		return s;
+		if (history != null) {
+			history.derive(s2, s1, i * 1. / n);
+			// rest is random
+		}
+
+		return s2;
 	}
 
 }

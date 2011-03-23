@@ -12,6 +12,12 @@ import org.uncommons.watchmaker.framework.operators.AbstractCrossover;
 
 public class ScheduleCrossover extends AbstractCrossover<Schedule> {
 
+	public GeneticHistory<Schedule, ?> history;
+	
+	public void setHistory(GeneticHistory<Schedule, ?> history) {
+		this.history = history;
+	}
+	
 	public ScheduleCrossover(int crossoverPoints, Probability probability) {
 		super(crossoverPoints, probability);
 	}
@@ -22,7 +28,7 @@ public class ScheduleCrossover extends AbstractCrossover<Schedule> {
 		LSTTime last = parent1.findLastEntry();
 		{
 			LSTTime last2 = parent2.findLastEntry();
-			if (last2.compareTo(last) > 1) {
+			if (last2.compareTo(last) > 0) {
 				last = last2;
 			}
 		}
@@ -39,15 +45,19 @@ public class ScheduleCrossover extends AbstractCrossover<Schedule> {
 			a = tmp;
 		}
 
+		int i = 0;
+		int n = 0;
 		LSTTime t = new LSTTime(0L, 0L);
 		while (t.compareTo(last) <= 0) {
 			if (t.isAfter(a) && t.isBefore(b)) {
 				mix1.add(t, parent1.get(t));
 				mix2.add(t, parent2.get(t));
+				i++;
 			} else {
 				mix1.add(t, parent2.get(t));
 				mix2.add(t, parent1.get(t));
 			}
+			n++;
 
 			t.minute += Schedule.LST_SLOTS_MINUTES;
 
@@ -60,6 +70,13 @@ public class ScheduleCrossover extends AbstractCrossover<Schedule> {
 		ArrayList<Schedule> list = new ArrayList<Schedule>(2);
 		list.add(mix1);
 		list.add(mix2);
+		if (history!= null) {
+			history.derive(mix1, parent1, i * 1. / n);
+			history.derive(mix2, parent1, 1 - i * 1. / n);
+			history.derive(mix1, parent2, 1 - i * 1. / n);
+			history.derive(mix2, parent2, i * 1. / n);
+		}
+		
 		return list;
 	}
 }

@@ -12,7 +12,6 @@ import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.cpu.CPULikeScheduler;
 import local.radioschedulers.cpu.FairPrioritizedSelector;
 import local.radioschedulers.cpu.PrioritizedSelector;
-import local.radioschedulers.cpu.RandomizedSelector;
 import local.radioschedulers.cpu.ShortestFirstSelector;
 import local.radioschedulers.exporter.HtmlExport;
 import local.radioschedulers.lp.ParallelLinearScheduler;
@@ -33,13 +32,14 @@ public class HeuristicsScheduleCollector {
 		schedulers.add(new CPULikeScheduler(new PrioritizedSelector()));
 		schedulers.add(new CPULikeScheduler(new ShortestFirstSelector()));
 
-		CPULikeScheduler rand = new CPULikeScheduler(new RandomizedSelector());
+		/*CPULikeScheduler rand = new CPULikeScheduler(new RandomizedSelector());
 		schedulers.add(rand);
 		schedulers.add(rand);
 		schedulers.add(rand);
-		schedulers.add(rand);
+		schedulers.add(rand);*/
 
 		schedulers.add(new ParallelLinearScheduler());
+		//schedulers.add(new LinearScheduler());
 
 		for (IScheduler s : schedulers) {
 			log.debug("scheduling using " + s);
