@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import local.radioschedulers.LSTTime;
+import local.radioschedulers.LSTTimeIterator;
 import local.radioschedulers.Schedule;
 
 import org.apache.log4j.Logger;
@@ -12,6 +13,8 @@ import org.uncommons.maths.random.Probability;
 import org.uncommons.watchmaker.framework.operators.AbstractCrossover;
 
 public class ScheduleCrossover extends AbstractCrossover<Schedule> {
+
+	@SuppressWarnings("unused")
 	private static Logger log = Logger.getLogger(ScheduleCrossover.class);
 	public GeneticHistory<Schedule, ?> history;
 
@@ -27,13 +30,11 @@ public class ScheduleCrossover extends AbstractCrossover<Schedule> {
 	protected List<Schedule> mate(Schedule parent1, Schedule parent2,
 			int numberOfCrossoverPoints, Random rng) {
 		LSTTime last = parent1.findLastEntry();
-		log.debug("parent1 last: " + last);
 		{
 			LSTTime last2 = parent2.findLastEntry();
 			if (last2.compareTo(last) > 0) {
 				last = last2;
 			}
-			log.debug("parent2 last: " + last);
 		}
 		Schedule mix1 = new Schedule();
 		Schedule mix2 = new Schedule();
@@ -50,9 +51,9 @@ public class ScheduleCrossover extends AbstractCrossover<Schedule> {
 
 		int i = 0;
 		int n = 0;
-		LSTTime tc = new LSTTime(0L, 0L);
-		while (tc.compareTo(last) <= 0) {
-			LSTTime t = new LSTTime(tc.day, tc.minute);
+		for (LSTTimeIterator it = new LSTTimeIterator(last,
+				Schedule.LST_SLOTS_MINUTES); it.hasNext();) {
+			LSTTime t = it.next();
 			if (t.isAfter(a) && t.isBefore(b)) {
 				mix1.add(t, parent1.get(t));
 				mix2.add(t, parent2.get(t));
@@ -62,13 +63,6 @@ public class ScheduleCrossover extends AbstractCrossover<Schedule> {
 				mix2.add(t, parent1.get(t));
 			}
 			n++;
-
-			tc.minute += Schedule.LST_SLOTS_MINUTES;
-
-			if (tc.minute >= 24 * 60) {
-				tc.day++;
-				tc.minute = 0L;
-			}
 		}
 
 		ArrayList<Schedule> list = new ArrayList<Schedule>(2);

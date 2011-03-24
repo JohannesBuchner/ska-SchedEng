@@ -57,29 +57,18 @@ public class Schedule implements Iterable<Entry<LSTTime, JobCombination>> {
 	@Override
 	public Iterator<Entry<LSTTime, JobCombination>> iterator() {
 		return new Iterator<Entry<LSTTime, JobCombination>>() {
-			LSTTime t = new LSTTime(0L, 0L);
-			LSTTime lastEntry = findLastEntry();
+			private Iterator<LSTTime> it = new LSTTimeIterator(findLastEntry(),
+					Schedule.LST_SLOTS_MINUTES);
 
 			@Override
 			public boolean hasNext() {
-				if (t.compareTo(lastEntry) <= 0)
-					return true;
-				else
-					return false;
+				return it.hasNext();
 			}
 
 			@Override
 			public Entry<LSTTime, JobCombination> next() {
-				JobCombination jc = get(new LSTTime(t.day, t.minute));
-				Entry<LSTTime, JobCombination> entry = new SimpleEntry<LSTTime, JobCombination>(
-						new LSTTime(t.day, t.minute), jc);
-				t.minute += LST_SLOTS_MINUTES;
-
-				if (t.minute >= 24 * 60) {
-					t.day++;
-					t.minute = 0L;
-				}
-				return entry;
+				LSTTime t = it.next();
+				return new SimpleEntry<LSTTime, JobCombination>(t, get(t));
 			}
 
 			@Override

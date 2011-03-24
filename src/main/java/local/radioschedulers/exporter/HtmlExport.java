@@ -7,6 +7,7 @@ import java.io.IOException;
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
+import local.radioschedulers.LSTTimeIterator;
 import local.radioschedulers.Schedule;
 
 public class HtmlExport implements IExport {
@@ -45,49 +46,55 @@ public class HtmlExport implements IExport {
 
 		LSTTime lastday = schedule.findLastEntry();
 
-		LSTTime t = new LSTTime(0L, 0L);
-		for (t.day = 0L; t.day <= lastday.day + 1; t.day++) {
-			fw.append("\n\t\t<tr>\n\t\t\t<th>" + t.day + "</th>");
-			for (t.minute = 0L; t.minute < 24 * 60;) {
-				fw.append("\n\t\t\t");
-				JobCombination jc = schedule.get(new LSTTime(t.day, t.minute));
-				int ncells = 1;
-				LSTTime t2 = new LSTTime(t.day, t.minute + 15);
-				if (MERGESAME)
-					for (; t2.minute < 24 * 60; t2.minute += 15) {
-						JobCombination jc2 = schedule.get(new LSTTime(t2.day,
-								t2.minute));
-						if ((jc == null && jc2 == null)
-								|| (jc != null && jc.equals(jc2))) {
-							ncells++;
-						} else
-							break;
-					}
-				String params = "";
-				if (jc == null)
-					params += " class=\"free\" ";
-
-				if (ncells > 1) {
-					log("same between [" + t + ".." + t2 + ")");
-					params += " colspan=" + ncells + " ";
-				}
-				fw.append("<td " + params + ">");
-
-				if (jc == null || jc.jobs.isEmpty()) {
-					fw.append("&nbsp;");
-				} else {
-					for (Job j : jc.jobs) {
-						log("@" + t + ": " + j + "");
-						fw.append(j.proposal.name + "/" + j.hours + " ");
-					}
-				}
-				t.minute = t2.minute;
-				fw.append("</td>");
-
+		Long prevday = -1L;
+		for (LSTTimeIterator it = new LSTTimeIterator(lastday,
+				Schedule.LST_SLOTS_MINUTES); it.hasNext();) {
+			LSTTime t = it.next();
+			if (t.day != prevday) {
+				if (prevday != -1)
+					fw.append("\n\t\t</tr>");
+				fw.append("\n\t\t<tr>\n\t\t\t<th>" + t.day + "</th>");
 			}
-			fw.append("\n\t\t</tr>");
+			prevday = t.day;
+			
+			fw.append("\n\t\t\t");
+			JobCombination jc = schedule.get(new LSTTime(t.day, t.minute));
+			int ncells = 1;
+			LSTTime t2 = new LSTTime(t.day, t.minute + 15);
+			if (MERGESAME)
+				for (; t2.minute < 24 * 60; t2.minute += 15) {
+					JobCombination jc2 = schedule.get(new LSTTime(t2.day,
+							t2.minute));
+					if ((jc == null && jc2 == null)
+							|| (jc != null && jc.equals(jc2))) {
+						ncells++;
+					} else
+						break;
+				}
+			String params = "";
+			if (jc == null)
+				params += " class=\"free\" ";
+
+			if (ncells > 1) {
+				log("same between [" + t + ".." + t2 + ")");
+				params += " colspan=" + ncells + " ";
+			}
+			fw.append("<td " + params + ">");
+
+			if (jc == null || jc.jobs.isEmpty()) {
+				fw.append("&nbsp;");
+			} else {
+				for (Job j : jc.jobs) {
+					log("@" + t + ": " + j + "");
+					fw.append(j.proposal.name + "/" + j.hours + " ");
+				}
+			}
+			t.minute = t2.minute;
+			fw.append("</td>");
+
 		}
 
+		fw.append("\n\t\t</tr>");
 		fw.append("\n\t</tbody>\n</table>\n");
 		fw.close();
 	}
