@@ -63,7 +63,7 @@ public class WFSchedulerTest {
 
 		Assert.assertNotNull(s);
 
-		WFScheduleFactoryTest
+		ScheduleFactoryTest
 				.assertScheduleIsWithinTemplate(s, template, ndays);
 		int i = 0;
 		Set<Proposal> scheduledJobs = new HashSet<Proposal>();

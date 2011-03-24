@@ -9,12 +9,12 @@ import java.util.Map.Entry;
 
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
+import local.radioschedulers.JobWithResources;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ga.ScheduleFitnessFunction;
 
-public class SimpleScheduleFitnessFunction implements
-		ScheduleFitnessFunction {
+public class SimpleScheduleFitnessFunction implements ScheduleFitnessFunction {
 
 	private int switchLostMinutes = 5;
 
@@ -25,7 +25,7 @@ public class SimpleScheduleFitnessFunction implements
 	public int getSwitchLostMinutes() {
 		return switchLostMinutes;
 	}
-	
+
 	@Override
 	public double evaluate(Schedule s) {
 		double value = 0.;
@@ -34,13 +34,14 @@ public class SimpleScheduleFitnessFunction implements
 
 		for (Entry<LSTTime, JobCombination> entry : s) {
 			JobCombination jc = entry.getValue();
-			value += evaluateSlot(jc, previousEntry, timeleftMap);
+			value += evaluateSlot(entry.getKey(), entry.getValue(),
+					previousEntry, timeleftMap);
 			previousEntry = jc;
 		}
 		return value;
 	}
 
-	protected double evaluateSlot(JobCombination jc,
+	protected double evaluateSlot(LSTTime t, JobCombination jc,
 			JobCombination previousEntry, Map<Job, Long> timeleftMap) {
 		Long timeleft;
 		double expvalue = 0;
@@ -59,14 +60,15 @@ public class SimpleScheduleFitnessFunction implements
 				inPreviousSlot = previousEntry != null
 						&& previousEntry.jobs.contains(j);
 
-				expvalue += Math.log(evaluateSlotJob(j, timeleft,
+				expvalue += Math.log(evaluateSlotJob(t, j, timeleft,
 						inPreviousSlot));
 			}
 		}
 		return Math.exp(expvalue);
 	}
 
-	protected double evaluateSlotJob(Job j, Long timeleft, boolean inPreviousSlot) {
+	protected double evaluateSlotJob(LSTTime t, Job j, Long timeleft,
+			boolean inPreviousSlot) {
 		double time;
 		if (inPreviousSlot) {
 			// full time for continued
@@ -80,14 +82,14 @@ public class SimpleScheduleFitnessFunction implements
 			time = 0;
 		}
 
-		// TODO: add checks that the observation can actually be
-		// made
-		// if (!j.isAvailable(entry.getKey())) {
-		// time = 0;
-		// }
+		// checks that the observation can actually be made
+		/*if (j instanceof JobWithResources) {
+			JobWithResources jr = (JobWithResources) j;
+			// jr.resources.
+			time = 0;
+		}*/
 
 		// TODO: add benefit based on observation conditions
-
 		return Math.exp(j.proposal.priority) * time
 				/ Schedule.LST_SLOTS_MINUTES;
 	}

@@ -22,9 +22,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.uncommons.maths.random.MersenneTwisterRNG;
 
-public class WFScheduleFactoryTest {
+public class ScheduleFactoryTest {
 	@SuppressWarnings("unused")
-	private static Logger log = Logger.getLogger(WFScheduleFactoryTest.class);
+	private static Logger log = Logger.getLogger(ScheduleFactoryTest.class);
 
 	private Collection<Proposal> proposals;
 	private ScheduleSpace template;

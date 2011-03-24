@@ -26,9 +26,9 @@ import org.junit.Test;
 import org.uncommons.maths.random.MersenneTwisterRNG;
 import org.uncommons.maths.random.Probability;
 
-public class WFScheduleMutationsTest {
+public class ScheduleCrossoverTest {
 	@SuppressWarnings("unused")
-	private static Logger log = Logger.getLogger(WFScheduleMutationsTest.class);
+	private static Logger log = Logger.getLogger(ScheduleCrossoverTest.class);
 
 	private Collection<Proposal> proposals;
 	private ScheduleSpace template;
@@ -76,11 +76,7 @@ public class WFScheduleMutationsTest {
 			JobCombination scheduleJc2 = schedule2.get(t);
 			JobCombination scheduleJc3 = schedules.get(0).get(t);
 			JobCombination scheduleJc4 = schedules.get(1).get(t);
-			/*
-			 * log.debug("in 1:" + scheduleJc1); log.debug("in 2:" +
-			 * scheduleJc2); log.debug("out1:" + scheduleJc3); log.debug("out2:"
-			 * + scheduleJc4);
-			 */
+
 			if (schedEquals(scheduleJc1, scheduleJc3)) {
 				Assert.assertTrue(schedEquals(scheduleJc2, scheduleJc4));
 			} else {
@@ -88,10 +84,17 @@ public class WFScheduleMutationsTest {
 				Assert.assertTrue(schedEquals(scheduleJc1, scheduleJc4));
 			}
 		}
+		ScheduleFactoryTest.assertScheduleIsWithinTemplate(schedule1,
+				template, ndays);
+		ScheduleFactoryTest.assertScheduleIsWithinTemplate(schedule2,
+				template, ndays);
 	}
 
-	private boolean schedEquals(JobCombination a, JobCombination b) {
-		return WFScheduleCrossoverTest.schedEquals(a, b);
+	public static boolean schedEquals(JobCombination a, JobCombination b) {
+		if (a == null && b == null || a != null && a.equals(b))
+			return true;
+		else
+			return false;
 	}
 
 }

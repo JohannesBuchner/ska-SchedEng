@@ -12,11 +12,13 @@ import local.radioschedulers.LSTTime;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 
+import org.apache.log4j.Logger;
 import org.uncommons.watchmaker.framework.CandidateFactory;
 
 public class ScheduleFactory implements CandidateFactory<Schedule> {
 	private ScheduleSpace possibles;
 	private GeneticHistory<Schedule, String> history;
+	private static Logger log = Logger.getLogger(ScheduleFactory.class);
 
 	public void setHistory(GeneticHistory<Schedule, String> history) {
 		this.history = history;
@@ -35,13 +37,17 @@ public class ScheduleFactory implements CandidateFactory<Schedule> {
 	@Override
 	public List<Schedule> generateInitialPopulation(int populationSize,
 			Collection<Schedule> seedCandidates, Random rng) {
+		log.debug("got " + seedCandidates.size()
+				+ " seed candidates, need to make " + populationSize);
 		List<Schedule> list = new ArrayList<Schedule>();
 		if (seedCandidates != null && !seedCandidates.isEmpty()) {
 			while (list.size() < populationSize) {
+				// log.debug("making copies of seed candidates");
 				list.addAll(seedCandidates);
 			}
 		}
 		while (list.size() < populationSize) {
+			// log.debug("adding random seed candidate");
 			list.add(generateRandomCandidate(rng));
 		}
 		return list;

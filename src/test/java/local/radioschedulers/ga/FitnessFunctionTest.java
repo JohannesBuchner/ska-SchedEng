@@ -1,16 +1,12 @@
 package local.radioschedulers.ga;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
-import local.radioschedulers.JobCombination;
-import local.radioschedulers.LSTTime;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.cpu.CPULikeScheduler;
 import local.radioschedulers.cpu.FirstSelector;
-import local.radioschedulers.cpu.JobSelector;
 import local.radioschedulers.ga.fitness.SimpleScheduleFitnessFunction;
 import local.radioschedulers.importer.GeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
