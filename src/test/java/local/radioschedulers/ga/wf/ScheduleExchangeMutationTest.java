@@ -28,7 +28,6 @@ import org.uncommons.maths.random.Probability;
 
 public class ScheduleExchangeMutationTest {
 	private static final Probability MUTATION_PROBABILITY = new Probability(0.1);
-	@SuppressWarnings("unused")
 	private static Logger log = Logger
 			.getLogger(ScheduleExchangeMutationTest.class);
 

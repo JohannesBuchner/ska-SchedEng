@@ -54,9 +54,6 @@ public class WFSchedulerTest {
 		scheduler.setNumberOfGenerations(10);
 	}
 
-	public void testCrossover() throws Exception {
-	}
-
 	@Test
 	public void testGA() throws Exception {
 		Schedule s = scheduler.schedule(template);

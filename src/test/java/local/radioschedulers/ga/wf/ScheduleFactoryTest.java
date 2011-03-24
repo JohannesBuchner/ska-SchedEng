@@ -53,10 +53,16 @@ public class ScheduleFactoryTest {
 
 	public static void assertScheduleIsWithinTemplate(Schedule schedule,
 			ScheduleSpace template, int ndays) {
-		Assert.assertEquals(schedule.findLastEntry().day.intValue(), template
-				.findLastEntry().day.intValue(), 1);
-		Assert.assertTrue(schedule.findLastEntry().compareTo(
-				template.findLastEntry()) <= 0);
+		Assert.assertEquals("last scheduleentry ("
+				+ schedule.findLastEntry().day
+				+ ") should be roughly same day as schedulespace ("
+				+ template.findLastEntry().day + ")",
+				schedule.findLastEntry().day.intValue(), template
+						.findLastEntry().day.intValue(), 1);
+		Assert.assertTrue("last scheduleentry (" + schedule.findLastEntry()
+				+ ") should be <= as schedulespace ("
+				+ template.findLastEntry() + ")", schedule.findLastEntry()
+				.compareTo(template.findLastEntry()) <= 0);
 		Assert.assertEquals(schedule.findLastEntry().day.intValue(), ndays, 1);
 
 		for (Entry<LSTTime, JobCombination> e : schedule) {

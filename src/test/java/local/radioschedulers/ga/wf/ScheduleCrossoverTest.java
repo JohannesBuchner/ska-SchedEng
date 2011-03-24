@@ -27,7 +27,7 @@ import org.uncommons.maths.random.MersenneTwisterRNG;
 import org.uncommons.maths.random.Probability;
 
 public class ScheduleCrossoverTest {
-	@SuppressWarnings("unused")
+	private static final Probability CROSSOVER_PROBABILITY = new Probability(1.);
 	private static Logger log = Logger.getLogger(ScheduleCrossoverTest.class);
 
 	private Collection<Proposal> proposals;
@@ -58,18 +58,20 @@ public class ScheduleCrossoverTest {
 		schedules.add(schedule1);
 		schedules.add(schedule2);
 
-		ScheduleCrossover op = new ScheduleCrossover(1, new Probability(0.1));
+		ScheduleCrossover op = new ScheduleCrossover(1, CROSSOVER_PROBABILITY);
 		schedules = op.apply(schedules, rng);
 
-		Assert.assertEquals(schedules.get(0).findLastEntry(), schedule1
-				.findLastEntry());
-		Assert.assertEquals(schedules.get(1).findLastEntry(), schedule2
-				.findLastEntry());
-		Assert.assertEquals(schedules.get(0).findLastEntry(), schedule2
-				.findLastEntry());
-		Assert.assertEquals(schedules.get(1).findLastEntry(), schedule1
-				.findLastEntry());
+		ScheduleFactoryTest.assertScheduleIsWithinTemplate(schedule1, template,
+				ndays);
+		ScheduleFactoryTest.assertScheduleIsWithinTemplate(schedule2, template,
+				ndays);
+		ScheduleFactoryTest.assertScheduleIsWithinTemplate(schedules.get(0),
+				template, ndays);
+		ScheduleFactoryTest.assertScheduleIsWithinTemplate(schedules.get(1),
+				template, ndays);
 
+		int eqcount = 0;
+		int neqcount = 0;
 		for (Entry<LSTTime, JobCombination> e : schedule1) {
 			LSTTime t = e.getKey();
 			JobCombination scheduleJc1 = schedule1.get(t);
@@ -79,15 +81,16 @@ public class ScheduleCrossoverTest {
 
 			if (schedEquals(scheduleJc1, scheduleJc3)) {
 				Assert.assertTrue(schedEquals(scheduleJc2, scheduleJc4));
+				eqcount++;
 			} else {
 				Assert.assertTrue(schedEquals(scheduleJc2, scheduleJc3));
 				Assert.assertTrue(schedEquals(scheduleJc1, scheduleJc4));
+				neqcount++;
 			}
 		}
-		ScheduleFactoryTest.assertScheduleIsWithinTemplate(schedule1,
-				template, ndays);
-		ScheduleFactoryTest.assertScheduleIsWithinTemplate(schedule2,
-				template, ndays);
+		log.debug("crossover parts " + eqcount + " vs " + neqcount);
+		Assert.assertTrue(eqcount != 0);
+		Assert.assertTrue(neqcount != 0);
 	}
 
 	public static boolean schedEquals(JobCombination a, JobCombination b) {
