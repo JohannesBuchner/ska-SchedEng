@@ -25,7 +25,7 @@ import local.radioschedulers.importer.JsonProposalReader;
 import org.apache.log4j.Logger;
 
 public abstract class EvaluateGA {
-	public static final int numberOfEvaluations = 200;
+	public static final int numberOfEvaluations = 1000;
 	public static int ndays = 365 / 4;
 	public static double oversubscriptionFactor = 0.2;
 
@@ -36,6 +36,8 @@ public abstract class EvaluateGA {
 	protected int populationSize = 100;
 	protected double crossoverProb = 0.3;
 	protected double mutationProb = 0.3;
+	protected double mutationSimilarProb;
+	protected double mutationExchangeProb;
 
 	public void handleParams(String[] args) throws Exception {
 		if (args.length >= 1)
@@ -51,8 +53,12 @@ public abstract class EvaluateGA {
 			crossoverProb = Double.parseDouble(args[4]);
 		if (args.length >= 6)
 			mutationProb = Double.parseDouble(args[5]);
+		if (args.length >= 7)
+			mutationSimilarProb = Double.parseDouble(args[6]);
+		if (args.length >= 8)
+			mutationExchangeProb = Double.parseDouble(args[7]);
 		else
-			throw new IllegalArgumentException("expected 6 arguments!");
+			throw new IllegalArgumentException("expected 8 arguments!");
 	}
 
 	public void run() throws Exception {
@@ -60,6 +66,10 @@ public abstract class EvaluateGA {
 		ps.println("ndays: " + ndays);
 		ps.println("oversubscriptionFactor: " + oversubscriptionFactor);
 		ps.println("populationSize: " + populationSize);
+		ps.println("crossoverProb: " + crossoverProb);
+		ps.println("mutationProb: " + mutationProb);
+		ps.println("mutationSimilarProb: " + mutationSimilarProb);
+		ps.println("mutationExchangeProb: " + mutationExchangeProb);
 		ps.println("mutationProb: " + mutationProb);
 		ps.println("crossoverProb: " + crossoverProb);
 		log.info("{ ndays: " + ndays + " }");
@@ -99,7 +109,7 @@ public abstract class EvaluateGA {
 		Map<String, Schedule> schedules = sr.readall();
 		Map<String, Schedule> selectedSchedules = new HashMap<String, Schedule>();
 		for (Entry<String, Schedule> e : schedules.entrySet()) {
-			if (!e.getKey().contains("RandomizedSelector")) {
+			if (!e.getKey().contains("RandomizedSelector") && false) {
 				selectedSchedules.put(e.getKey(), e.getValue());
 			}
 		}
@@ -115,6 +125,7 @@ public abstract class EvaluateGA {
 	private void compareInitialAndFinalPopulations(
 			Map<String, Schedule> schedules, ScheduleFitnessFunction f,
 			List<Schedule> lastPopulation) throws FileNotFoundException {
+		log.info("comparing input and output population ...");
 		PrintStream p;
 		p = getOutputFile("ga-final-population-similarity.json");
 		p.println("{");
@@ -148,6 +159,7 @@ public abstract class EvaluateGA {
 		}
 		p.println("\t\"thats it\"");
 		p.println("]}");
+		log.info("comparing input and output population done");
 	}
 
 	abstract protected List<Schedule> evolveGA(PrintStream ps,
@@ -186,7 +198,9 @@ public abstract class EvaluateGA {
 	}
 
 	private ScheduleFitnessFunction getFitnessFunction() {
-		return new SimpleScheduleFitnessFunction();
+		SimpleScheduleFitnessFunction f = new SimpleScheduleFitnessFunction();
+		f.setSwitchLostMinutes(15);
+		return f;
 	}
 
 	private IProposalReader getProposalReader() throws Exception {

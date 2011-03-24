@@ -9,6 +9,8 @@ import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.importer.GeneratingProposalReader;
+import local.radioschedulers.importer.IProposalReader;
+import local.radioschedulers.importer.RandomGeneratingProposalReader;
 import local.radioschedulers.preschedule.RequirementGuard;
 import local.radioschedulers.preschedule.SingleRequirementGuard;
 
@@ -18,7 +20,6 @@ import org.junit.Test;
 
 public class FastRecursiveCompatibleJobFactoryTest {
 
-	@SuppressWarnings("unused")
 	private static Logger log = Logger
 			.getLogger(CompatibleJobFactoryTest.class);
 	private FastRecursiveCompatibleJobFactory cjf;
@@ -30,6 +31,10 @@ public class FastRecursiveCompatibleJobFactoryTest {
 	public void setUp() throws Exception {
 		GeneratingProposalReader gpr = new GeneratingProposalReader();
 		gpr.fill();
+		getProposals(gpr);
+	}
+
+	private void getProposals(IProposalReader gpr) throws Exception {
 		proposals = gpr.readall();
 
 		alljobs = new HashSet<Job>();
@@ -65,6 +70,21 @@ public class FastRecursiveCompatibleJobFactoryTest {
 		Collection<JobCombination> combinations = cjf.getCombinations();
 		int ncomb = combinations.size();
 		Assert.assertEquals("full combination", (1 << njobs) - 1, ncomb);
+	}
+
+	@Test
+	public void testFullParallelStress() throws Exception {
+		RandomGeneratingProposalReader pr = new RandomGeneratingProposalReader();
+		pr.fill(15);
+		getProposals(pr);
+		
+		RequirementGuard req = new ParallelRequirementGuard();
+		log.debug("getting combinations...");
+		cjf = new FastRecursiveCompatibleJobFactory(alljobs, req);
+		Collection<JobCombination> combinations = cjf.getCombinations();
+		int ncomb = combinations.size();
+		log.debug("got " + ncomb + " combinations");
+		Assert.assertTrue("full combination " + ncomb + " > " + njobs, ncomb > njobs);
 	}
 
 }

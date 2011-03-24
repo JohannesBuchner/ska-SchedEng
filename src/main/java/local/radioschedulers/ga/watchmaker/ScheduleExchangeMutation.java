@@ -56,8 +56,9 @@ public class ScheduleExchangeMutation implements EvolutionaryOperator<Schedule> 
 		Probability u = new Probability(1. / 3);
 		for (Entry<LSTTime, JobCombination> e : s1) {
 			LSTTime t = e.getKey();
+			s2.add(t, e.getValue());
+			Set<JobCombination> jcs = possibles.get(t);
 			if ((i * 1. / n) < prob.doubleValue() && u.nextEvent(rng)) {
-				Set<JobCombination> jcs = possibles.get(t);
 				if (!jcs.isEmpty()) {
 					JobCombination jc = e.getValue();
 					List<LSTTime> timeCandidates = new ArrayList<LSTTime>();
@@ -98,8 +99,6 @@ public class ScheduleExchangeMutation implements EvolutionaryOperator<Schedule> 
 						s2.add(t, e.getValue());
 					}
 				}
-			} else {
-				s2.add(t, e.getValue());
 			}
 			n++;
 		}

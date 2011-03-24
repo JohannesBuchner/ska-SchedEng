@@ -120,7 +120,7 @@ public class FastRecursiveCompatibleJobFactory {
 					possibles.put(t, list);
 				}
 				list.add(j);
-				//log.debug("@" + t + " : " + j);
+				// log.debug("@" + t + " : " + j);
 			}
 		}
 

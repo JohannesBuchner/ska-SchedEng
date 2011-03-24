@@ -52,17 +52,15 @@ public class ScheduleMutation implements EvolutionaryOperator<Schedule> {
 		int n = 0;
 		for (Entry<LSTTime, JobCombination> e : s1) {
 			LSTTime t = e.getKey();
-			if (mutationProbability.nextValue().nextEvent(rng)) {
-				Set<JobCombination> jcs = possibles.get(t);
-				if (jcs != null && jcs.size() > 0) {
+			s2.add(t, s1.get(t));
+			Set<JobCombination> jcs = possibles.get(t);
+			if (!jcs.isEmpty()) {
+				if (mutationProbability.nextValue().nextEvent(rng)) {
 					JobCombination jc = (JobCombination) jcs.toArray()[rng
 							.nextInt(jcs.size())];
 					s2.add(t, jc);
+					i++;
 				}
-				i++;
-			} else {
-				s2.add(t, s1.get(t));
-
 			}
 			n++;
 		}

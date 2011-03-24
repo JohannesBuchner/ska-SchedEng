@@ -50,6 +50,8 @@ public class EvaluateWF extends EvaluateGA {
 		scheduler.setMutationProbability(mutationProb);
 		scheduler.setPopulationSize(populationSize);
 		scheduler.setPopulation(population);
+		wfs.setMutationExchangeProbability(mutationExchangeProb);
+		wfs.setMutationSimilarProbability(mutationSimilarProb);
 		wfs.setObserver(new EvolutionObserver<Schedule>() {
 
 			@Override

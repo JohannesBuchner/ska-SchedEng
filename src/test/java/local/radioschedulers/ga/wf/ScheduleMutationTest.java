@@ -13,7 +13,6 @@ import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.cpu.CPULikeScheduler;
 import local.radioschedulers.cpu.RandomizedSelector;
-import local.radioschedulers.ga.watchmaker.ScheduleCrossover;
 import local.radioschedulers.ga.watchmaker.ScheduleMutation;
 import local.radioschedulers.importer.GeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
@@ -74,18 +73,20 @@ public class ScheduleMutationTest {
 			JobCombination scheduleJc1 = schedule1.get(t);
 			JobCombination scheduleJc2 = schedule2.get(t);
 
-			if (schedEquals(scheduleJc1, scheduleJc2)) {
-				eqcount++;
-			} else {
-				diffcount++;
+			if (!template.get(t).isEmpty()) {
+				if (schedEquals(scheduleJc1, scheduleJc2)) {
+					eqcount++;
+				} else {
+					diffcount++;
+				}
 			}
 		}
 		Assert.assertTrue(diffcount > 0);
 		Assert.assertEquals(diffcount * 1. / (eqcount + diffcount),
 				MUTATION_PROBABILITY.doubleValue(), 0.05);
 
-		ScheduleFactoryTest.assertScheduleIsWithinTemplate(schedule2,
-				template, ndays);
+		ScheduleFactoryTest.assertScheduleIsWithinTemplate(schedule2, template,
+				ndays);
 
 	}
 

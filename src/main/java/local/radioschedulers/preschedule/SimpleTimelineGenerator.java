@@ -5,15 +5,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.ScheduleSpace;
-import local.radioschedulers.preschedule.parallel.CompatibleJobFactory;
 import local.radioschedulers.preschedule.parallel.FastRecursiveCompatibleJobFactory;
+
+import org.apache.log4j.Logger;
 
 public class SimpleTimelineGenerator implements ITimelineGenerator {
 	private RequirementGuard req;
@@ -30,10 +29,10 @@ public class SimpleTimelineGenerator implements ITimelineGenerator {
 			alljobs.addAll(p.jobs);
 		}
 		log.debug("found all jobs: " + alljobs.size());
-		//CompatibleJobFactory compatibles1 = new CompatibleJobFactory(
-		//		alljobs, requirementGuard);
-		//log.debug("got compatibleJobFactory with "
-		//		+ compatibles1.getCombinations().size() + " combinations.");
+		// CompatibleJobFactory compatibles1 = new CompatibleJobFactory(
+		// alljobs, requirementGuard);
+		// log.debug("got compatibleJobFactory with "
+		// + compatibles1.getCombinations().size() + " combinations.");
 		FastRecursiveCompatibleJobFactory compatibles = new FastRecursiveCompatibleJobFactory(
 				alljobs, requirementGuard);
 		log.debug("got FRcompatibleJobFactory with "
@@ -49,6 +48,8 @@ public class SimpleTimelineGenerator implements ITimelineGenerator {
 			LSTTime t = new LSTTime(0, minute * ScheduleSpace.LST_SLOTS_MINUTES);
 
 			Set<JobCombination> jcs = timelineConstruct.get(t);
+			if (jcs.isEmpty())
+				continue;
 			// log.debug("at " + t.minute + ": " + jcs.size() +
 			// " combinations");
 			for (int day = 0; day < ndays; day++) {

@@ -14,8 +14,8 @@ import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.cpu.CPULikeScheduler;
 import local.radioschedulers.cpu.FairPrioritizedSelector;
+import local.radioschedulers.cpu.KeepingPrioritizedSelector;
 import local.radioschedulers.cpu.PrioritizedSelector;
-import local.radioschedulers.cpu.RandomizedSelector;
 import local.radioschedulers.cpu.ShortestFirstSelector;
 import local.radioschedulers.lp.ParallelLinearScheduler;
 
@@ -36,12 +36,9 @@ public class ParallelizedHeuristicsScheduleCollector {
 
 		schedulers.add(new CPULikeScheduler(new FairPrioritizedSelector()));
 		schedulers.add(new CPULikeScheduler(new FairPrioritizedSelector()));
+		schedulers.add(new CPULikeScheduler(new KeepingPrioritizedSelector()));
 		schedulers.add(new CPULikeScheduler(new PrioritizedSelector()));
 		schedulers.add(new CPULikeScheduler(new ShortestFirstSelector()));
-		schedulers.add(new CPULikeScheduler(new RandomizedSelector()));
-		schedulers.add(new CPULikeScheduler(new RandomizedSelector()));
-		schedulers.add(new CPULikeScheduler(new RandomizedSelector()));
-		schedulers.add(new CPULikeScheduler(new RandomizedSelector()));
 
 		BlockingQueue<Runnable> queue = new ArrayBlockingQueue<Runnable>(
 				schedulers.size());

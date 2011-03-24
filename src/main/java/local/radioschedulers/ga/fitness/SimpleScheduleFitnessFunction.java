@@ -83,14 +83,19 @@ public class SimpleScheduleFitnessFunction implements ScheduleFitnessFunction {
 		}
 
 		// checks that the observation can actually be made
-		/*if (j instanceof JobWithResources) {
+		if (j instanceof JobWithResources) {
 			JobWithResources jr = (JobWithResources) j;
-			// jr.resources.
-			time = 0;
-		}*/
+			if (!areResourcesAvailable(jr, t)) {
+				time = 0;
+			}
+		}
 
 		// TODO: add benefit based on observation conditions
 		return Math.exp(j.proposal.priority) * time
 				/ Schedule.LST_SLOTS_MINUTES;
+	}
+
+	protected boolean areResourcesAvailable(JobWithResources jr, LSTTime t) {
+		return true;
 	}
 }

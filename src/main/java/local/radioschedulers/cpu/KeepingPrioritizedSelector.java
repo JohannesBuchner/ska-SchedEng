@@ -3,6 +3,7 @@ package local.radioschedulers.cpu;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
@@ -46,7 +47,10 @@ public class KeepingPrioritizedSelector extends PrioritizedSelector {
 	@Override
 	public Collection<JobCombination> select(Collection<JobCombination> list) {
 		Collection<JobCombination> l = super.select(list);
-		lastJobCombination = l.iterator().next();
+		Iterator<JobCombination> it = l.iterator();
+		if (it.hasNext()) {
+			lastJobCombination = it.next();
+		}
 		return l;
 	}
 }
