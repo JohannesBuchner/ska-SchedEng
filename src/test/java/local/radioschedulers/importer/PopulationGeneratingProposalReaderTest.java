@@ -152,6 +152,7 @@ public class PopulationGeneratingProposalReaderTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private void calculateAntennaBins2(Histogram<Integer> histantennas) {
 		histantennas.addBin(0, 1);
 		histantennas.addBin(1, 2);

@@ -8,9 +8,12 @@ public class LSTTimeIterator implements Iterator<LSTTime> {
 	private final int minuteSteps;
 
 	public LSTTimeIterator(LSTTime last, int minuteSteps) {
+		this(new LSTTime(0, 0), last, minuteSteps);
+	}
+	public LSTTimeIterator(LSTTime start, LSTTime last, int minuteSteps) {
 		this.last = last;
 		this.minuteSteps = minuteSteps;
-		this.current = new LSTTime(0, 0);
+		this.current = new LSTTime(start.day, start.day);
 	}
 
 	@Override

@@ -30,6 +30,7 @@ public class BlockBasedScheduleFitnessFunction implements
 	private static final boolean MINUTES_SQUARED = false;
 	private static final boolean GIVE_CREDIT_FOR_FINISHED = true;
 
+	@SuppressWarnings("unused")
 	private static Logger log = Logger
 			.getLogger(BlockBasedScheduleFitnessFunction.class);
 

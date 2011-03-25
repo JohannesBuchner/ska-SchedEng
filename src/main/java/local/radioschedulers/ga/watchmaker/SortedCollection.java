@@ -15,6 +15,7 @@ import java.util.Iterator;
  * @param <T>
  *            datatype of the Collection
  */
+@SuppressWarnings("unchecked")
 public class SortedCollection<T> implements Iterable<T> {
 
 	public static interface MappingFunction<T, V extends Comparable> {

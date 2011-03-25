@@ -75,7 +75,7 @@ public class ScheduleFactoryTest {
 			}
 			if (jc != null)
 				Assert
-						.assertTrue(jc + " should be in " + jcs, jcs
+						.assertTrue("@ " + t + ", " + jc + " should be in " + jcs, jcs
 								.contains(jc));
 		}
 		for (Entry<LSTTime, Set<JobCombination>> e : template) {

@@ -20,7 +20,6 @@ import org.junit.Test;
 
 public class CompatibleJobFactoryTest {
 
-	@SuppressWarnings("unused")
 	private static Logger log = Logger
 			.getLogger(CompatibleJobFactoryTest.class);
 	private CompatibleJobFactory cjf;

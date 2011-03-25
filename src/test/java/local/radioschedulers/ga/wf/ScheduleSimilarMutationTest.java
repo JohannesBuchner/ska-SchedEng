@@ -12,7 +12,7 @@ import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.cpu.CPULikeScheduler;
-import local.radioschedulers.cpu.RandomizedSelector;
+import local.radioschedulers.cpu.PrioritizedSelector;
 import local.radioschedulers.ga.watchmaker.ScheduleSimilarMutation;
 import local.radioschedulers.importer.GeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
@@ -49,7 +49,7 @@ public class ScheduleSimilarMutationTest {
 				new ParallelRequirementGuard());
 		template = tlg.schedule(proposals, ndays);
 		CPULikeScheduler scheduler = new CPULikeScheduler(
-				new RandomizedSelector());
+				new PrioritizedSelector());
 		schedule1 = scheduler.schedule(template);
 	}
 
@@ -87,14 +87,13 @@ public class ScheduleSimilarMutationTest {
 			}
 			lastJc = scheduleJc1;
 		}
-		Assert.assertTrue(diffcount > 0);
-		log.debug("crossover parts " + eqcount + " vs " + diffcount + " --> "
-				+ diffcount * 1. / (eqcount + diffcount));
-		Assert.assertEquals(MUTATION_PROBABILITY.doubleValue(), diffcount * 1.
-				/ (eqcount + diffcount), 0.05);
-
 		ScheduleFactoryTest.assertScheduleIsWithinTemplate(schedule2, template,
 				ndays);
+		Assert.assertTrue(diffcount > 0);
+		log.debug("mutated parts " + eqcount + " vs " + diffcount + " --> "
+				+ diffcount * 1. / (eqcount + diffcount));
+		Assert.assertEquals(MUTATION_PROBABILITY.doubleValue(), diffcount * 1.
+				/ (eqcount + diffcount), 0.1);
 
 	}
 

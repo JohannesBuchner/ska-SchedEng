@@ -1,6 +1,7 @@
 package local.radioschedulers.ga.watchmaker;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -57,17 +58,27 @@ public class ScheduleSimilarMutation implements EvolutionaryOperator<Schedule> {
 		Schedule s2 = new Schedule();
 		int i = 0;
 		int n = 0;
-		for (Entry<LSTTime, JobCombination> e : s1) {
+
+		JobCombination lastJc = null;
+
+		for (Iterator<Entry<LSTTime, JobCombination>> it = s1.iterator(); it
+				.hasNext();) {
+			Entry<LSTTime, JobCombination> e = it.next();
 			LSTTime t = e.getKey();
-			JobCombination jc = s1.get(t);
+			// log.debug("considering " + t);
+			JobCombination jc = e.getValue();
 			Set<JobCombination> jcs = possibles.get(t);
-			if (e.getValue() != null && !jcs.isEmpty()) {
+			if (jc != null && !jcs.isEmpty()) {
 				s2.add(t, jc);
-				if ((mutationProbability.nextValue().nextEvent(rng))) {
-					i += makeSimilarAround(t, possibles, s1, s2);
+				/* only if we have a change, we should consider it */
+				if ((lastJc == null || !lastJc.equals(jc))
+						&& (mutationProbability.nextValue().nextEvent(rng))) {
+					log.debug("mutating around " + t);
+					i += makeSimilarAround(t, jc, possibles, s2);
 				}
 				n++;
 			}
+			lastJc = jc;
 		}
 		log.debug("changed " + i + " of " + n);
 		if (history != null) {
@@ -78,68 +89,42 @@ public class ScheduleSimilarMutation implements EvolutionaryOperator<Schedule> {
 		return s2;
 	}
 
-	private int makeSimilarAround(LSTTime t, ScheduleSpace template,
-			Schedule s, Schedule s2) {
-		boolean posContinue = false; // disabled completely
-		boolean negContinue = true;
-		LSTTime last = template.findLastEntry();
-		JobCombination thisjc = s.get(t);
+	private int makeSimilarAround(LSTTime t, JobCombination thisjc,
+			ScheduleSpace template, Schedule s2) {
 		int countChanged = 0;
-		LSTTimeIterator it = new LSTTimeIterator(new LSTTime(1, 0),
-				Schedule.LST_SLOTS_MINUTES);
-		it.next(); // skip 0
+		LSTTimeIterator it = new LSTTimeIterator(new LSTTime(0, 1),
+				new LSTTime(1, 0), Schedule.LST_SLOTS_MINUTES);
+		log.debug("jc " + thisjc);
 		for (; it.hasNext();) {
 			LSTTime tDelta = it.next();
-			if (posContinue) {
-				LSTTime tPlus = new LSTTime(t.day + tDelta.day, t.minute
-						+ tDelta.minute);
-				if (tPlus.minute > Schedule.LST_SLOTS_PER_DAY
-						* Schedule.LST_SLOTS_MINUTES) {
-					long extraDays = tPlus.minute
-							/ (Schedule.LST_SLOTS_PER_DAY * Schedule.LST_SLOTS_MINUTES);
-					tPlus.day += extraDays;
-					tPlus.minute -= extraDays
-							* (Schedule.LST_SLOTS_PER_DAY * Schedule.LST_SLOTS_MINUTES);
-				}
-				log.debug("tPlus " + tPlus);
+			// log.debug("tDelta " + tDelta);
+			LSTTime tMinus = new LSTTime(t.day - tDelta.day, t.minute
+					- tDelta.minute);
+			if (tMinus.minute < 0) {
+				long extraDays = tMinus.minute
+						/ (Schedule.LST_SLOTS_PER_DAY * Schedule.LST_SLOTS_MINUTES)
+						+ 1;
+				tMinus.day -= extraDays;
+				tMinus.minute += extraDays
+						* (Schedule.LST_SLOTS_PER_DAY * Schedule.LST_SLOTS_MINUTES);
+			}
+			log.debug("tMinus " + tMinus);
 
-				if (tPlus.isAfter(last))
-					posContinue = false;
+			if (tMinus.day < 0)
+				break;
 
-				JobCombination jc = getMostSimilar(thisjc, template.get(tPlus));
+			Set<JobCombination> jcs = template.get(tMinus);
+			log.debug("jcs " + jcs);
+			if (!jcs.isEmpty()) {
+				JobCombination jc = getMostSimilar(thisjc, jcs);
 				if (jc != null) {
-					s2.add(t, jc);
+					log.debug("jc " + jc);
+					s2.add(tMinus, jc);
 					countChanged++;
 				} else {
-					posContinue = false;
+					break;
 				}
-			}
-			if (negContinue) {
-				LSTTime tMinus = new LSTTime(t.day - tDelta.day, t.minute
-						- tDelta.minute);
-				if (tMinus.minute < 0) {
-					long extraDays = tMinus.minute
-							/ (Schedule.LST_SLOTS_PER_DAY * Schedule.LST_SLOTS_MINUTES)
-							+ 1;
-					tMinus.day -= extraDays;
-					tMinus.minute += extraDays
-							* (Schedule.LST_SLOTS_PER_DAY * Schedule.LST_SLOTS_MINUTES);
-				}
-				log.debug("tMinus " + tMinus);
-
-				if (tMinus.day < 0)
-					negContinue = false;
-
-				JobCombination jc = getMostSimilar(thisjc, template.get(tMinus));
-				if (jc != null) {
-					s2.add(t, jc);
-					countChanged++;
-				} else {
-					negContinue = false;
-				}
-			}
-
-			if (!negContinue && !posContinue) {
+			} else {
 				break;
 			}
 		}
