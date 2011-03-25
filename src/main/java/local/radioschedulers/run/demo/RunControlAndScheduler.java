@@ -1,5 +1,7 @@
 package local.radioschedulers.run.demo;
 
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Map.Entry;
 
@@ -24,6 +26,8 @@ public abstract class RunControlAndScheduler {
 		ControlSystem cs = new PrintControlSystem();
 		MonitoringSystem mon = new TextFileMonitoringSystem();
 		ScheduleExport ex = new HtmlScheduleExport();
+
+		writeAvailability();
 
 		LSTTime currentTime = null;
 		Schedule s = null;
@@ -52,6 +56,15 @@ public abstract class RunControlAndScheduler {
 					log.debug("resources have changed");
 					break;
 				}
+				if (t.minute == 4 * 60) {
+					backendAvailable = false;
+					writeAvailability();
+				}
+				if (t.minute == 5 * 60) {
+					backendAvailable = true;
+					writeAvailability();
+				}
+
 				if (t.minute > 10 * 60) {
 					log.info("end of run at " + t);
 					return;
@@ -59,6 +72,20 @@ public abstract class RunControlAndScheduler {
 			}
 		}
 
+	}
+
+	private static boolean backendAvailable = true;
+
+	private static void writeAvailability() {
+		try {
+			PrintStream p = new PrintStream("available-backends.txt");
+			if (backendAvailable)
+				p.println("A");
+			p.println("B");
+			p.close();
+		} catch (IOException e) {
+			log.warn(e);
+		}
 	}
 
 }

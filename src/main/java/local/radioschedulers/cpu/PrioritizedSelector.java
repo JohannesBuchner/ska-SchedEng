@@ -12,6 +12,7 @@ import local.radioschedulers.JobCombination;
  */
 public class PrioritizedSelector extends ShortestFirstSelector {
 
+	@Override
 	protected Comparator<JobCombination> generateComparator(
 			HashMap<Job, Double> timeleft) {
 		return new Comparator<JobCombination>() {

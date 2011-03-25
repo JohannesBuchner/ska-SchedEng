@@ -15,9 +15,9 @@ import local.radioschedulers.JobCombination;
  * @author Johannes Buchner
  */
 public class KeepingPrioritizedSelector extends PrioritizedSelector {
+	private JobCombination lastJobCombination;
 
-	private static JobCombination lastJobCombination;
-
+	@Override
 	protected Comparator<JobCombination> generateComparator(
 			HashMap<Job, Double> timeleft) {
 		return new Comparator<JobCombination>() {
@@ -26,12 +26,9 @@ public class KeepingPrioritizedSelector extends PrioritizedSelector {
 			public int compare(JobCombination o1, JobCombination o2) {
 				// prefer the ones that were in the last
 				if (lastJobCombination != null) {
-					boolean continued1 = lastJobCombination.jobs.contains(o1);
-					boolean continued2 = lastJobCombination.jobs.contains(o2);
-					if (continued1 && !continued2)
-						return -1;
-					else if (!continued1 && continued2)
-						return 1;
+					int v = compareContinuedCount(o1, o2);
+					if (v != 0)
+						return v;
 				}
 
 				// if that's the same, prefer higher priority
@@ -39,7 +36,27 @@ public class KeepingPrioritizedSelector extends PrioritizedSelector {
 				// is better.
 				Double p1 = o1.calculatePriority();
 				Double p2 = o2.calculatePriority();
-				return p1.compareTo(p2);
+				return p2.compareTo(p1);
+			}
+
+			private int compareContinuedCount(JobCombination o1,
+					JobCombination o2) {
+				Integer continued1 = countContinuedJobs(lastJobCombination,
+						o1);
+				Integer continued2 = countContinuedJobs(lastJobCombination,
+						o2);
+				int v = continued2.compareTo(continued1);
+				return v;
+			}
+
+			private Integer countContinuedJobs(
+					JobCombination lastjc, JobCombination jc) {
+				int count = 0;
+				for (Job j : lastjc.jobs) {
+					if (jc.jobs.contains(j))
+						count++;
+				}
+				return count;
 			}
 		};
 	}

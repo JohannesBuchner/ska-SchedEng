@@ -45,6 +45,7 @@ public class ShortestFirstSelector extends JobSelector {
 		};
 	};
 
+	@Override
 	public Collection<JobCombination> select(Collection<JobCombination> list) {
 		List<JobCombination> jobs = pruneDone(list);
 		Collections.sort(jobs, cmp);
