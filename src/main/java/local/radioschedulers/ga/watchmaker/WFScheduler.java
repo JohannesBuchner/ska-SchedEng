@@ -107,25 +107,25 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 		List<EvolutionaryOperator<Schedule>> operators = new LinkedList<EvolutionaryOperator<Schedule>>();
 		// new StringMutation(null, new NumberGener);
 
-		{
+		if (getCrossoverProbability() > 0) {
 			ScheduleCrossover crossover = new ScheduleCrossover(1,
 					new Probability(getCrossoverProbability()));
 			crossover.setHistory(history);
 			operators.add(crossover);
 		}
-		{
+		if (getMutationProbability() > 0) {
 			ScheduleMutation mutation = new ScheduleMutation(possibles,
 					new Probability(getMutationProbability()));
 			mutation.setHistory(history);
 			operators.add(mutation);
 		}
-		{
+		if (getMutationSimilarProbability() > 0) {
 			ScheduleSimilarMutation mutationSimilar = new ScheduleSimilarMutation(
 					possibles, new Probability(getMutationSimilarProbability()));
 			mutationSimilar.setHistory(history);
 			operators.add(mutationSimilar);
 		}
-		{
+		if (getMutationExchangeProbability() > 0) {
 			ScheduleExchangeMutation mutationExchange = new ScheduleExchangeMutation(
 					possibles,
 					new Probability(getMutationExchangeProbability()));

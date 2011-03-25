@@ -44,15 +44,17 @@ public class SimpleScheduleFitnessFunction implements ScheduleFitnessFunction {
 	protected double evaluateSlot(LSTTime t, JobCombination jc,
 			JobCombination previousEntry, Map<Job, Long> timeleftMap) {
 		Long timeleft;
-		double expvalue = 0;
+		double value = 0;
 		boolean inPreviousSlot;
 
 		if (jc == null) {
 			// no points for doing nothing
+			return 0;
 		} else {
 			for (Job j : jc.jobs) {
 				if (!timeleftMap.containsKey(j)) {
-					timeleftMap.put(j, j.hours * Schedule.LST_SLOTS_MINUTES);
+					timeleftMap.put(j, j.hours * Schedule.LST_SLOTS_MINUTES
+							* Schedule.LST_SLOTS_PER_DAY);
 				}
 				timeleft = timeleftMap.get(j) - Schedule.LST_SLOTS_MINUTES;
 				timeleftMap.put(j, timeleft);
@@ -60,11 +62,10 @@ public class SimpleScheduleFitnessFunction implements ScheduleFitnessFunction {
 				inPreviousSlot = previousEntry != null
 						&& previousEntry.jobs.contains(j);
 
-				expvalue += Math.log(evaluateSlotJob(t, j, timeleft,
-						inPreviousSlot));
+				value += evaluateSlotJob(t, j, timeleft, inPreviousSlot);
 			}
+			return value * jc.calculatePriority();
 		}
-		return Math.exp(expvalue);
 	}
 
 	protected double evaluateSlotJob(LSTTime t, Job j, Long timeleft,
@@ -76,6 +77,8 @@ public class SimpleScheduleFitnessFunction implements ScheduleFitnessFunction {
 		} else {
 			// some time lost for new observation
 			time = Schedule.LST_SLOTS_MINUTES - this.switchLostMinutes;
+			if (time < 0)
+				time = 0;
 		}
 		if (timeleft < 0) {
 			/* we are over desired limit already, no benefits */
@@ -91,8 +94,8 @@ public class SimpleScheduleFitnessFunction implements ScheduleFitnessFunction {
 		}
 
 		// TODO: add benefit based on observation conditions
-		return Math.exp(j.proposal.priority) * time
-				/ Schedule.LST_SLOTS_MINUTES;
+
+		return time;
 	}
 
 	protected boolean areResourcesAvailable(JobWithResources jr, LSTTime t) {

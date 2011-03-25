@@ -1,8 +1,10 @@
 package local.radioschedulers.run;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import local.radioschedulers.Proposal;
+import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.ga.GeneticAlgorithmScheduler;
 import local.radioschedulers.ga.HeuristicsScheduleCollector;
@@ -29,8 +31,9 @@ public class RunGA {
 		ScheduleSpace template = tlg.schedule(proposals, ndays);
 		GeneticAlgorithmScheduler scheduler = new JGAPScheduler(
 				getFitnessFunction());
-		scheduler.setPopulation(HeuristicsScheduleCollector
-				.getStartSchedules(template));
+		scheduler.setPopulation(new ArrayList<Schedule>(
+				HeuristicsScheduleCollector.getStartSchedules(template)
+						.values()));
 		scheduler.schedule(template);
 	}
 

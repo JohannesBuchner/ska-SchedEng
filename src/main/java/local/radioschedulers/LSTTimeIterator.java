@@ -33,6 +33,17 @@ public class LSTTimeIterator implements Iterator<LSTTime> {
 		return entry;
 	}
 
+	public LSTTime prev() {
+		LSTTime entry = new LSTTime(current.day, current.minute);
+		current.minute -= minuteSteps;
+
+		if (current.minute < 0) {
+			current.day--;
+			current.minute += 24 * 60;
+		}
+		return entry;
+	}
+
 	@Override
 	public void remove() {
 		throw new Error("Not implemented.");

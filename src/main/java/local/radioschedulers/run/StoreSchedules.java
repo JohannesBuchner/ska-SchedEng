@@ -10,7 +10,8 @@ import local.radioschedulers.IScheduler;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
-import local.radioschedulers.ga.ParallelizedHeuristicsScheduleCollector;
+import local.radioschedulers.exporter.HtmlExport;
+import local.radioschedulers.ga.HeuristicsScheduleCollector;
 import local.radioschedulers.importer.CsvScheduleReader;
 import local.radioschedulers.importer.IProposalReader;
 import local.radioschedulers.importer.JsonProposalReader;
@@ -24,6 +25,9 @@ public class StoreSchedules {
 	private static int ndays = 365 / 4;
 	private static double oversubscriptionFactor = 0.2;
 	private static Logger log = Logger.getLogger(StoreSchedules.class);
+	private static File schedulesFile;
+	private static File spaceFile;
+	private static File schedulesHtmlFile;
 
 	public static void main(String[] args) throws Exception {
 		if (args.length >= 1)
@@ -31,6 +35,14 @@ public class StoreSchedules {
 		int maxParallel = 4;
 		if (args.length >= 2)
 			maxParallel = Integer.parseInt(args[1]);
+		schedulesFile = new File("schedule_testset_ndays-" + ndays
+				+ "_oversubs-" + oversubscriptionFactor + "_parallel-"
+				+ maxParallel + ".csv");
+		schedulesHtmlFile = new File("schedule_testset_ndays-" + ndays
+				+ "_oversubs-" + oversubscriptionFactor + "_parallel-"
+				+ maxParallel + ".html");
+		spaceFile = new File("space_testset_ndays-" + ndays + "_oversubs-"
+				+ oversubscriptionFactor + "_parallel-" + maxParallel + ".csv");
 
 		IProposalReader pr = getProposalReader();
 		Collection<Proposal> proposals = pr.readall();
@@ -42,7 +54,7 @@ public class StoreSchedules {
 		log.debug("created schedule space");
 
 		log.debug("creating heuristic initial population");
-		Map<IScheduler, Schedule> schedules2 = ParallelizedHeuristicsScheduleCollector
+		Map<IScheduler, Schedule> schedules2 = HeuristicsScheduleCollector
 				.getStartSchedules(template);
 		Map<String, Schedule> schedules = new HashMap<String, Schedule>();
 		for (Entry<IScheduler, Schedule> e : schedules2.entrySet()) {
@@ -53,6 +65,13 @@ public class StoreSchedules {
 		CsvScheduleReader csv = getScheduleReader(maxParallel, proposals);
 		csv.write(template);
 		csv.write(schedules);
+		
+		schedulesHtmlFile.mkdir();
+		for (Entry<String, Schedule> e : schedules.entrySet()) {
+			HtmlExport ex = new HtmlExport(new File(schedulesHtmlFile, e.getKey()
+					+ ".html"), e.getKey());
+			ex.export(e.getValue());
+		}
 
 		ScheduleSpace space = csv.readspace();
 		if (!space.findLastEntry().equals(template.findLastEntry()))
@@ -72,12 +91,6 @@ public class StoreSchedules {
 
 	private static CsvScheduleReader getScheduleReader(int maxParallel,
 			Collection<Proposal> proposals) {
-		File schedulesFile = new File("schedule_testset_ndays-" + ndays
-				+ "_oversubs-" + oversubscriptionFactor + "_parallel-"
-				+ maxParallel + ".csv");
-		File spaceFile = new File("space_testset_ndays-" + ndays
-				+ "_oversubs-" + oversubscriptionFactor + "_parallel-"
-				+ maxParallel + ".csv");
 
 		CsvScheduleReader csv = new CsvScheduleReader(schedulesFile, spaceFile,
 				proposals);

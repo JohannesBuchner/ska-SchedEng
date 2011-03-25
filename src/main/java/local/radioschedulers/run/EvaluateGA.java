@@ -17,7 +17,7 @@ import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.ga.ScheduleFitnessFunction;
-import local.radioschedulers.ga.fitness.SimpleScheduleFitnessFunction;
+import local.radioschedulers.ga.fitness.BlockBasedScheduleFitnessFunction;
 import local.radioschedulers.importer.CsvScheduleReader;
 import local.radioschedulers.importer.IProposalReader;
 import local.radioschedulers.importer.JsonProposalReader;
@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 
 public abstract class EvaluateGA {
 	public static final int numberOfEvaluations = 1000;
+	private static final boolean LOAD_SCHEDULES = true;
 	public static int ndays = 365 / 4;
 	public static double oversubscriptionFactor = 0.2;
 
@@ -33,11 +34,18 @@ public abstract class EvaluateGA {
 
 	protected String prefix = "";
 	protected int maxParallel = 4;
-	protected int populationSize = 100;
+	protected int populationSize = 20;
 	protected double crossoverProb = 0.3;
 	protected double mutationProb = 0.3;
 	protected double mutationSimilarProb;
 	protected double mutationExchangeProb;
+
+	private ScheduleFitnessFunction getFitnessFunction() {
+		// SimpleScheduleFitnessFunction f = new SimpleScheduleFitnessFunction();
+		// f.setSwitchLostMinutes(15);
+		ScheduleFitnessFunction f = new BlockBasedScheduleFitnessFunction();
+		return f;
+	}
 
 	public void handleParams(String[] args) throws Exception {
 		if (args.length >= 1)
@@ -108,9 +116,11 @@ public abstract class EvaluateGA {
 
 		Map<String, Schedule> schedules = sr.readall();
 		Map<String, Schedule> selectedSchedules = new HashMap<String, Schedule>();
-		for (Entry<String, Schedule> e : schedules.entrySet()) {
-			if (!e.getKey().contains("RandomizedSelector") && false) {
-				selectedSchedules.put(e.getKey(), e.getValue());
+		if (LOAD_SCHEDULES) {
+			for (Entry<String, Schedule> e : schedules.entrySet()) {
+				if (!e.getKey().contains("RandomizedSelector")) {
+					selectedSchedules.put(e.getKey(), e.getValue());
+				}
 			}
 		}
 
@@ -195,12 +205,6 @@ public abstract class EvaluateGA {
 		}
 
 		return c / n;
-	}
-
-	private ScheduleFitnessFunction getFitnessFunction() {
-		SimpleScheduleFitnessFunction f = new SimpleScheduleFitnessFunction();
-		f.setSwitchLostMinutes(15);
-		return f;
 	}
 
 	private IProposalReader getProposalReader() throws Exception {
