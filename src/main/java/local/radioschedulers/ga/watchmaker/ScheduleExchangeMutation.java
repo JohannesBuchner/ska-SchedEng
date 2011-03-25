@@ -17,6 +17,12 @@ import org.uncommons.maths.number.NumberGenerator;
 import org.uncommons.maths.random.Probability;
 import org.uncommons.watchmaker.framework.EvolutionaryOperator;
 
+/**
+ * selects random slot and tries to exchange with the same slot from a previous
+ * day
+ * 
+ * @author Johannes Buchner
+ */
 public class ScheduleExchangeMutation implements EvolutionaryOperator<Schedule> {
 	private final NumberGenerator<Probability> mutationProbability;
 	private ScheduleSpace possibles;
