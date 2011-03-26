@@ -2,7 +2,9 @@ package local.radioschedulers.ga;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,12 +51,23 @@ public class HeuristicsScheduleCollector {
 
 		List<IScheduler> schedulers = getSchedulers();
 
-		for (IScheduler s : schedulers) {
-			log.debug("scheduling using " + s);
-			Schedule schedule = s.schedule(timeline);
-			log.debug("scheduling done");
-			schedules.put(s, schedule);
-			exportSchedule(schedules, s, schedule);
+		try {
+			PrintStream executionTimeLog = new PrintStream(new FileOutputStream("executiontime.log", true));
+
+			for (IScheduler s : schedulers) {
+				log.debug("scheduling using " + s);
+				
+				long start = System.currentTimeMillis();
+				Schedule schedule = s.schedule(timeline);
+				long duration = System.currentTimeMillis() - start;
+				log.debug("scheduling done");
+				executionTimeLog.println(duration + "\t" + s.toString());
+				executionTimeLog.flush();
+				
+				schedules.put(s, schedule);
+				exportSchedule(schedules, s, schedule);
+			}
+		} catch (IOException e) {
 		}
 
 		return schedules;

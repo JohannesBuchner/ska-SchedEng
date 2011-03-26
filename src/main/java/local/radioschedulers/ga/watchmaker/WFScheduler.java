@@ -114,7 +114,7 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 			operators.add(crossover);
 		}
 		if (getMutationProbability() > 0) {
-			ScheduleMutation mutation = new ScheduleMutation(possibles,
+			ScheduleKeepingMutation mutation = new ScheduleKeepingMutation(possibles,
 					new Probability(getMutationProbability()));
 			mutation.setHistory(history);
 			operators.add(mutation);
