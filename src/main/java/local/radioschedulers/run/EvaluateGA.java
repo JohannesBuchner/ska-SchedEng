@@ -131,9 +131,13 @@ public abstract class EvaluateGA {
 		log.info("{ populationSize: " + populationSize + " }");
 		log.info("{ mutationProb: " + mutationProb + " }");
 		log.info("{ mutationKeepingProb: " + mutationKeepingProb + " }");
-		log.info("{ mutationSimilarForwardsProb: " + mutationSimilarForwardsProb + " }");
-		log.info("{ mutationSimilarBackwardsProb: " + mutationSimilarBackwardsProb + " }");
-		log.info("{ mutationSimilarPrevProb: " + mutationSimilarPrevProb + " }");
+		log.info("{ mutationSimilarForwardsProb: "
+				+ mutationSimilarForwardsProb + " }");
+		log.info("{ mutationSimilarBackwardsProb: "
+				+ mutationSimilarBackwardsProb + " }");
+		log
+				.info("{ mutationSimilarPrevProb: " + mutationSimilarPrevProb
+						+ " }");
 		log.info("{ mutationExchangeProb: " + mutationExchangeProb + " }");
 		log.info("{ crossoverProb: " + crossoverProb + " }");
 		log.info("{ simpleFitnessFunction: " + simpleFitnessFunction + " }");
@@ -167,13 +171,15 @@ public abstract class EvaluateGA {
 	private Map<String, Schedule> readSchedules(CsvScheduleReader sr)
 			throws IOException {
 
+		if (!loadSchedules) {
+			return new HashMap<String, Schedule>();
+		}
+
 		Map<String, Schedule> schedules = sr.readall();
 		Map<String, Schedule> selectedSchedules = new HashMap<String, Schedule>();
-		if (loadSchedules) {
-			for (Entry<String, Schedule> e : schedules.entrySet()) {
-				if (!e.getKey().contains("RandomizedSelector")) {
-					selectedSchedules.put(e.getKey(), e.getValue());
-				}
+		for (Entry<String, Schedule> e : schedules.entrySet()) {
+			if (!e.getKey().contains("RandomizedSelector")) {
+				selectedSchedules.put(e.getKey(), e.getValue());
 			}
 		}
 

@@ -34,6 +34,9 @@ public class SimpleScheduleFitnessFunction implements ScheduleFitnessFunction {
 
 		for (Entry<LSTTime, JobCombination> entry : s) {
 			JobCombination jc = entry.getValue();
+			if (jc == null)
+				continue;
+
 			value += evaluateSlot(entry.getKey(), entry.getValue(),
 					previousEntry, timeleftMap);
 			previousEntry = jc;
@@ -47,28 +50,23 @@ public class SimpleScheduleFitnessFunction implements ScheduleFitnessFunction {
 		double value = 0;
 		boolean inPreviousSlot;
 
-		if (jc == null) {
-			// no points for doing nothing
-			return 0;
-		} else {
-			for (Job j : jc.jobs) {
-				if (!timeleftMap.containsKey(j)) {
-					timeleftMap.put(j, j.hours * Schedule.LST_SLOTS_MINUTES
-							* Schedule.LST_SLOTS_PER_DAY);
-				}
-				timeleft = timeleftMap.get(j) - Schedule.LST_SLOTS_MINUTES;
-				timeleftMap.put(j, timeleft);
-
-				inPreviousSlot = previousEntry != null
-						&& previousEntry.jobs.contains(j);
-
-				value += evaluateSlotJob(t, j, timeleft, inPreviousSlot);
+		for (Job j : jc.jobs) {
+			if (!timeleftMap.containsKey(j)) {
+				timeleftMap.put(j, j.hours * Schedule.LST_SLOTS_MINUTES
+						* Schedule.LST_SLOTS_PER_DAY);
 			}
-			return value * jc.calculatePriority();
+			timeleft = timeleftMap.get(j) - Schedule.LST_SLOTS_MINUTES;
+			timeleftMap.put(j, timeleft);
+
+			inPreviousSlot = previousEntry != null
+					&& previousEntry.jobs.contains(j);
+
+			value += evaluateSlotJob(t, j, timeleft, inPreviousSlot);
 		}
+		return value * jc.calculatePriority();
 	}
 
-	protected double evaluateSlotJob(LSTTime t, Job j, Long timeleft,
+	protected double evaluateSlotJob(LSTTime t, Job j, long timeleft,
 			boolean inPreviousSlot) {
 		double time;
 		if (inPreviousSlot) {

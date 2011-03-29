@@ -54,6 +54,7 @@ public class EvaluateWF extends EvaluateGA {
 		wfs.setMutationSimilarForwardsProbability(mutationSimilarForwardsProb);
 		wfs.setMutationSimilarBackwardsProbability(mutationSimilarBackwardsProb);
 		wfs.setMutationKeepingProbability(mutationKeepingProb);
+		wfs.setMutationSimilarPrevProbability(mutationSimilarPrevProb);
 		
 		wfs.setObserver(new EvolutionObserver<Schedule>() {
 
