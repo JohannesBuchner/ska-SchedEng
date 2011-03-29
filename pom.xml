@@ -4,7 +4,7 @@
 
 	<groupId>local.arrayschedule</groupId>
 	<artifactId>engine</artifactId>
-	<version>0.1-SNAPSHOT</version>
+	<version>0.3-SNAPSHOT</version>
 	<name>SchedulingEngine</name>
 	<description>Flexible scheduling engine for large-scale radio telescope
 		arrays</description>
@@ -38,6 +38,11 @@
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
+					<archive>
+						<manifest>
+							<mainClass>local.radioschedulers.run.EvaluateWF</mainClass>
+						</manifest>
+					</archive>
 				</configuration>
 			</plugin>
 		</plugins>

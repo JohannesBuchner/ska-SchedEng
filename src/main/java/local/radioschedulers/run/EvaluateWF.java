@@ -51,7 +51,10 @@ public class EvaluateWF extends EvaluateGA {
 		scheduler.setPopulationSize(populationSize);
 		scheduler.setPopulation(population);
 		wfs.setMutationExchangeProbability(mutationExchangeProb);
-		wfs.setMutationSimilarProbability(mutationSimilarProb);
+		wfs.setMutationSimilarForwardsProbability(mutationSimilarForwardsProb);
+		wfs.setMutationSimilarBackwardsProbability(mutationSimilarBackwardsProb);
+		wfs.setMutationKeepingProbability(mutationKeepingProb);
+		
 		wfs.setObserver(new EvolutionObserver<Schedule>() {
 
 			@Override
@@ -115,12 +118,14 @@ public class EvaluateWF extends EvaluateGA {
 					title += " " + e.getKey() + " (" + e.getValue() + ")";
 				}
 			}
-			HtmlExport ex = new HtmlExport(new File(prefix + "_export_" + i
-					+ ".html"), title);
-			try {
-				ex.export(s);
-			} catch (IOException e1) {
-				log.error(e1);
+			if (i < populationSize / 2) {
+				HtmlExport ex = new HtmlExport(new File(prefix + "_export_" + i
+						+ ".html"), title);
+				try {
+					ex.export(s);
+				} catch (IOException e1) {
+					log.error(e1);
+				}
 			}
 			i++;
 		}

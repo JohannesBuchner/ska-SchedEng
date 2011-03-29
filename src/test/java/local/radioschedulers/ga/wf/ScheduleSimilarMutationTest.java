@@ -54,12 +54,36 @@ public class ScheduleSimilarMutationTest {
 	}
 
 	@Test
-	public void testMutation() throws Exception {
+	public void testBoth() throws Exception {
+		ScheduleSimilarMutation op = new ScheduleSimilarMutation(template,
+				MUTATION_PROBABILITY);
+		op.setBackwardsKeep(true);
+		op.setForwardsKeep(true);
+		testMutation(op);
+	}
+
+	@Test
+	public void testForward() throws Exception {
+		ScheduleSimilarMutation op = new ScheduleSimilarMutation(template,
+				MUTATION_PROBABILITY);
+		op.setBackwardsKeep(false);
+		op.setForwardsKeep(true);
+		testMutation(op);
+	}
+
+	@Test
+	public void testBackward() throws Exception {
+		ScheduleSimilarMutation op = new ScheduleSimilarMutation(template,
+				MUTATION_PROBABILITY);
+		op.setBackwardsKeep(true);
+		op.setForwardsKeep(false);
+		testMutation(op);
+	}
+
+	public void testMutation(ScheduleSimilarMutation op) throws Exception {
 		List<Schedule> schedules = new ArrayList<Schedule>(2);
 		schedules.add(schedule1);
 
-		ScheduleSimilarMutation op = new ScheduleSimilarMutation(template,
-				MUTATION_PROBABILITY);
 		schedules = op.apply(schedules, rng);
 		schedule2 = schedules.get(0);
 
@@ -68,28 +92,22 @@ public class ScheduleSimilarMutationTest {
 
 		int diffcount = 0;
 		int eqcount = 0;
-		JobCombination lastJc = null;
 		for (Entry<LSTTime, JobCombination> e : schedule1) {
 			LSTTime t = e.getKey();
 			JobCombination scheduleJc1 = schedule1.get(t);
 			JobCombination scheduleJc2 = schedule2.get(t);
 
-			if (scheduleJc1 == null) {
-				Assert.assertNull(scheduleJc2);
-			} else {
-				if (lastJc != scheduleJc1 && !template.get(t).isEmpty()) {
-					if (schedEquals(scheduleJc1, scheduleJc2)) {
-						eqcount++;
-					} else {
-						diffcount++;
-					}
+			if (!template.get(t).isEmpty()) {
+				if (schedEquals(scheduleJc1, scheduleJc2)) {
+					eqcount++;
+				} else {
+					diffcount++;
 				}
 			}
-			lastJc = scheduleJc1;
 		}
 		ScheduleFactoryTest.assertScheduleIsWithinTemplate(schedule2, template,
 				ndays);
-		Assert.assertTrue(diffcount > 0);
+		Assert.assertTrue("something should have been changed", diffcount > 0);
 		log.debug("mutated parts " + eqcount + " vs " + diffcount + " --> "
 				+ diffcount * 1. / (eqcount + diffcount));
 		Assert.assertEquals(MUTATION_PROBABILITY.doubleValue(), diffcount * 1.

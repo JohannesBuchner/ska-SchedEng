@@ -32,7 +32,7 @@ public class ScheduleCrossover extends AbstractCrossover<Schedule> {
 		LSTTime last = parent1.findLastEntry();
 		{
 			LSTTime last2 = parent2.findLastEntry();
-			if (last2.compareTo(last) > 0) {
+			if (last2.isAfter(last)) {
 				last = last2;
 			}
 		}

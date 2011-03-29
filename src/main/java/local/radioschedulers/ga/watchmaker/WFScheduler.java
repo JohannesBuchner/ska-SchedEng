@@ -29,16 +29,46 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 	private EvolutionObserver<Schedule> observer;
 	private GeneticHistory<Schedule, String> history;
 
-	private double mutationSimilarProbability = 0.;
+	private double mutationKeepingProbability = 0.;
+	private double mutationSimilarPrevProbability = 0.;
+	private double mutationSimilarBackwardsProbability = 0.;
+	private double mutationSimilarForwardsProbability = 0.;
 	private double mutationExchangeProbability = 0.;
+
+	public double getMutationKeepingProbability() {
+		return mutationKeepingProbability;
+	}
+
+	public double getMutationSimilarBackwardsProbability() {
+		return mutationSimilarBackwardsProbability;
+	}
+
+	public double getMutationSimilarForwardsProbability() {
+		return mutationSimilarForwardsProbability;
+	}
+
+	public void setMutationKeepingProbability(double mutationKeepingProbability) {
+		this.mutationKeepingProbability = mutationKeepingProbability;
+	}
+
+	public void setMutationSimilarBackwardsProbability(
+			double mutationSimilarBackwardsProbability) {
+		this.mutationSimilarBackwardsProbability = mutationSimilarBackwardsProbability;
+	}
+
+	public void setMutationSimilarForwardsProbability(
+			double mutationSimilarForwardsProbability) {
+		this.mutationSimilarForwardsProbability = mutationSimilarForwardsProbability;
+	}
+
+	public void setMutationSimilarPrevProbability(
+			double mutationSimilarPrevProbability) {
+		this.mutationSimilarPrevProbability = mutationSimilarPrevProbability;
+	}
 
 	public void setMutationExchangeProbability(
 			double mutationExchangeProbability) {
 		this.mutationExchangeProbability = mutationExchangeProbability;
-	}
-
-	public void setMutationSimilarProbability(double mutationSimilarProbability) {
-		this.mutationSimilarProbability = mutationSimilarProbability;
 	}
 
 	public void setHistory(GeneticHistory<Schedule, String> history) {
@@ -114,14 +144,36 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 			operators.add(crossover);
 		}
 		if (getMutationProbability() > 0) {
-			ScheduleKeepingMutation mutation = new ScheduleKeepingMutation(possibles,
+			ScheduleMutation mutation = new ScheduleMutation(possibles,
 					new Probability(getMutationProbability()));
 			mutation.setHistory(history);
 			operators.add(mutation);
 		}
-		if (getMutationSimilarProbability() > 0) {
+		if (getMutationKeepingProbability() > 0) {
+			ScheduleKeepingMutation mutation = new ScheduleKeepingMutation(
+					possibles, new Probability(getMutationKeepingProbability()));
+			mutation.setHistory(history);
+			operators.add(mutation);
+		}
+		if (getMutationSimilarPrevProbability() > 0) {
+			ScheduleSimilarPrevMutation mutation = new ScheduleSimilarPrevMutation(
+					possibles, new Probability(getMutationSimilarPrevProbability()));
+			mutation.setHistory(history);
+			operators.add(mutation);
+		}
+		if (getMutationSimilarBackwardsProbability() > 0) {
 			ScheduleSimilarMutation mutationSimilar = new ScheduleSimilarMutation(
-					possibles, new Probability(getMutationSimilarProbability()));
+					possibles, new Probability(getMutationSimilarBackwardsProbability()));
+			mutationSimilar.setBackwardsKeep(true);
+			mutationSimilar.setForwardsKeep(false);
+			mutationSimilar.setHistory(history);
+			operators.add(mutationSimilar);
+		}
+		if (getMutationSimilarForwardsProbability() > 0) {
+			ScheduleSimilarMutation mutationSimilar = new ScheduleSimilarMutation(
+					possibles, new Probability(getMutationSimilarForwardsProbability()));
+			mutationSimilar.setBackwardsKeep(false);
+			mutationSimilar.setForwardsKeep(true);
 			mutationSimilar.setHistory(history);
 			operators.add(mutationSimilar);
 		}
@@ -139,12 +191,16 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 		return pipeline;
 	}
 
+	private double getMutationSimilarPrevProbability() {
+		return mutationSimilarPrevProbability;
+	}
+
 	public double getMutationExchangeProbability() {
 		return mutationExchangeProbability;
 	}
 
 	public double getMutationSimilarProbability() {
-		return mutationSimilarProbability;
+		return mutationSimilarBackwardsProbability;
 	}
 
 	public void setObserver(EvolutionObserver<Schedule> observer) {

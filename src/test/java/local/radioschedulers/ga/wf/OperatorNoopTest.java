@@ -15,8 +15,10 @@ import local.radioschedulers.cpu.CPULikeScheduler;
 import local.radioschedulers.cpu.RandomizedSelector;
 import local.radioschedulers.ga.watchmaker.ScheduleCrossover;
 import local.radioschedulers.ga.watchmaker.ScheduleExchangeMutation;
+import local.radioschedulers.ga.watchmaker.ScheduleKeepingMutation;
 import local.radioschedulers.ga.watchmaker.ScheduleMutation;
 import local.radioschedulers.ga.watchmaker.ScheduleSimilarMutation;
+import local.radioschedulers.ga.watchmaker.ScheduleSimilarPrevMutation;
 import local.radioschedulers.importer.GeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
 import local.radioschedulers.preschedule.SimpleTimelineGenerator;
@@ -73,8 +75,24 @@ public class OperatorNoopTest {
 
 	@Test
 	public void testSimilarMutation() throws Exception {
-		apply(new ScheduleSimilarMutation(template, NOOP_PROBABILITY));
+		ScheduleSimilarMutation op = new ScheduleSimilarMutation(template, NOOP_PROBABILITY);
+		op.setBackwardsKeep(true);
+		op.setForwardsKeep(true);
+		apply(op);
 	}
+
+
+	@Test
+	public void testSimilarPrevMutation() throws Exception {
+		apply(new ScheduleSimilarPrevMutation(template, NOOP_PROBABILITY));
+	}
+
+
+	@Test
+	public void testKeepingMutation() throws Exception {
+		apply(new ScheduleKeepingMutation(template, NOOP_PROBABILITY));
+	}
+
 
 	public void apply(EvolutionaryOperator<Schedule> op) {
 

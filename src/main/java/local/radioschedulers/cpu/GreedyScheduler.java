@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 public class GreedyScheduler implements IScheduler {
 	public static final int LST_SLOTS = 24 * 4;
 	public static final int LST_SLOTS_MINUTES = 24 * 60 / LST_SLOTS;
+	protected static final boolean IGNORE_LONG_TASKS = true;
 
 	private static Logger log = Logger.getLogger(GreedyScheduler.class);
 
@@ -56,8 +57,27 @@ public class GreedyScheduler implements IScheduler {
 		log
 				.debug("scanning schedulespace for number of possible slot for each job");
 		for (Entry<LSTTime, Set<JobCombination>> e : timeline) {
-			for (JobCombination jc : e.getValue()) {
+			Set<JobCombination> jcs = e.getValue();
+			if (jcs.size() == 1) {
+				// trivial choice
+				JobCombination jc = jcs.iterator().next();
 				for (Job j : jc.jobs) {
+					if (!timeleft.containsKey(j)) {
+						timeleft.put(j, j.hours - 1.
+								/ Schedule.LST_SLOTS_PER_HOUR);
+					} else {
+						timeleft.put(j, timeleft.get(j) - 1.
+								/ Schedule.LST_SLOTS_PER_HOUR);
+					}
+				}
+				s.add(e.getKey(), jc);
+				continue;
+			}
+			for (JobCombination jc : jcs) {
+				for (Job j : jc.jobs) {
+					if (!timeleft.containsKey(j))
+						timeleft.put(j, (double) j.hours);
+
 					Integer n = npossibleSlots.get(j);
 					if (n == null) {
 						npossibleSlots.put(j, 1);
@@ -79,7 +99,6 @@ public class GreedyScheduler implements IScheduler {
 
 		for (Job j : jobsSortedByPressure) {
 			log.debug("# of slots: " + npossibleSlots.get(j) + " for " + j);
-			timeleft.put(j, (double) j.hours);
 
 			// try to schedule it
 			for (LSTTime t : possibleSlots.get(j)) {
@@ -92,6 +111,14 @@ public class GreedyScheduler implements IScheduler {
 			}
 		}
 
+		assignTasks(timeline, s, pressureOrderedTasks, jobsSortedByPressure);
+
+		return s;
+	}
+
+	protected void assignTasks(ScheduleSpace timeline, Schedule s,
+			Map<LSTTime, List<Job>> pressureOrderedTasks,
+			SortedCollection<Job> jobsSortedByPressure) {
 		log
 				.debug("selecting suitable JobCombination for each slot in schedulespace");
 		// now we have for each time the ordered tasks there.
@@ -101,12 +128,18 @@ public class GreedyScheduler implements IScheduler {
 				continue;
 			// we want these jobs:
 			List<Job> jl = pressureOrderedTasks.get(t);
+			if (jl == null)
+				continue;
 			for (Iterator<Job> it = jl.iterator(); it.hasNext();) {
 				Job j = it.next();
 				if (timeleft.get(j) <= 0) {
+					log.debug(j + " is out of time");
 					it.remove();
 				}
 			}
+			if (jl.isEmpty())
+				continue;
+
 			JobCombination bestJobCombination = new SortedCollection<JobCombination>(
 					e.getValue(), getCoveredCountMapper(jl)).first();
 
@@ -120,8 +153,6 @@ public class GreedyScheduler implements IScheduler {
 				}
 			}
 		}
-
-		return s;
 	}
 
 	/**
@@ -160,7 +191,14 @@ public class GreedyScheduler implements IScheduler {
 
 			@Override
 			public Double map(Job item) {
-				return npossibleSlots.get(item) * 1. / item.hours;
+				int npossiblehours = npossibleSlots.get(item)
+						/ Schedule.LST_SLOTS_PER_HOUR;
+				if (IGNORE_LONG_TASKS && item.hours > 24 * 20) {
+					// long tasks can be carried on to the next quarters
+					return 3 + npossiblehours * 1. / item.hours;
+				} else {
+					return npossiblehours * 1. / item.hours;
+				}
 			}
 		};
 	}

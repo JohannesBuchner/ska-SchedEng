@@ -23,7 +23,8 @@ public abstract class RunControlAndScheduler {
 		ReusableScheduler cas = new ReusableScheduler();
 		cas.setNdays(ndays);
 
-		ControlSystem cs = new PrintControlSystem();
+		// ControlSystem cs = new PrintControlSystem();
+		ControlSystem cs = new NraoBasedControlSystem();
 		MonitoringSystem mon = new TextFileMonitoringSystem();
 		ScheduleExport ex = new HtmlScheduleExport();
 
@@ -40,31 +41,27 @@ public abstract class RunControlAndScheduler {
 			log.info("advancing schedules ...");
 			cas.advanceSchedules();
 			s = cas.getCurrentSchedule();
-			ex.export(s);
+			ex.export(s, currentTime);
 			log.info("executing ...");
 
 			for (Entry<LSTTime, JobCombination> e : s) {
 				LSTTime t = e.getKey();
 				// on re-entry, skip forward
-				if (currentTime != null && t.isBefore(currentTime)) {
+				if (currentTime != null && t.isBeforeOrEqual(currentTime)) {
 					continue;
 				}
 				currentTime = t;
-				log.info("@" + t + ": " + e.getValue());
+				//log.info("@" + t + ": " + e.getValue());
+				ex.export(s, currentTime);
+				System.out.println("Time: " + t + " ------------------------- ");
 				cs.execute(e.getValue());
+
+				measureEnvironment(t);
+
 				if (mon.haveResourcesChanged()) {
 					log.debug("resources have changed");
 					break;
 				}
-				if (t.minute == 4 * 60) {
-					backendAvailable = false;
-					writeAvailability();
-				}
-				if (t.minute == 5 * 60) {
-					backendAvailable = true;
-					writeAvailability();
-				}
-
 				if (t.minute > 10 * 60) {
 					log.info("end of run at " + t);
 					return;
@@ -72,6 +69,19 @@ public abstract class RunControlAndScheduler {
 			}
 		}
 
+	}
+
+	private static void measureEnvironment(LSTTime t) {
+		if (true)
+			return;
+		if (t.minute == 4 * 60) {
+			backendAvailable = false;
+			writeAvailability();
+		}
+		if (t.minute == 5 * 60) {
+			backendAvailable = true;
+			writeAvailability();
+		}
 	}
 
 	private static boolean backendAvailable = true;

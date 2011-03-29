@@ -48,6 +48,8 @@ import org.apache.log4j.Logger;
  * 
  */
 public class ReusableScheduler {
+	private static final String PREFERRED_HEURISTIC = "jobselector PrioritizedSelector";
+
 	private static final boolean GA_ENABLED = false;
 
 	private static Logger log = Logger.getLogger(ReusableScheduler.class);
@@ -93,7 +95,7 @@ public class ReusableScheduler {
 
 		for (Entry<LSTTime, Set<JobCombination>> e : template) {
 			// remove choice from past
-			if (currentTime != null && e.getKey().compareTo(currentTime) <= 0) {
+			if (currentTime != null && e.getKey().isBeforeOrEqual(currentTime)) {
 				template.clear(e.getKey());
 				JobCombination jc = previousSchedule.get(e.getKey());
 				if (jc != null)
@@ -154,7 +156,7 @@ public class ReusableScheduler {
 		heuristicschedules = new HashMap<String, Schedule>();
 		for (Entry<IScheduler, Schedule> e : schedules2.entrySet()) {
 			heuristicschedules.put(e.getKey().toString(), e.getValue());
-			if (e.getKey().toString().contains("jobselector KeepingPrioritizedSelector")) {
+			if (e.getKey().toString().contains(PREFERRED_HEURISTIC)) {
 				bestSchedule = e.getValue();
 			}
 		}
@@ -186,7 +188,7 @@ public class ReusableScheduler {
 		scheduler.setPopulationSize(populationSize);
 		scheduler.setPopulation(population);
 		wfs.setMutationExchangeProbability(mutationExchangeProb);
-		wfs.setMutationSimilarProbability(mutationSimilarProb);
+		wfs.setMutationSimilarBackwardsProbability(mutationSimilarProb);
 
 		bestSchedule = scheduler.schedule(template);
 		schedules = scheduler.getPopulation();

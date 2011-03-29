@@ -17,7 +17,7 @@ public class DemoProposalReader implements IProposalReader {
 	public DemoProposalReader() {
 		JobWithResources jwr = new JobWithResources();
 		ResourceRequirement req = new ResourceRequirement();
-		req.possibles.add("12m");
+		req.possibles.add("Ww");
 		req.numberrequired = 1;
 		jwr.resources.put("antennas", req);
 		req = new ResourceRequirement();
@@ -25,19 +25,19 @@ public class DemoProposalReader implements IProposalReader {
 		req.possibles.add("B");
 		req.numberrequired = 1;
 		jwr.resources.put("backends", req);
-		proposals.add(createSimpleProposal("Less Important", 1., 2., 20., 100L,
+		proposals.add(createSimpleProposal("MYPKS", 1., 2., 20., 100L,
 				jwr));
 
 		jwr = new JobWithResources();
 		req = new ResourceRequirement();
-		req.possibles.add("12m");
+		req.possibles.add("Ww");
 		req.numberrequired = 1;
 		jwr.resources.put("antennas", req);
 		req = new ResourceRequirement();
 		req.possibles.add("A");
 		req.numberrequired = 1;
 		jwr.resources.put("backends", req);
-		proposals.add(createSimpleProposal("Very Important", 5., 1., 14., 60L,
+		proposals.add(createSimpleProposal("NGC3603", 5., 1., 14., 60L,
 				jwr));
 	}
 
@@ -61,7 +61,7 @@ public class DemoProposalReader implements IProposalReader {
 		j.hours = totalhours;
 		j.lstmax = endlst;
 		j.lstmin = startlst;
-		j.id = p.name;
+		j.id = name;
 		j.proposal = p;
 		p.jobs.add(j);
 		return p;

@@ -18,7 +18,7 @@ public class LSTTimeIterator implements Iterator<LSTTime> {
 
 	@Override
 	public boolean hasNext() {
-		if (current.compareTo(last) <= 0)
+		if (current.isBeforeOrEqual(last))
 			return true;
 		else
 			return false;

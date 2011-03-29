@@ -62,7 +62,7 @@ public class ScheduleFactoryTest {
 		Assert.assertTrue("last scheduleentry (" + schedule.findLastEntry()
 				+ ") should be <= as schedulespace ("
 				+ template.findLastEntry() + ")", schedule.findLastEntry()
-				.compareTo(template.findLastEntry()) <= 0);
+				.isBeforeOrEqual(template.findLastEntry()));
 		Assert.assertEquals(schedule.findLastEntry().day.intValue(), ndays, 1);
 
 		for (Entry<LSTTime, JobCombination> e : schedule) {

@@ -22,15 +22,23 @@ import org.uncommons.maths.random.Probability;
  * 
  * @author Johannes Buchner
  */
-public class ScheduleSimilarMutation extends ScheduleKeepingMutation {
-	private static final boolean FORWARDS_KEEP = false;
-	private static final boolean BACKWARDS_KEEP = true;
+public class ScheduleSimilarMutation extends AbstractScheduleMutation {
+	private boolean forwardsKeep = false;
+	private boolean backwardsKeep = true;
 
 	private static Logger log = Logger.getLogger(ScheduleSimilarMutation.class);
 
 	public ScheduleSimilarMutation(ScheduleSpace possibles,
 			Probability probability) {
 		this(possibles, new ConstantGenerator<Probability>(probability));
+	}
+
+	public void setForwardsKeep(boolean forwardsKeep) {
+		this.forwardsKeep = forwardsKeep;
+	}
+
+	public void setBackwardsKeep(boolean backwardsKeep) {
+		this.backwardsKeep = backwardsKeep;
 	}
 
 	public ScheduleSimilarMutation(ScheduleSpace possibles,
@@ -46,20 +54,25 @@ public class ScheduleSimilarMutation extends ScheduleKeepingMutation {
 
 		JobCombination lastJc = null;
 
+		int toSkip = 0;
 		for (Iterator<Entry<LSTTime, JobCombination>> it = s1.iterator(); it
 				.hasNext();) {
 			Entry<LSTTime, JobCombination> e = it.next();
 			LSTTime t = e.getKey();
-			// log.debug("considering " + t);
 			JobCombination jc = e.getValue();
 			Set<JobCombination> jcs = possibles.get(t);
 			if (jc != null && !jcs.isEmpty()) {
 				s2.add(t, jc);
-				/* only if we have a change, we should consider it */
-				if ((lastJc == null || !lastJc.equals(jc))
-						&& (mutationProbability.nextValue().nextEvent(rng))) {
-					log.debug("mutating around " + t);
-					i += makeSimilarAround(t, jc, possibles, s2);
+				if (toSkip > 0) {
+					toSkip--;
+				} else {
+					/* only if we have a change, we should consider it */
+					if ((lastJc == null || !lastJc.equals(jc))
+							&& (mutationProbability.nextValue().nextEvent(rng))) {
+						log.debug("mutating around " + t);
+						toSkip = makeSimilarAround(t, jc, possibles, s2);
+						i += toSkip;
+					}
 				}
 				n++;
 			}
@@ -74,10 +87,10 @@ public class ScheduleSimilarMutation extends ScheduleKeepingMutation {
 		return s2;
 	}
 
-	private int makeSimilarAround(LSTTime t, JobCombination thisjc,
+	protected int makeSimilarAround(LSTTime t, JobCombination thisjc,
 			ScheduleSpace template, Schedule s2) {
-		boolean posContinue = FORWARDS_KEEP;
-		boolean negContinue = BACKWARDS_KEEP;
+		boolean posContinue = forwardsKeep;
+		boolean negContinue = backwardsKeep;
 		int countChanged = 0;
 		LSTTime last = template.findLastEntry();
 		LSTTimeIterator it = new LSTTimeIterator(new LSTTime(0, 1),
@@ -152,4 +165,5 @@ public class ScheduleSimilarMutation extends ScheduleKeepingMutation {
 		}
 		return countChanged;
 	}
+
 }

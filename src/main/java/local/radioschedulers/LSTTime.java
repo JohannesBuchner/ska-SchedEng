@@ -59,6 +59,14 @@ public class LSTTime implements Comparable<LSTTime> {
 	public boolean isAfter(LSTTime o) {
 		return compareTo(o) > 0;
 	}
+	@JsonIgnore
+	public boolean isBeforeOrEqual(LSTTime o) {
+		return compareTo(o) <= 0;
+	}
+	@JsonIgnore
+	public boolean isAfterOrEqual(LSTTime o) {
+		return compareTo(o) >= 0;
+	}
 
 	@Override
 	public String toString() {

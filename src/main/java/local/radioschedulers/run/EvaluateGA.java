@@ -18,6 +18,7 @@ import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.ga.ScheduleFitnessFunction;
 import local.radioschedulers.ga.fitness.BlockBasedScheduleFitnessFunction;
+import local.radioschedulers.ga.fitness.SimpleScheduleFitnessFunction;
 import local.radioschedulers.importer.CsvScheduleReader;
 import local.radioschedulers.importer.IProposalReader;
 import local.radioschedulers.importer.JsonProposalReader;
@@ -26,7 +27,7 @@ import org.apache.log4j.Logger;
 
 public abstract class EvaluateGA {
 	public static final int numberOfEvaluations = 1000;
-	private static final boolean LOAD_SCHEDULES = true;
+	private static boolean loadSchedules = false;
 	public static int ndays = 365 / 4;
 	public static double oversubscriptionFactor = 0.2;
 
@@ -37,14 +38,22 @@ public abstract class EvaluateGA {
 	protected int populationSize = 20;
 	protected double crossoverProb = 0.3;
 	protected double mutationProb = 0.3;
-	protected double mutationSimilarProb;
-	protected double mutationExchangeProb;
+	protected double mutationSimilarPrevProb = 0.;
+	protected double mutationKeepingProb = 0.;
+	protected double mutationSimilarBackwardsProb = 0.;
+	protected double mutationSimilarForwardsProb = 0.;
+	protected double mutationExchangeProb = 0.;
+	private boolean simpleFitnessFunction = true;
 
 	private ScheduleFitnessFunction getFitnessFunction() {
-		// SimpleScheduleFitnessFunction f = new SimpleScheduleFitnessFunction();
-		// f.setSwitchLostMinutes(15);
-		ScheduleFitnessFunction f = new BlockBasedScheduleFitnessFunction();
-		return f;
+		if (simpleFitnessFunction) {
+			SimpleScheduleFitnessFunction f = new SimpleScheduleFitnessFunction();
+			f.setSwitchLostMinutes(15);
+			return f;
+		} else {
+			ScheduleFitnessFunction f = new BlockBasedScheduleFitnessFunction();
+			return f;
+		}
 	}
 
 	public void handleParams(String[] args) throws Exception {
@@ -62,11 +71,43 @@ public abstract class EvaluateGA {
 		if (args.length >= 6)
 			mutationProb = Double.parseDouble(args[5]);
 		if (args.length >= 7)
-			mutationSimilarProb = Double.parseDouble(args[6]);
+			mutationKeepingProb = Double.parseDouble(args[6]);
 		if (args.length >= 8)
-			mutationExchangeProb = Double.parseDouble(args[7]);
+			mutationSimilarForwardsProb = Double.parseDouble(args[7]);
+		if (args.length >= 9)
+			mutationSimilarBackwardsProb = Double.parseDouble(args[8]);
+		if (args.length >= 10)
+			mutationSimilarPrevProb = Double.parseDouble(args[9]);
+		if (args.length >= 11)
+			mutationExchangeProb = Double.parseDouble(args[10]);
 		else
-			throw new IllegalArgumentException("expected 8 arguments!");
+			usage();
+		if (args.length >= 12)
+			loadSchedules = Boolean.parseBoolean(args[11]);
+		if (args.length >= 13)
+			simpleFitnessFunction = Boolean.parseBoolean(args[12]);
+	}
+
+	private void usage() {
+		System.err
+				.println("SYNOPSIS: EvaluateGA <prefix> "
+						+ "<oversubscriptionFactor> <maxParallel> "
+						+ "<populationSize> <crossoverProb> "
+						+ "<mutationProb> <mutationKeepingProb> "
+						+ "<mutationSimilarForwardsProb> <mutationSimilarBackwardsProb> "
+						+ "<mutationSimilarPrevProb> <mutationExchangeProb> "
+						+ "[loadSchedule [blockFitnessFunction]]");
+		System.err.println();
+		System.err
+				.println("prefix                           output file prefix");
+		System.err
+				.println("mutation{,Similar,Exchange}Prob  probability for mutation operators");
+		System.err
+				.println("loadSchedule                     if given, load stored schedules");
+		System.err
+				.println("blockFitnessFunction             if given, use blockFitnessFunction");
+
+		throw new IllegalArgumentException("expected at least 8 arguments!");
 	}
 
 	public void run() throws Exception {
@@ -76,15 +117,27 @@ public abstract class EvaluateGA {
 		ps.println("populationSize: " + populationSize);
 		ps.println("crossoverProb: " + crossoverProb);
 		ps.println("mutationProb: " + mutationProb);
-		ps.println("mutationSimilarProb: " + mutationSimilarProb);
+		ps.println("mutationKeepingProb: " + mutationKeepingProb);
+		ps.println("mutationSimilarForwardsProb: "
+				+ mutationSimilarForwardsProb);
+		ps.println("mutationSimilarBackwardsProb: "
+				+ mutationSimilarBackwardsProb);
+		ps.println("mutationSimilarPrevProb: " + mutationSimilarPrevProb);
 		ps.println("mutationExchangeProb: " + mutationExchangeProb);
-		ps.println("mutationProb: " + mutationProb);
-		ps.println("crossoverProb: " + crossoverProb);
+		ps.println("simpleFitnessFunction: " + simpleFitnessFunction);
+		ps.println("loadSchedules: " + loadSchedules);
 		log.info("{ ndays: " + ndays + " }");
 		log.info("{ oversubscriptionFactor: " + oversubscriptionFactor + " } ");
 		log.info("{ populationSize: " + populationSize + " }");
 		log.info("{ mutationProb: " + mutationProb + " }");
+		log.info("{ mutationKeepingProb: " + mutationKeepingProb + " }");
+		log.info("{ mutationSimilarForwardsProb: " + mutationSimilarForwardsProb + " }");
+		log.info("{ mutationSimilarBackwardsProb: " + mutationSimilarBackwardsProb + " }");
+		log.info("{ mutationSimilarPrevProb: " + mutationSimilarPrevProb + " }");
+		log.info("{ mutationExchangeProb: " + mutationExchangeProb + " }");
 		log.info("{ crossoverProb: " + crossoverProb + " }");
+		log.info("{ simpleFitnessFunction: " + simpleFitnessFunction + " }");
+		log.info("{ loadSchedules: " + loadSchedules + " }");
 
 		IProposalReader pr = getProposalReader();
 		Collection<Proposal> proposals = pr.readall();
@@ -116,7 +169,7 @@ public abstract class EvaluateGA {
 
 		Map<String, Schedule> schedules = sr.readall();
 		Map<String, Schedule> selectedSchedules = new HashMap<String, Schedule>();
-		if (LOAD_SCHEDULES) {
+		if (loadSchedules) {
 			for (Entry<String, Schedule> e : schedules.entrySet()) {
 				if (!e.getKey().contains("RandomizedSelector")) {
 					selectedSchedules.put(e.getKey(), e.getValue());

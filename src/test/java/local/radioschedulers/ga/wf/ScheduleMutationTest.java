@@ -13,6 +13,7 @@ import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.cpu.CPULikeScheduler;
 import local.radioschedulers.cpu.RandomizedSelector;
+import local.radioschedulers.ga.watchmaker.AbstractScheduleMutation;
 import local.radioschedulers.ga.watchmaker.ScheduleMutation;
 import local.radioschedulers.importer.GeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
@@ -27,17 +28,20 @@ import org.uncommons.maths.random.MersenneTwisterRNG;
 import org.uncommons.maths.random.Probability;
 
 public class ScheduleMutationTest {
-	private static final Probability MUTATION_PROBABILITY = new Probability(0.1);
+	protected static final Probability MUTATION_PROBABILITY = new Probability(
+			0.1);
 
 	@SuppressWarnings("unused")
 	private static Logger log = Logger.getLogger(ScheduleMutationTest.class);
 
-	private Collection<Proposal> proposals;
-	private ScheduleSpace template;
+	protected Collection<Proposal> proposals;
+	protected ScheduleSpace template;
 	private int ndays = 10;
 	private Schedule schedule1;
 	private Schedule schedule2;
 	private Random rng = new MersenneTwisterRNG();
+
+	protected AbstractScheduleMutation op;
 
 	@Before
 	public void setup() throws Exception {
@@ -51,15 +55,14 @@ public class ScheduleMutationTest {
 		CPULikeScheduler scheduler = new CPULikeScheduler(
 				new RandomizedSelector());
 		schedule1 = scheduler.schedule(template);
+
+		op = getOperator();
 	}
 
 	@Test
 	public void testMutation() throws Exception {
 		List<Schedule> schedules = new ArrayList<Schedule>(2);
 		schedules.add(schedule1);
-
-		ScheduleMutation op = new ScheduleMutation(template,
-				MUTATION_PROBABILITY);
 		schedules = op.apply(schedules, rng);
 		schedule2 = schedules.get(0);
 
@@ -82,12 +85,18 @@ public class ScheduleMutationTest {
 			}
 		}
 		Assert.assertTrue(diffcount > 0);
-		Assert.assertEquals(diffcount * 1. / (eqcount + diffcount),
-				MUTATION_PROBABILITY.doubleValue(), 0.05);
+		Assert.assertEquals(MUTATION_PROBABILITY.doubleValue(), diffcount * 1.
+				/ (eqcount + diffcount), 0.1);
 
 		ScheduleFactoryTest.assertScheduleIsWithinTemplate(schedule2, template,
 				ndays);
 
+	}
+
+	protected AbstractScheduleMutation getOperator() {
+		ScheduleMutation op = new ScheduleMutation(template,
+				MUTATION_PROBABILITY);
+		return op;
 	}
 
 	private boolean schedEquals(JobCombination a, JobCombination b) {
