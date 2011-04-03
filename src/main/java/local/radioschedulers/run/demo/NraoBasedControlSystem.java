@@ -61,7 +61,7 @@ public class NraoBasedControlSystem implements ControlSystem {
 		System.out.print(name + "...");
 		Process p = pb.start();
 		p.getOutputStream().close();
-		InputStream is = p.getInputStream();
+		//InputStream is = p.getInputStream();
 		InputStream es = p.getErrorStream();
 		p.waitFor();
 		{

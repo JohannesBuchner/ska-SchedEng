@@ -13,8 +13,8 @@ import org.uncommons.maths.number.NumberGenerator;
 import org.uncommons.maths.random.Probability;
 
 /**
- * Operator that randomly mutates a slot and tries to extend the selection
- * forward as long as possible (max 1 day).
+ * Operator that randomly mutates a slot and tries to extend the previous Job
+ * if possible.
  * 
  * @author Johannes Buchner
  */

@@ -1,4 +1,4 @@
-package local.radioschedulers.cpu;
+package local.radioschedulers.greedy;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -90,13 +90,15 @@ public class GreedyScheduler implements IScheduler {
 			}
 		}
 
+		
 		log.debug("sorting jobs by pressure");
 		SortedCollection<Job> jobsSortedByPressure = new SortedCollection<Job>(
 				possibleSlots.keySet(), getOvershoot());
-
+		
 		log.debug("assigning job order in schedulespace based on pressure");
 		Map<LSTTime, List<Job>> pressureOrderedTasks = new HashMap<LSTTime, List<Job>>();
-
+		
+		
 		for (Job j : jobsSortedByPressure) {
 			log.debug("# of slots: " + npossibleSlots.get(j) + " for " + j);
 
@@ -186,14 +188,14 @@ public class GreedyScheduler implements IScheduler {
 	 * timeslots. restricted, short tasks get a low number; unrestricted, long
 	 * tasks get a high number
 	 */
-	private MappingFunction<Job, Double> getOvershoot() {
+	protected MappingFunction<Job, Double> getOvershoot() {
 		return new MappingFunction<Job, Double>() {
 
 			@Override
 			public Double map(Job item) {
 				int npossiblehours = npossibleSlots.get(item)
 						/ Schedule.LST_SLOTS_PER_HOUR;
-				if (IGNORE_LONG_TASKS && item.hours > 24 * 20) {
+				if (IGNORE_LONG_TASKS && item.hours > 6 * 20) {
 					// long tasks can be carried on to the next quarters
 					return 3 + npossiblehours * 1. / item.hours;
 				} else {

@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import local.radioschedulers.cpu.GreedyScheduler;
+import local.radioschedulers.greedy.GreedyScheduler;
 import local.radioschedulers.importer.GeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
 import local.radioschedulers.preschedule.RequirementGuard;

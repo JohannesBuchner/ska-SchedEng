@@ -19,11 +19,14 @@ import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.cpu.CPULikeScheduler;
 import local.radioschedulers.cpu.FairPrioritizedSelector;
-import local.radioschedulers.cpu.GreedyScheduler;
 import local.radioschedulers.cpu.KeepingPrioritizedSelector;
 import local.radioschedulers.cpu.PrioritizedSelector;
 import local.radioschedulers.cpu.ShortestFirstSelector;
 import local.radioschedulers.exporter.HtmlExport;
+import local.radioschedulers.greedy.GreedyPlacementScheduler;
+import local.radioschedulers.greedy.GreedyScheduler;
+import local.radioschedulers.greedy.PressureJobSortCriterion;
+import local.radioschedulers.greedy.PriorityJobSortCriterion;
 import local.radioschedulers.lp.ParallelLinearScheduler;
 
 import org.apache.log4j.Logger;
@@ -139,6 +142,9 @@ public class HeuristicsScheduleCollector {
 		schedulers.add(new CPULikeScheduler(new ShortestFirstSelector()));
 
 		schedulers.add(new GreedyScheduler());
+
+		schedulers.add(new GreedyPlacementScheduler(new PressureJobSortCriterion()));
+		schedulers.add(new GreedyPlacementScheduler(new PriorityJobSortCriterion()));
 
 		return schedulers;
 	}
