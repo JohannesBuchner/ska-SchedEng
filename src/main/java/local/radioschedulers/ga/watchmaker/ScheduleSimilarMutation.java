@@ -83,6 +83,7 @@ public class ScheduleSimilarMutation extends AbstractScheduleMutation {
 			history.derive(s2, s1, i * 1. / n);
 			// rest is random
 		}
+		updateCounters(s2, s1, i);
 
 		return s2;
 	}

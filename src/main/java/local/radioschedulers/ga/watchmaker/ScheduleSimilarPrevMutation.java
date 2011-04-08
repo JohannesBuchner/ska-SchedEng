@@ -13,8 +13,8 @@ import org.uncommons.maths.number.NumberGenerator;
 import org.uncommons.maths.random.Probability;
 
 /**
- * Operator that randomly mutates a slot and tries to extend the previous Job
- * if possible.
+ * Operator that randomly mutates a slot and tries to extend the previous Job if
+ * possible.
  * 
  * @author Johannes Buchner
  */
@@ -60,6 +60,7 @@ public class ScheduleSimilarPrevMutation extends AbstractScheduleMutation {
 			history.derive(s2, s1, i * 1. / n);
 			// rest is random
 		}
+		updateCounters(s2, s1, i);
 
 		return s2;
 	}

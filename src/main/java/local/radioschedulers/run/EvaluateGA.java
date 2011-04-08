@@ -191,7 +191,7 @@ public abstract class EvaluateGA {
 		return new PrintStream(prefix + suffix);
 	}
 
-	private void compareInitialAndFinalPopulations(
+	protected void compareInitialAndFinalPopulations(
 			Map<String, Schedule> schedules, ScheduleFitnessFunction f,
 			List<Schedule> lastPopulation) throws FileNotFoundException {
 		log.info("comparing input and output population ...");
@@ -235,7 +235,7 @@ public abstract class EvaluateGA {
 			ScheduleSpace template, Map<String, Schedule> schedules,
 			ScheduleFitnessFunction f, PrintStream p) throws Exception;
 
-	private double compareSchedules(Schedule s, Schedule s1) {
+	protected double compareSchedules(Schedule s, Schedule s1) {
 		double c = 0;
 		int n = 0;
 

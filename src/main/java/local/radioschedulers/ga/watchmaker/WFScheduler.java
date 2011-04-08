@@ -28,6 +28,7 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 	private WFFitnessFunction fitness;
 	private EvolutionObserver<Schedule> observer;
 	private GeneticHistory<Schedule, String> history;
+	private MutationCounter<Schedule, Class> counter;
 
 	private double mutationKeepingProbability = 0.;
 	private double mutationSimilarPrevProbability = 0.;
@@ -39,8 +40,16 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 		this.history = history;
 	}
 
+	public void setCounter(MutationCounter<Schedule, Class> counter) {
+		this.counter = counter;
+	}
+
 	public GeneticHistory<Schedule, String> getHistory() {
 		return history;
+	}
+
+	public MutationCounter<Schedule, Class> getCounter() {
+		return counter;
 	}
 
 	public WFScheduler(ScheduleFitnessFunction f) {
@@ -105,18 +114,21 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 			ScheduleCrossover crossover = new ScheduleCrossover(1,
 					new Probability(getCrossoverProbability()));
 			crossover.setHistory(history);
+			crossover.setCounter(counter);
 			operators.add(crossover);
 		}
 		if (getMutationProbability() > 0) {
 			ScheduleMutation mutation = new ScheduleMutation(possibles,
 					new Probability(getMutationProbability()));
 			mutation.setHistory(history);
+			mutation.setCounter(counter);
 			operators.add(mutation);
 		}
 		if (getMutationKeepingProbability() > 0) {
 			ScheduleKeepingMutation mutation = new ScheduleKeepingMutation(
 					possibles, new Probability(getMutationKeepingProbability()));
 			mutation.setHistory(history);
+			mutation.setCounter(counter);
 			operators.add(mutation);
 		}
 		if (getMutationSimilarPrevProbability() > 0) {
@@ -124,6 +136,7 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 					possibles, new Probability(
 							getMutationSimilarPrevProbability()));
 			mutation.setHistory(history);
+			mutation.setCounter(counter);
 			operators.add(mutation);
 		}
 		if (getMutationSimilarBackwardsProbability() > 0) {
@@ -133,6 +146,7 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 			mutationSimilar.setBackwardsKeep(true);
 			mutationSimilar.setForwardsKeep(false);
 			mutationSimilar.setHistory(history);
+			mutationSimilar.setCounter(counter);
 			operators.add(mutationSimilar);
 		}
 		if (getMutationSimilarForwardsProbability() > 0) {
@@ -142,6 +156,7 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 			mutationSimilar.setBackwardsKeep(false);
 			mutationSimilar.setForwardsKeep(true);
 			mutationSimilar.setHistory(history);
+			mutationSimilar.setCounter(counter);
 			operators.add(mutationSimilar);
 		}
 		if (getMutationExchangeProbability() > 0) {
@@ -149,6 +164,7 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 					possibles,
 					new Probability(getMutationExchangeProbability()));
 			mutationExchange.setHistory(history);
+			mutationExchange.setCounter(counter);
 			operators.add(mutationExchange);
 		}
 

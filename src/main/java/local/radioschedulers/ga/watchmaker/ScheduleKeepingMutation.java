@@ -50,7 +50,8 @@ public class ScheduleKeepingMutation extends ScheduleSimilarMutation {
 				if (toSkip > 0) {
 					toSkip--;
 				} else {
-					if (u.nextEvent(rng) && mutationProbability.nextValue().nextEvent(rng)) {
+					if (u.nextEvent(rng)
+							&& mutationProbability.nextValue().nextEvent(rng)) {
 						// randomly choose a task
 						jc = (JobCombination) jcs.toArray()[rng.nextInt(jcs
 								.size())];
@@ -69,6 +70,7 @@ public class ScheduleKeepingMutation extends ScheduleSimilarMutation {
 			history.derive(s2, s1, i * 1. / n);
 			// rest is random
 		}
+		updateCounters(s2, s1, i);
 
 		return s2;
 	}

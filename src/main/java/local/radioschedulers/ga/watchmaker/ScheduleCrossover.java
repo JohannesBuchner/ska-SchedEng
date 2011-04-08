@@ -17,9 +17,14 @@ public class ScheduleCrossover extends AbstractCrossover<Schedule> {
 	@SuppressWarnings("unused")
 	private static Logger log = Logger.getLogger(ScheduleCrossover.class);
 	public GeneticHistory<Schedule, ?> history;
+	private MutationCounter<Schedule, Class> counter;
 
 	public void setHistory(GeneticHistory<Schedule, ?> history) {
 		this.history = history;
+	}
+
+	public void setCounter(MutationCounter<Schedule, Class> counter) {
+		this.counter = counter;
 	}
 
 	public ScheduleCrossover(int crossoverPoints, Probability probability) {
@@ -73,6 +78,14 @@ public class ScheduleCrossover extends AbstractCrossover<Schedule> {
 			history.derive(mix2, parent1, 1 - i * 1. / n);
 			history.derive(mix1, parent2, 1 - i * 1. / n);
 			history.derive(mix2, parent2, i * 1. / n);
+		}
+		if (counter != null) {
+			counter.derive(mix1, parent1);
+			counter.derive(mix2, parent1);
+			counter.derive(mix1, parent2);
+			counter.derive(mix2, parent2);
+			counter.add(mix1, this.getClass(), i);
+			counter.add(mix2, this.getClass(), n - i);
 		}
 
 		return list;

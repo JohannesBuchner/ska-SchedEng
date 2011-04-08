@@ -21,6 +21,7 @@ import local.radioschedulers.ga.GeneticAlgorithmScheduler;
 import local.radioschedulers.ga.HeuristicsScheduleCollector;
 import local.radioschedulers.ga.fitness.SimpleScheduleFitnessFunction;
 import local.radioschedulers.ga.watchmaker.GeneticHistory;
+import local.radioschedulers.ga.watchmaker.MutationCounter;
 import local.radioschedulers.ga.watchmaker.WFScheduler;
 import local.radioschedulers.preschedule.ITimelineGenerator;
 import local.radioschedulers.preschedule.RequirementGuard;
@@ -72,6 +73,8 @@ public class ReusableScheduler {
 	private GeneticHistory<Schedule, String> history;
 
 	private int ndays;
+
+	private MutationCounter<Schedule, Class> counter;
 
 	public void setNdays(int ndays) {
 		this.ndays = ndays;
@@ -170,6 +173,7 @@ public class ReusableScheduler {
 
 	private void advanceSchedulesWithGA() {
 		history = new GeneticHistory<Schedule, String>();
+		counter = new MutationCounter<Schedule, Class>();
 		for (Entry<String, Schedule> e : heuristicschedules.entrySet()) {
 			history.initiated(e.getValue(), e.getKey());
 		}
@@ -180,6 +184,7 @@ public class ReusableScheduler {
 
 		WFScheduler wfs = new WFScheduler(f);
 		wfs.setHistory(history);
+		wfs.setCounter(counter);
 		GeneticAlgorithmScheduler scheduler = wfs;
 		scheduler.setNumberOfGenerations(numberOfEvaluations / populationSize);
 		scheduler.setEliteSize(2);

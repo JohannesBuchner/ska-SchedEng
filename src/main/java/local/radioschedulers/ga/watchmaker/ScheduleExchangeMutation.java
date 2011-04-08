@@ -28,9 +28,14 @@ public class ScheduleExchangeMutation implements EvolutionaryOperator<Schedule> 
 	private ScheduleSpace possibles;
 
 	public GeneticHistory<Schedule, ?> history;
+	private MutationCounter<Schedule, Class> counter;
 
 	public void setHistory(GeneticHistory<Schedule, ?> history) {
 		this.history = history;
+	}
+
+	public void setCounter(MutationCounter<Schedule, Class> counter) {
+		this.counter = counter;
 	}
 
 	public ScheduleExchangeMutation(ScheduleSpace possibles,
@@ -110,6 +115,10 @@ public class ScheduleExchangeMutation implements EvolutionaryOperator<Schedule> 
 		}
 		if (history != null) {
 			history.derive(s2, s1, i * 1. / n);
+		}
+		if (counter != null) {
+			counter.derive(s2, s1);
+			counter.add(s2, this.getClass(), i);
 		}
 
 		return s2;
