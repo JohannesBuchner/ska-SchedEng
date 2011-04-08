@@ -77,7 +77,9 @@ public class HtmlExport implements IExport {
 					params += " class=\"free\" ";
 
 				if (ncells > 1) {
-					log("same between [" + t + ".." + t2 + ")");
+					if (log.isDebugEnabled()) {
+						log.debug("same between [" + t + ".." + t2 + ")");
+					}
 					params += " colspan=" + ncells + " ";
 				}
 				fw.append("<td " + params + ">");
@@ -90,7 +92,9 @@ public class HtmlExport implements IExport {
 						if (i == null)
 							i = 1;
 						jobs.put(j, i + 1);
-						log("@" + t + ": " + j + "");
+						if (log.isDebugEnabled()) {
+							log.debug("@" + t + ": " + j + "");
+						}
 						fw.append(j.proposal.name + "/" + j.hours + " ");
 					}
 				}
@@ -118,9 +122,5 @@ public class HtmlExport implements IExport {
 					/ Schedule.LST_SLOTS_PER_HOUR + "</td></tr>");
 		}
 		fw.append("</tbody></table>");
-	}
-
-	private void log(String string) {
-		log.debug(string);
 	}
 }
