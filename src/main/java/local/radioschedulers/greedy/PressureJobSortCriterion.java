@@ -22,7 +22,7 @@ public class PressureJobSortCriterion extends JobSortCriterion {
 						/ Schedule.LST_SLOTS_PER_HOUR;
 				if (IGNORE_LONG_TASKS && item.hours > 6 * 20) {
 					// long tasks can be carried on to the next quarters
-					return 3 + npossiblehours * 1. / item.hours;
+					return 100 + npossiblehours * 1. / item.hours;
 				} else {
 					return npossiblehours * 1. / item.hours;
 				}

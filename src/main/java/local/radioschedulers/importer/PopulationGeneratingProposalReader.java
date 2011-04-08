@@ -14,7 +14,6 @@ import local.radioschedulers.JobWithResources;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.ResourceRequirement;
-import local.radioschedulers.Schedule;
 import local.radioschedulers.SolarDateRangeRequirements;
 
 import org.apache.log4j.Logger;
@@ -133,8 +132,7 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 		p.jobs = new ArrayList<Job>();
 		JobWithResources jwr = newJob();
 		jwr.date = new SolarDateRangeRequirements(new LSTTime(startday,
-				starthour * Schedule.LST_SLOTS_PER_HOUR), new LSTTime(endday,
-				(endhour) * Schedule.LST_SLOTS_PER_HOUR));
+				starthour * 60), new LSTTime(-1, (endhour) * 60), 7, 3);
 		/*
 		 * require the staff to be focused on this --> only 1 maintenance task
 		 * at a time.
@@ -185,7 +183,7 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 		p.name = name + " " + p.id;
 		p.priority = prio;
 		p.jobs = new ArrayList<Job>();
-		int n = 8;
+		int n = 4;
 		for (int i = 0; i < n; i++) {
 			Job j = newJob();
 			j.hours = totalhours / n;

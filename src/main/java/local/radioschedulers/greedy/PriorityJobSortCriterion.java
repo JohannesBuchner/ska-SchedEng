@@ -11,9 +11,11 @@ public class PriorityJobSortCriterion extends JobSortCriterion {
 
 			@Override
 			public Double map(Job item) {
+				double v;
 				if (item.proposal.mustcomplete)
-					return item.proposal.priority + 10;
-				return item.proposal.priority;
+					v = item.proposal.priority + 10;
+				v = item.proposal.priority;
+				return -v;
 			}
 		};
 	}

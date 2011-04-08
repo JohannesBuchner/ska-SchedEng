@@ -102,12 +102,12 @@ public class FastRecursiveCompatibleJobFactory {
 				long minute = ((int) (j.lstmin * 60 + slot * LST_SLOTS_MINUTES) % (LST_SLOTS * LST_SLOTS_MINUTES));
 
 				if (j.lstmin < j.lstmax) {
-					if (minute < Math.round(j.lstmin) * 60
-							|| minute > Math.round(j.lstmax) * 60)
+					if (minute < Math.round(j.lstmin * 60)
+							|| minute >= Math.round(j.lstmax * 60))
 						break;
 				} else {
-					if (minute < Math.round(j.lstmin) * 60
-							&& minute > Math.round(j.lstmax) * 60)
+					if (minute >= Math.round(j.lstmax * 60)
+							&& minute < Math.round(j.lstmin * 60))
 						break;
 				}
 

@@ -3,11 +3,15 @@ package local.radioschedulers.exporter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.Schedule;
+import local.radioschedulers.ga.fitness.SimpleScheduleFitnessFunction;
 
 public class HtmlExport implements IExport {
 
@@ -45,6 +49,8 @@ public class HtmlExport implements IExport {
 
 		LSTTime lastday = schedule.findLastEntry();
 
+		Map<Job, Integer> jobs = new HashMap<Job, Integer>();
+
 		LSTTime t = new LSTTime(0L, 0L);
 		for (t.day = 0L; t.day <= lastday.day + 1; t.day++) {
 			fw.append("\n\t\t<tr>\n\t\t\t<th>" + t.day + "</th>");
@@ -77,6 +83,10 @@ public class HtmlExport implements IExport {
 					fw.append("&nbsp;");
 				} else {
 					for (Job j : jc.jobs) {
+						Integer i = jobs.get(j);
+						if (i == null)
+							i = 1;
+						jobs.put(j, i + 1);
 						log("@" + t + ": " + j + "");
 						fw.append(j.proposal.name + "/" + j.hours + " ");
 					}
@@ -89,7 +99,23 @@ public class HtmlExport implements IExport {
 		}
 
 		fw.append("\n\t</tbody>\n</table>\n");
+
+		fw.append("<h2>Jobs scheduled</h2>");
+		fw
+				.append("<table><thead><th>Job</th><th>Hours scheduled</th></thead><tbody>");
+		for (Entry<Job, Integer> e : jobs.entrySet()) {
+			fw.append("<tr><td>" + e.getKey() + "</td><td>" + e.getValue()
+					/ Schedule.LST_SLOTS_PER_HOUR + "</td></tr>");
+		}
+		fw.append("</tbody></table>");
+
+		fw.append("<h2>Fitness value: " + getValue(schedule) + "</h2>");
+
 		fw.close();
+	}
+
+	private double getValue(Schedule s) {
+		return new SimpleScheduleFitnessFunction().evaluate(s);
 	}
 
 	private void log(String string) {

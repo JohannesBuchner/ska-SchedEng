@@ -21,6 +21,7 @@ import local.radioschedulers.cpu.CPULikeScheduler;
 import local.radioschedulers.cpu.FairPrioritizedSelector;
 import local.radioschedulers.cpu.KeepingPrioritizedSelector;
 import local.radioschedulers.cpu.PrioritizedSelector;
+import local.radioschedulers.cpu.RandomizedSelector;
 import local.radioschedulers.cpu.ShortestFirstSelector;
 import local.radioschedulers.exporter.HtmlExport;
 import local.radioschedulers.greedy.GreedyPlacementScheduler;
@@ -55,18 +56,20 @@ public class HeuristicsScheduleCollector {
 		List<IScheduler> schedulers = getSchedulers();
 
 		try {
-			PrintStream executionTimeLog = new PrintStream(new FileOutputStream("executiontime.log", true));
+			PrintStream executionTimeLog = new PrintStream(
+					new FileOutputStream("executiontime.log", true));
 
 			for (IScheduler s : schedulers) {
 				log.debug("scheduling using " + s);
-				
+
 				long start = System.currentTimeMillis();
 				Schedule schedule = s.schedule(timeline);
 				long duration = System.currentTimeMillis() - start;
-				log.debug("scheduling done");
+				log.debug("scheduling "
+						+ (schedule == null ? "FAILED" : "done"));
 				executionTimeLog.println(duration + "\t" + s.toString());
 				executionTimeLog.flush();
-				
+
 				schedules.put(s, schedule);
 				exportSchedule(schedules, s, schedule);
 			}
@@ -140,11 +143,15 @@ public class HeuristicsScheduleCollector {
 		schedulers.add(new CPULikeScheduler(new KeepingPrioritizedSelector()));
 		schedulers.add(new CPULikeScheduler(new PrioritizedSelector()));
 		schedulers.add(new CPULikeScheduler(new ShortestFirstSelector()));
+		schedulers.add(new CPULikeScheduler(new RandomizedSelector()));
+		schedulers.add(new CPULikeScheduler(new RandomizedSelector()));
 
 		schedulers.add(new GreedyScheduler());
 
-		schedulers.add(new GreedyPlacementScheduler(new PressureJobSortCriterion()));
-		schedulers.add(new GreedyPlacementScheduler(new PriorityJobSortCriterion()));
+		schedulers.add(new GreedyPlacementScheduler(
+				new PressureJobSortCriterion()));
+		schedulers.add(new GreedyPlacementScheduler(
+				new PriorityJobSortCriterion()));
 
 		return schedulers;
 	}
