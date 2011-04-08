@@ -23,7 +23,9 @@ import local.radioschedulers.cpu.KeepingPrioritizedSelector;
 import local.radioschedulers.cpu.PrioritizedSelector;
 import local.radioschedulers.cpu.RandomizedSelector;
 import local.radioschedulers.cpu.ShortestFirstSelector;
+import local.radioschedulers.exporter.ExportFactory;
 import local.radioschedulers.exporter.HtmlExport;
+import local.radioschedulers.exporter.IExport;
 import local.radioschedulers.greedy.GreedyPlacementScheduler;
 import local.radioschedulers.greedy.GreedyScheduler;
 import local.radioschedulers.greedy.PressureJobSortCriterion;
@@ -85,7 +87,7 @@ public class HeuristicsScheduleCollector {
 		if (!SHOW_SCHEDULE)
 			return;
 		File f = new File("schedule" + schedules.size() + ".html");
-		HtmlExport ex = new HtmlExport(f, s.toString());
+		IExport ex = ExportFactory.getHtmlExport(f, s.toString());
 		try {
 			ex.export(schedule);
 

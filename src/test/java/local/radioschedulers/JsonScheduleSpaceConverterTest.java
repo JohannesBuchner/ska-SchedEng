@@ -6,6 +6,7 @@ import java.util.Collection;
 
 import local.radioschedulers.cpu.CPULikeScheduler;
 import local.radioschedulers.cpu.FirstSelector;
+import local.radioschedulers.exporter.ExportFactory;
 import local.radioschedulers.exporter.HtmlExport;
 import local.radioschedulers.exporter.IExport;
 import local.radioschedulers.importer.GeneratingProposalReader;
@@ -58,7 +59,7 @@ public class JsonScheduleSpaceConverterTest {
 	@Test
 	public void testExportToHtml() throws Exception {
 		IScheduler scheduler = new CPULikeScheduler(new FirstSelector());
-		IExport export = new HtmlExport(f);
+		IExport export = ExportFactory.getHtmlExport(f, "test schedule");
 
 		Schedule s = scheduler.schedule(template);
 		export.export(s);

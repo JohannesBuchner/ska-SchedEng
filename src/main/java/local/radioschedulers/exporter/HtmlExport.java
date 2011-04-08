@@ -11,9 +11,12 @@ import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.Schedule;
-import local.radioschedulers.ga.fitness.SimpleScheduleFitnessFunction;
+
+import org.apache.log4j.Logger;
 
 public class HtmlExport implements IExport {
+
+	private static Logger log = Logger.getLogger(HtmlExport.class);
 
 	private static final boolean MERGESAME = true;
 	private File f;
@@ -100,6 +103,13 @@ public class HtmlExport implements IExport {
 
 		fw.append("\n\t</tbody>\n</table>\n");
 
+		appendAdditionalStats(schedule, fw, jobs);
+
+		fw.close();
+	}
+
+	protected void appendAdditionalStats(Schedule schedule, FileWriter fw,
+			Map<Job, Integer> jobs) throws IOException {
 		fw.append("<h2>Jobs scheduled</h2>");
 		fw
 				.append("<table><thead><th>Job</th><th>Hours scheduled</th></thead><tbody>");
@@ -108,18 +118,9 @@ public class HtmlExport implements IExport {
 					/ Schedule.LST_SLOTS_PER_HOUR + "</td></tr>");
 		}
 		fw.append("</tbody></table>");
-
-		fw.append("<h2>Fitness value: " + getValue(schedule) + "</h2>");
-
-		fw.close();
-	}
-
-	private double getValue(Schedule s) {
-		return new SimpleScheduleFitnessFunction().evaluate(s);
 	}
 
 	private void log(String string) {
-
+		log.debug(string);
 	}
-
 }

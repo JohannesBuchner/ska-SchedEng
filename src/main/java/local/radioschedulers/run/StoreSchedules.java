@@ -10,7 +10,8 @@ import local.radioschedulers.IScheduler;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
-import local.radioschedulers.exporter.HtmlExport;
+import local.radioschedulers.exporter.ExportFactory;
+import local.radioschedulers.exporter.IExport;
 import local.radioschedulers.ga.HeuristicsScheduleCollector;
 import local.radioschedulers.importer.CsvScheduleReader;
 import local.radioschedulers.importer.IProposalReader;
@@ -68,7 +69,7 @@ public class StoreSchedules {
 		
 		schedulesHtmlFile.mkdir();
 		for (Entry<String, Schedule> e : schedules.entrySet()) {
-			HtmlExport ex = new HtmlExport(new File(schedulesHtmlFile, e.getKey()
+			IExport ex = ExportFactory.getHtmlExport(new File(schedulesHtmlFile, e.getKey()
 					+ ".html"), e.getKey());
 			ex.export(e.getValue());
 		}

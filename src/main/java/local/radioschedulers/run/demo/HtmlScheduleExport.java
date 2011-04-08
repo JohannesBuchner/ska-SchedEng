@@ -8,7 +8,8 @@ import java.io.PrintStream;
 
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.Schedule;
-import local.radioschedulers.exporter.HtmlExport;
+import local.radioschedulers.exporter.ExportFactory;
+import local.radioschedulers.exporter.IExport;
 
 public class HtmlScheduleExport implements ScheduleExport {
 	private static final boolean LAUNCH = false;
@@ -17,7 +18,7 @@ public class HtmlScheduleExport implements ScheduleExport {
 	@Override
 	public void export(Schedule s) {
 		try {
-			HtmlExport ex = new HtmlExport(htmlExportFile, "current schedule");
+			IExport ex = ExportFactory.getHtmlExport(htmlExportFile, "current schedule");
 			ex.export(s);
 			if (LAUNCH) {
 				Desktop d = Desktop.getDesktop();

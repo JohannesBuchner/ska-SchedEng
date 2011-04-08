@@ -12,7 +12,8 @@ import java.util.Map.Entry;
 
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
-import local.radioschedulers.exporter.HtmlExport;
+import local.radioschedulers.exporter.ExportFactory;
+import local.radioschedulers.exporter.IExport;
 import local.radioschedulers.ga.GeneticAlgorithmScheduler;
 import local.radioschedulers.ga.ScheduleFitnessFunction;
 import local.radioschedulers.ga.watchmaker.GeneticHistory;
@@ -120,7 +121,7 @@ public class EvaluateWF extends EvaluateGA {
 				}
 			}
 			if (i < populationSize / 2) {
-				HtmlExport ex = new HtmlExport(new File(prefix + "_export_" + i
+				IExport ex = ExportFactory.getHtmlExport(new File(prefix + "_export_" + i
 						+ ".html"), title);
 				try {
 					ex.export(s);
