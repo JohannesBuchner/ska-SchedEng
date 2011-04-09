@@ -28,13 +28,13 @@ public class ScheduleExchangeMutation implements EvolutionaryOperator<Schedule> 
 	private ScheduleSpace possibles;
 
 	public GeneticHistory<Schedule, ?> history;
-	private MutationCounter<Schedule, Class> counter;
+	private MutationCounter<Schedule, String> counter;
 
 	public void setHistory(GeneticHistory<Schedule, ?> history) {
 		this.history = history;
 	}
 
-	public void setCounter(MutationCounter<Schedule, Class> counter) {
+	public void setCounter(MutationCounter<Schedule, String> counter) {
 		this.counter = counter;
 	}
 
@@ -118,7 +118,7 @@ public class ScheduleExchangeMutation implements EvolutionaryOperator<Schedule> 
 		}
 		if (counter != null) {
 			counter.derive(s2, s1);
-			counter.add(s2, this.getClass(), i);
+			counter.add(s2, this.toString(), i);
 		}
 
 		return s2;

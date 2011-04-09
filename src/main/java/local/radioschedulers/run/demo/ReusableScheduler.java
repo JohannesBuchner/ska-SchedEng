@@ -23,12 +23,15 @@ import local.radioschedulers.ga.fitness.SimpleScheduleFitnessFunction;
 import local.radioschedulers.ga.watchmaker.GeneticHistory;
 import local.radioschedulers.ga.watchmaker.MutationCounter;
 import local.radioschedulers.ga.watchmaker.WFScheduler;
+import local.radioschedulers.ga.wf.OperatorNoopTest;
 import local.radioschedulers.preschedule.ITimelineGenerator;
 import local.radioschedulers.preschedule.RequirementGuard;
 import local.radioschedulers.preschedule.SimpleTimelineGenerator;
 import local.radioschedulers.preschedule.parallel.ParallelRequirementGuard;
 
 import org.apache.log4j.Logger;
+import org.jgap.BaseGeneticOperator;
+import org.jgap.impl.MutationOperator;
 
 /**
  * TODO: add executor that does SCHED/FS execution
@@ -74,7 +77,7 @@ public class ReusableScheduler {
 
 	private int ndays;
 
-	private MutationCounter<Schedule, Class> counter;
+	private MutationCounter<Schedule, String> counter;
 
 	public void setNdays(int ndays) {
 		this.ndays = ndays;
@@ -173,7 +176,7 @@ public class ReusableScheduler {
 
 	private void advanceSchedulesWithGA() {
 		history = new GeneticHistory<Schedule, String>();
-		counter = new MutationCounter<Schedule, Class>();
+		counter = new MutationCounter<Schedule, String>();
 		for (Entry<String, Schedule> e : heuristicschedules.entrySet()) {
 			history.initiated(e.getValue(), e.getKey());
 		}

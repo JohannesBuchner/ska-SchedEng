@@ -27,7 +27,7 @@ import org.uncommons.watchmaker.framework.PopulationData;
 public class EvaluateWF extends EvaluateGA {
 	private static Logger log = Logger.getLogger(EvaluateWF.class);
 	GeneticHistory<Schedule, String> history;
-	MutationCounter<Schedule, Class> counter;
+	MutationCounter<Schedule, String> counter;
 
 	public static void main(String[] args) throws Exception {
 		EvaluateGA ev = new EvaluateWF();
@@ -43,7 +43,7 @@ public class EvaluateWF extends EvaluateGA {
 		List<Schedule> population = new ArrayList<Schedule>(schedules.values());
 		WFScheduler wfs = new WFScheduler(f);
 		history = new GeneticHistory<Schedule, String>();
-		counter = new MutationCounter<Schedule, Class>();
+		counter = new MutationCounter<Schedule, String>();
 		for (Entry<String, Schedule> e : schedules.entrySet()) {
 			history.initiated(e.getValue(), e.getKey());
 		}
@@ -103,7 +103,7 @@ public class EvaluateWF extends EvaluateGA {
 
 	private void printContributions(List<Schedule> population,
 			GeneticHistory<Schedule, String> history,
-			MutationCounter<Schedule, Class> counter)
+			MutationCounter<Schedule, String> counter)
 			throws FileNotFoundException {
 		if (population == null)
 			return;
@@ -132,9 +132,9 @@ public class EvaluateWF extends EvaluateGA {
 				}
 			}
 			if (i == 0) {
-				Map<Class, Integer> opc = counter.getProperties(s);
+				Map<String, Integer> opc = counter.getProperties(s);
 				if (opc != null) {
-					for (Entry<Class, Integer> e : opc.entrySet()) {
+					for (Entry<String, Integer> e : opc.entrySet()) {
 						popcount.println(e.getKey() + " - " + e.getValue());
 					}
 				}
@@ -156,7 +156,7 @@ public class EvaluateWF extends EvaluateGA {
 		pcontr.close();
 		log.info("saving contributions done");
 	}
-	
+
 	@Override
 	protected void compareInitialAndFinalPopulations(
 			Map<String, Schedule> schedules, ScheduleFitnessFunction f,
@@ -196,7 +196,8 @@ public class EvaluateWF extends EvaluateGA {
 				Map<String, Double> props = history.getProperties(s);
 				if (props != null) {
 					for (Entry<String, Double> e : props.entrySet()) {
-						p.println("\t\t\t\"" + e.getKey() + "\":" + e.getValue() + ",");
+						p.println("\t\t\t\"" + e.getKey() + "\":"
+								+ e.getValue() + ",");
 					}
 				}
 			}
@@ -205,10 +206,11 @@ public class EvaluateWF extends EvaluateGA {
 
 			p.println("\t\t\"operators\": {");
 			{
-				Map<Class, Integer> props = counter.getProperties(s);
+				Map<String, Integer> props = counter.getProperties(s);
 				if (props != null) {
-					for (Entry<Class, Integer> e : props.entrySet()) {
-						p.println("\t\t\t\"" + e.getKey().getSimpleName() + "\":" + e.getValue() + ",");
+					for (Entry<String, Integer> e : props.entrySet()) {
+						p.println("\t\t\t\"" + e.getKey() + "\":"
+								+ e.getValue() + ",");
 					}
 				}
 			}

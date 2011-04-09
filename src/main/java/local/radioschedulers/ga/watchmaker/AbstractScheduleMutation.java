@@ -22,13 +22,13 @@ public abstract class AbstractScheduleMutation implements
 	protected ScheduleSpace possibles;
 
 	protected GeneticHistory<Schedule, ?> history;
-	private MutationCounter<Schedule, Class> counter;
+	private MutationCounter<Schedule, String> counter;
 
 	public void setHistory(GeneticHistory<Schedule, ?> history) {
 		this.history = history;
 	}
 
-	public void setCounter(MutationCounter<Schedule, Class> counter) {
+	public void setCounter(MutationCounter<Schedule, String> counter) {
 		this.counter = counter;
 	}
 
@@ -85,7 +85,7 @@ public abstract class AbstractScheduleMutation implements
 	protected void updateCounters(Schedule s2, Schedule s1, Integer i) {
 		if (counter != null) {
 			counter.derive(s2, s1);
-			counter.add(s2, this.getClass(), i);
+			counter.add(s2, this.toString(), i);
 		}
 	}
 }

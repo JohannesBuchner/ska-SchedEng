@@ -28,7 +28,7 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 	private WFFitnessFunction fitness;
 	private EvolutionObserver<Schedule> observer;
 	private GeneticHistory<Schedule, String> history;
-	private MutationCounter<Schedule, Class> counter;
+	private MutationCounter<Schedule, String> counter;
 
 	private double mutationKeepingProbability = 0.;
 	private double mutationSimilarPrevProbability = 0.;
@@ -40,7 +40,7 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 		this.history = history;
 	}
 
-	public void setCounter(MutationCounter<Schedule, Class> counter) {
+	public void setCounter(MutationCounter<Schedule, String> counter) {
 		this.counter = counter;
 	}
 
@@ -48,7 +48,7 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 		return history;
 	}
 
-	public MutationCounter<Schedule, Class> getCounter() {
+	public MutationCounter<Schedule, String> getCounter() {
 		return counter;
 	}
 

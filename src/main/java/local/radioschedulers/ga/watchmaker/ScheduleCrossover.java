@@ -17,13 +17,13 @@ public class ScheduleCrossover extends AbstractCrossover<Schedule> {
 	@SuppressWarnings("unused")
 	private static Logger log = Logger.getLogger(ScheduleCrossover.class);
 	public GeneticHistory<Schedule, ?> history;
-	private MutationCounter<Schedule, Class> counter;
+	private MutationCounter<Schedule, String> counter;
 
 	public void setHistory(GeneticHistory<Schedule, ?> history) {
 		this.history = history;
 	}
 
-	public void setCounter(MutationCounter<Schedule, Class> counter) {
+	public void setCounter(MutationCounter<Schedule, String> counter) {
 		this.counter = counter;
 	}
 
@@ -84,8 +84,8 @@ public class ScheduleCrossover extends AbstractCrossover<Schedule> {
 			counter.derive(mix2, parent1);
 			counter.derive(mix1, parent2);
 			counter.derive(mix2, parent2);
-			counter.add(mix1, this.getClass(), i);
-			counter.add(mix2, this.getClass(), n - i);
+			counter.add(mix1, this.toString(), i);
+			counter.add(mix2, this.toString(), n - i);
 		}
 
 		return list;
