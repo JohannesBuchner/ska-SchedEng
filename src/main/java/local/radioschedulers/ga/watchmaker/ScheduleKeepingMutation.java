@@ -74,5 +74,10 @@ public class ScheduleKeepingMutation extends ScheduleSimilarMutation {
 
 		return s2;
 	}
+	
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
+	}
 
 }

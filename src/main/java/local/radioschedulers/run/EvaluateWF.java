@@ -109,7 +109,7 @@ public class EvaluateWF extends EvaluateGA {
 			return;
 		log.info("saving contributions and HTML export of schedules");
 		PrintStream pcontr = getOutputFile("ga-input-contributions.txt");
-		PrintStream popcount = getOutputFile("ga-operator-count.txt");
+		PrintStream popcount = getOutputFile("ga-operator-count.best.txt");
 		Map<String, Double> contributions = new HashMap<String, Double>();
 
 		int i = 0;
@@ -135,7 +135,7 @@ public class EvaluateWF extends EvaluateGA {
 				Map<String, Integer> opc = counter.getProperties(s);
 				if (opc != null) {
 					for (Entry<String, Integer> e : opc.entrySet()) {
-						popcount.println(e.getKey() + " - " + e.getValue());
+						popcount.println(e.getKey() + "\t" + e.getValue());
 					}
 				}
 			}
@@ -151,7 +151,7 @@ public class EvaluateWF extends EvaluateGA {
 			i++;
 		}
 		for (Entry<String, Double> e : contributions.entrySet()) {
-			pcontr.println(e.getKey() + " - " + e.getValue());
+			pcontr.println(e.getKey() + "\t" + e.getValue());
 		}
 		pcontr.close();
 		log.info("saving contributions done");
