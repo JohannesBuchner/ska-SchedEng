@@ -90,4 +90,9 @@ public class ScheduleCrossover extends AbstractCrossover<Schedule> {
 
 		return list;
 	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
+	}
 }

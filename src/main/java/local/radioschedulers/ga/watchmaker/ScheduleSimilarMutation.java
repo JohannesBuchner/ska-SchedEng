@@ -167,4 +167,10 @@ public class ScheduleSimilarMutation extends AbstractScheduleMutation {
 		return countChanged;
 	}
 
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + " forwards:" + this.forwardsKeep
+				+ " backwards:" + this.backwardsKeep;
+	}
+
 }

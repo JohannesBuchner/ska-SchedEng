@@ -124,4 +124,8 @@ public class ScheduleExchangeMutation implements EvolutionaryOperator<Schedule> 
 		return s2;
 	}
 
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
+	}
 }

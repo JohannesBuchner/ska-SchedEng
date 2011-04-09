@@ -88,4 +88,9 @@ public abstract class AbstractScheduleMutation implements
 			counter.add(s2, this.toString(), i);
 		}
 	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
+	}
 }
