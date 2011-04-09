@@ -84,6 +84,8 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 			public void updatePopulation(List<EvaluatedCandidate<Schedule>> pop) {
 				if (history != null)
 					history.retain(pop);
+				if (counter != null)
+					counter.retain(pop);
 			}
 		});
 
