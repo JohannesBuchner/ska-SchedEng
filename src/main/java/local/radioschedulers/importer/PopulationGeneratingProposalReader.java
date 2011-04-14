@@ -39,7 +39,7 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 	}
 
 	public Proposal createSimpleProposal(String name, double prio,
-			double startlst, double endlst, Long totalhours) {
+			double startlst, double endlst, Double totalhours) {
 		Proposal p = new Proposal();
 		p.id = getNextIdAsString();
 		p.name = name + " " + p.id;
@@ -124,7 +124,7 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 
 	public Proposal createDaytimeProposal(String name, double prio,
 			int startday, int endday, int starthour, int endhour,
-			Long totalhours) {
+			Double totalhours) {
 		Proposal p = new Proposal();
 		p.id = getNextIdAsString();
 		p.name = name + " " + p.id;
@@ -166,9 +166,9 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 		if (j.lstmax > 24)
 			j.lstmax -= 24;
 		log.debug("Random: " + (j.lstmax - j.lstmin));
-		j.hours = 0L;
+		j.hours = 0.;
 		while (j.hours < 4)
-			j.hours = Math.round((1. / (r.nextDouble() * 200 + 1)) * 6000);
+			j.hours = 1. * Math.round((1. / (r.nextDouble() * 200 + 1)) * 6000);
 		j.proposal = p;
 
 		p.jobs.add(j);
@@ -177,7 +177,7 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 	}
 
 	public Proposal createFullSkyProposal(String name, double prio,
-			Long totalhours) {
+			double totalhours) {
 		Proposal p = new Proposal();
 		p.id = getNextIdAsString();
 		p.name = name + " " + p.id;
@@ -211,22 +211,22 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 	List<Proposal> proposals = new ArrayList<Proposal>();
 
 	public void fill(int ndays) throws Exception {
-		long totalhours = 0;
+		double totalhours = 0;
 
 		while (totalhours < ndays * 24 * PROPORTION_FULLSKY) {
-			int hours = 100 + r.nextInt(1000);
+			double hours = 100 + r.nextInt(1000);
 			totalhours += hours;
 			proposals.add(createFullSkyProposal("FullSky", calcPriority(),
-					hours * 1L));
+					hours));
 		}
 
 		totalhours = 0;
 		while (totalhours < ndays * 24 * PROPORTION_MILKYWAY) {
 			int startlst = 8 + r.nextInt(4);
-			int hours = r.nextInt(50) + 4;
+			double hours = r.nextInt(50) + 4;
 			totalhours += hours;
 			proposals.add(createSimpleProposal("Galaxy", calcPriority(),
-					startlst, startlst + 8, hours * 1L));
+					startlst, startlst + 8, hours));
 		}
 
 		totalhours = 0;
@@ -234,7 +234,7 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 			Proposal p = createRandomProposal();
 			Job j = (Job) p.jobs.toArray()[0];
 			proposals.add(p);
-			Long hours = j.hours;
+			double hours = j.hours;
 			totalhours += hours;
 		}
 
@@ -242,11 +242,11 @@ public class PopulationGeneratingProposalReader implements IProposalReader {
 		while (totalhours < ndays * 24 * PROPORTION_DAYTIME) {
 			int starthour = 9;
 			int endhour = 16;
-			int hours = r.nextInt(1) * 10 + r.nextInt(10) + 1;
+			double hours = r.nextInt(1) * 10 + r.nextInt(10) + 1;
 			totalhours += hours;
 
 			proposals.add(createDaytimeProposal("Maintainance", calcPriority(),
-					0, ndays, starthour, endhour, hours * 1L));
+					0, ndays, starthour, endhour, hours));
 		}
 
 		log.debug(getCurrentId() + " proposals issued.");

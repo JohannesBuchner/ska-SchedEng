@@ -53,17 +53,17 @@ public class SimpleTimelineGenerator implements ITimelineGenerator {
 			// log.debug("at " + t.minute + ": " + jcs.size() +
 			// " combinations");
 			for (int day = 0; day < ndays; day++) {
-				t.day = Long.valueOf(day);
+				LSTTime t2 = new LSTTime(Long.valueOf(day), t.minute);
 
 				for (JobCombination jc : jcs) {
 					boolean gooddate = true;
 					for (Job j : jc.jobs) {
-						if (!requirementGuard.isDateCompatible(j, t)) {
+						if (!requirementGuard.isDateCompatible(j, t2)) {
 							gooddate = false;
 						}
 					}
 					if (gooddate)
-						timeline.add(new LSTTime(t.day, t.minute), jc);
+						timeline.add(t2, jc);
 				}
 				// log.debug("   " + t.day + ": " + jcs.size());
 			}

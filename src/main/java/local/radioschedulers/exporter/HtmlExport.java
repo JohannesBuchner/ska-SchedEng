@@ -44,9 +44,9 @@ public class HtmlExport implements IExport {
 		fw.append("<table>\n\t<thead>\n\t\t<tr>\n\t\t\t<th>day \\ LST</th>");
 		for (int i = 0; i < 24; i++) {
 			fw.append("\n\t\t\t<th>" + i + "</th>");
-			fw.append("\n\t\t\t<th>&nbsp;</th>");
-			fw.append("\n\t\t\t<th>&nbsp;</th>");
-			fw.append("\n\t\t\t<th>&nbsp;</th>");
+			for (int j = 1; j < Schedule.LST_SLOTS_PER_HOUR; j++) {
+				fw.append("\n\t\t\t<th>&nbsp;</th>");
+			}
 		}
 		fw.append("\n\t\t</tr>\n\t</thead>\n\t<tbody>");
 
@@ -57,13 +57,16 @@ public class HtmlExport implements IExport {
 		LSTTime t = new LSTTime(0L, 0L);
 		for (t.day = 0L; t.day <= lastday.day + 1; t.day++) {
 			fw.append("\n\t\t<tr>\n\t\t\t<th>" + t.day + "</th>");
-			for (t.minute = 0L; t.minute < 24 * 60;) {
+			for (t.minute = 0L; t.minute < Schedule.LST_SLOTS_MINUTES
+					* Schedule.LST_SLOTS_PER_DAY;) {
 				fw.append("\n\t\t\t");
 				JobCombination jc = schedule.get(new LSTTime(t.day, t.minute));
 				int ncells = 1;
-				LSTTime t2 = new LSTTime(t.day, t.minute + 15);
+				LSTTime t2 = new LSTTime(t.day, t.minute
+						+ Schedule.LST_SLOTS_MINUTES);
 				if (MERGESAME)
-					for (; t2.minute < 24 * 60; t2.minute += 15) {
+					for (; t2.minute < Schedule.LST_SLOTS_MINUTES
+							* Schedule.LST_SLOTS_PER_DAY; t2.minute += Schedule.LST_SLOTS_MINUTES) {
 						JobCombination jc2 = schedule.get(new LSTTime(t2.day,
 								t2.minute));
 						if ((jc == null && jc2 == null)
@@ -90,12 +93,14 @@ public class HtmlExport implements IExport {
 					for (Job j : jc.jobs) {
 						Integer i = jobs.get(j);
 						if (i == null)
-							i = 1;
-						jobs.put(j, i + 1);
+							i = 0;
+						jobs.put(j, i + ncells);
 						if (log.isDebugEnabled()) {
 							log.debug("@" + t + ": " + j + "");
 						}
-						fw.append(j.proposal.name + "/" + j.hours + " ");
+						fw.append(j.proposal.name + "/"
+								+ j.hours.toString().replaceAll("\\.?0+$", "")
+								+ " ");
 					}
 				}
 				t.minute = t2.minute;

@@ -40,35 +40,35 @@ public class GeneratingProposalReader implements IProposalReader {
 		
 		Job j = new Job();
 		j.proposal = p1;
-		j.hours = 101L;
+		j.hours = 101.;
 		j.lstmin = 4.;
 		j.lstmax = 10.;
 		j.proposal.jobs.add(j);
 		
 		j = new Job();
 		j.proposal = p1;
-		j.hours = 41L;
+		j.hours = 41.;
 		j.lstmin = 8.;
 		j.lstmax = 10.;
 		j.proposal.jobs.add(j);
 		
 		j = new Job();
 		j.proposal = p1;
-		j.hours = 11L;
+		j.hours = 11.;
 		j.lstmin = 2.;
 		j.lstmax = 7.;
 		j.proposal.jobs.add(j);
 		
 		j = new Job();
 		j.proposal = p2;
-		j.hours = 102L;
+		j.hours = 102.;
 		j.lstmin = 19.;
 		j.lstmax = 2.;
 		j.proposal.jobs.add(j);
 
 		j = new Job();
 		j.proposal = p3;
-		j.hours = 43L;
+		j.hours = 43.;
 		j.lstmin = 0.;
 		j.lstmax = 23.;
 		j.proposal.jobs.add(j);

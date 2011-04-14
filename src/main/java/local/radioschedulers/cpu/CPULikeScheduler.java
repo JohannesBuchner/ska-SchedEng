@@ -16,9 +16,6 @@ import local.radioschedulers.ScheduleSpace;
 import org.apache.log4j.Logger;
 
 public class CPULikeScheduler implements IScheduler {
-	public static final int LST_SLOTS = 24 * 4;
-	public static final int LST_SLOTS_MINUTES = 24 * 60 / LST_SLOTS;
-
 	private static Logger log = Logger.getLogger(CPULikeScheduler.class);
 
 	/**
@@ -35,7 +32,8 @@ public class CPULikeScheduler implements IScheduler {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + " with jobselector " + jobselector + " instance " + hashCode();
+		return getClass().getSimpleName() + " with jobselector " + jobselector
+				+ " instance " + hashCode();
 	}
 
 	/*
@@ -74,7 +72,8 @@ public class CPULikeScheduler implements IScheduler {
 				s.add(new LSTTime(t.day, t.minute), selected);
 				/* count down time left */
 				for (Job j : selected.jobs) {
-					Double newtime = timeleft.get(j) - LST_SLOTS_MINUTES / 60.;
+					Double newtime = timeleft.get(j) - 1.
+							/ Schedule.LST_SLOTS_PER_HOUR;
 					log.debug("@" + t + " : " + j + " (" + newtime + " left)");
 					if (newtime <= 0) {
 						timeleft.remove(j);

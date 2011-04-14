@@ -69,6 +69,8 @@ public class ParallelLinearScheduler implements IScheduler {
 		 */
 		costFunction.append("max: ");
 
+		int varCount = 0;
+		int constraintCount = 0;
 		/**
 		 * 1) No incompatible jobs are at the same time k, i.e. not requesting
 		 * more resources than we have.
@@ -89,6 +91,7 @@ public class ParallelLinearScheduler implements IScheduler {
 						jobComboIdSet.add(jc);
 					}
 					String varname = getVar(t, id);
+					varCount++;
 					log.debug(varname + " -- jobCombination " + id
 							+ " at time " + t + " : " + " (prio "
 							+ jc.calculatePriority() + ")");
@@ -130,8 +133,10 @@ public class ParallelLinearScheduler implements IScheduler {
 		 */
 		for (Entry<Job, StringBuilder> e : jobsumSet.entrySet()) {
 			constraints.append(e.getValue());
-			constraints.append("0 <= " + e.getKey().hours
-					* ScheduleSpace.LST_SLOTS_PER_DAY + ";\n");
+			long totalslots = (long) Math.ceil(e.getKey().hours
+					* Schedule.LST_SLOTS_PER_HOUR);
+			constraints.append("0 <= " + totalslots + ";\n");
+			constraintCount++;
 		}
 		costFunction.append("0;\n");
 
@@ -147,6 +152,7 @@ public class ParallelLinearScheduler implements IScheduler {
 
 		Schedule s;
 		try {
+			log.info("Linear problem stated with " + varCount + " variables and " + constraintCount + " constraints.");
 			log.debug("solving ...");
 			s = lpsolve(lp);
 			log.debug("solving done");

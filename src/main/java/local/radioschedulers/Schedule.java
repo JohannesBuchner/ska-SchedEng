@@ -19,7 +19,7 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class Schedule implements Iterable<Entry<LSTTime, JobCombination>> {
-	public static final int LST_SLOTS_MINUTES = 15;
+	public static final int LST_SLOTS_MINUTES = ScheduleSpace.LST_SLOTS_MINUTES;
 	public static final int LST_SLOTS_PER_HOUR = 60 / LST_SLOTS_MINUTES;
 	public static final int LST_SLOTS_PER_DAY = LST_SLOTS_PER_HOUR * 24;
 

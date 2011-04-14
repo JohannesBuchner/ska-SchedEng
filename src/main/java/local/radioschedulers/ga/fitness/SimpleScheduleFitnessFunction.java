@@ -30,7 +30,7 @@ public class SimpleScheduleFitnessFunction implements ScheduleFitnessFunction {
 	public double evaluate(Schedule s) {
 		double value = 0.;
 		JobCombination previousEntry = null;
-		Map<Job, Long> timeleftMap = new HashMap<Job, Long>();
+		Map<Job, Double> timeleftMap = new HashMap<Job, Double>();
 
 		for (Entry<LSTTime, JobCombination> entry : s) {
 			JobCombination jc = entry.getValue();
@@ -45,8 +45,8 @@ public class SimpleScheduleFitnessFunction implements ScheduleFitnessFunction {
 	}
 
 	protected double evaluateSlot(LSTTime t, JobCombination jc,
-			JobCombination previousEntry, Map<Job, Long> timeleftMap) {
-		Long timeleft;
+			JobCombination previousEntry, Map<Job, Double> timeleftMap) {
+		double timeleft;
 		double value = 0;
 		boolean inPreviousSlot;
 
@@ -66,7 +66,7 @@ public class SimpleScheduleFitnessFunction implements ScheduleFitnessFunction {
 		return value * jc.calculatePriority();
 	}
 
-	protected double evaluateSlotJob(LSTTime t, Job j, long timeleft,
+	protected double evaluateSlotJob(LSTTime t, Job j, double timeleft,
 			boolean inPreviousSlot) {
 		double time;
 		if (inPreviousSlot) {

@@ -24,7 +24,6 @@ import local.radioschedulers.cpu.PrioritizedSelector;
 import local.radioschedulers.cpu.RandomizedSelector;
 import local.radioschedulers.cpu.ShortestFirstSelector;
 import local.radioschedulers.exporter.ExportFactory;
-import local.radioschedulers.exporter.HtmlExport;
 import local.radioschedulers.exporter.IExport;
 import local.radioschedulers.greedy.GreedyPlacementScheduler;
 import local.radioschedulers.greedy.GreedyScheduler;

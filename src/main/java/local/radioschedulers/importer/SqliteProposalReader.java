@@ -116,7 +116,7 @@ public class SqliteProposalReader implements IProposalReader {
 				Job j = new Job();
 				j.id = res2.getString(1);
 				j.proposal = p;
-				j.hours = res2.getLong(2);
+				j.hours = 1. * res2.getLong(2);
 				j.lstmin = res2.getDouble(3);
 				j.lstmax = res2.getDouble(4);
 

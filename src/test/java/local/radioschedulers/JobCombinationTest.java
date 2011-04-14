@@ -17,7 +17,7 @@ public class JobCombinationTest {
 		p1.priority = 1.;
 		p1.id = "p1";
 		j1 = new Job();
-		j1.hours = 100L;
+		j1.hours = 100.;
 		j1.proposal = p1;
 		p1.jobs = new ArrayList<Job>();
 		p1.jobs.add(j1);
@@ -27,7 +27,7 @@ public class JobCombinationTest {
 		p2.id = "p2";
 		j2 = new Job();
 		j2.proposal = p2;
-		j2.hours = 200L;
+		j2.hours = 200.;
 		p2.jobs = new ArrayList<Job>();
 		p2.jobs.add(j2);
 

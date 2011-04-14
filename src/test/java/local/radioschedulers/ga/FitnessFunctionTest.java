@@ -7,7 +7,6 @@ import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.cpu.CPULikeScheduler;
 import local.radioschedulers.cpu.FirstSelector;
-import local.radioschedulers.ga.fitness.BlockBasedScheduleFitnessFunction;
 import local.radioschedulers.ga.fitness.SimpleScheduleFitnessFunction;
 import local.radioschedulers.importer.GeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
@@ -49,15 +48,5 @@ public class FitnessFunctionTest {
 				v > w);
 		Assert.assertEquals(0, w, 0.01);
 	}
-	@Test
-	public void testBlockBasedFitnessFuntion() throws Exception {
-		ScheduleFitnessFunction fitness = new BlockBasedScheduleFitnessFunction();
-		double v = fitness.evaluate(schedule1);
-		double w = fitness.evaluate(emptyschedule);
-		Assert.assertTrue("Expecting schedule1: " + v + " > schedule2: " + w,
-				v > w);
-		Assert.assertEquals(0, w, 0.01);
-	}
-
 
 }

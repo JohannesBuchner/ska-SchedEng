@@ -52,7 +52,7 @@ public class DemoProposalReader implements IProposalReader {
 	}
 
 	public static Proposal createSimpleProposal(String name, double prio,
-			double startlst, double endlst, Long totalhours, Job j) {
+			double startlst, double endlst, double totalhours, Job j) {
 		Proposal p = new Proposal();
 		p.id = getNextIdAsString();
 		p.name = name + " " + p.id;

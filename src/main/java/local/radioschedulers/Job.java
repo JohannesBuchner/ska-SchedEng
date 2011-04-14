@@ -24,7 +24,7 @@ public class Job implements Comparable<Job> {
 	/**
 	 * total hours needed
 	 */
-	public Long hours;
+	public Double hours;
 
 	/**
 	 * start of LST time that can be used

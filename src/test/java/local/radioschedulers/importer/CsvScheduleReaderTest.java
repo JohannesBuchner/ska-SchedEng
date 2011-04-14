@@ -43,7 +43,7 @@ public class CsvScheduleReaderTest {
 		p.priority = 3.;
 		Job j = new Job();
 		j.id = "myjob";
-		j.hours = 60L;
+		j.hours = 60.;
 		j.lstmax = 10.;
 		j.lstmin = 4.;
 		p.jobs.add(j);

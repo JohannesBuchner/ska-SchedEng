@@ -2,12 +2,12 @@ package local.radioschedulers;
 
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include=JsonTypeInfo.As.PROPERTY, property="@class")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public interface DateRequirements {
 	/**
 	 * @param t
-	 *            Day (minute is ignored)
-	 * @return 0 if this day is not wanted. >=0 if it is wanted. The sum of all
+	 *            time
+	 * @return 0 if this time is not wanted. >=0 if it is wanted. The sum of all
 	 *         time requirements has to be 1. A preference can be expressed this
 	 *         way.
 	 */

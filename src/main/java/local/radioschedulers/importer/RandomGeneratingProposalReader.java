@@ -13,7 +13,7 @@ public class RandomGeneratingProposalReader implements IProposalReader {
 	List<Proposal> proposals = new ArrayList<Proposal>();
 
 	public Proposal createSimpleProposal(String name, double prio,
-			double startlst, double endlst, Long totalhours) {
+			double startlst, double endlst, double totalhours) {
 		Proposal p = new Proposal();
 		p.id = name;
 		p.name = name;

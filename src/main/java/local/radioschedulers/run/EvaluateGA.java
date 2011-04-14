@@ -17,7 +17,6 @@ import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.ga.ScheduleFitnessFunction;
-import local.radioschedulers.ga.fitness.BlockBasedScheduleFitnessFunction;
 import local.radioschedulers.ga.fitness.SimpleScheduleFitnessFunction;
 import local.radioschedulers.importer.CsvScheduleReader;
 import local.radioschedulers.importer.IProposalReader;
@@ -50,10 +49,8 @@ public abstract class EvaluateGA {
 			SimpleScheduleFitnessFunction f = new SimpleScheduleFitnessFunction();
 			f.setSwitchLostMinutes(15);
 			return f;
-		} else {
-			ScheduleFitnessFunction f = new BlockBasedScheduleFitnessFunction();
-			return f;
 		}
+		throw new IllegalStateException("no other fitness function known!");
 	}
 
 	public void handleParams(String[] args) throws Exception {
