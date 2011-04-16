@@ -54,12 +54,12 @@ public class LinearSolverTest {
 		for (Entry<LSTTime, JobCombination> e : s) {
 			Set<JobCombination> ref = template.get(e.getKey());
 			JobCombination actual = e.getValue();
-			Assert.assertTrue("Schedule is outside ScheduleSpace at " + i, ref
-					.contains(actual));
-			if (actual.jobs.size() > 0)
-				i++;
-			else
-				Assert.fail();
+			if (actual == null)
+				continue;
+			Assert.assertTrue("Schedule is outside ScheduleSpace at " + i
+					+ "-- " + actual + " not in " + ref, ref.contains(actual));
+			Assert.assertTrue(actual.jobs.size() > 0);
+			i++;
 			for (Job j : actual.jobs) {
 				scheduledJobs.add(j.proposal);
 			}

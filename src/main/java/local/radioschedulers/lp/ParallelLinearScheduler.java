@@ -11,6 +11,7 @@ import java.io.PrintStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +23,7 @@ import local.radioschedulers.IScheduler;
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
+import local.radioschedulers.LSTTimeIterator;
 import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.SimpleEntry;
 import local.radioschedulers.Schedule;
@@ -80,9 +82,9 @@ public class ParallelLinearScheduler implements IScheduler {
 		 * This is already ensured by the timeline, which only allows compatible
 		 * jobs in the first place
 		 */
-		for (Entry<LSTTime, Set<JobCombination>> entry : scheduleTemplate) {
-			LSTTime t = entry.getKey();
-			Set<JobCombination> jcs = entry.getValue();
+		for (Iterator<LSTTime> it = getIterator(scheduleTemplate); it.hasNext();) {
+			LSTTime t = it.next();
+			Set<JobCombination> jcs = scheduleTemplate.get(t);
 			if (!jcs.isEmpty()) {
 				for (JobCombination jc : jcs) {
 					Integer id = jobComboIdSet.lastIndexOf(jc);
@@ -152,7 +154,8 @@ public class ParallelLinearScheduler implements IScheduler {
 
 		Schedule s;
 		try {
-			log.info("Linear problem stated with " + varCount + " variables and " + constraintCount + " constraints.");
+			log.info("Linear problem stated with " + varCount
+					+ " variables and " + constraintCount + " constraints.");
 			log.debug("solving ...");
 			s = lpsolve(lp);
 			log.debug("solving done");
@@ -162,6 +165,11 @@ public class ParallelLinearScheduler implements IScheduler {
 			lp.delete();
 		}
 		return s;
+	}
+
+	protected Iterator<LSTTime> getIterator(ScheduleSpace scheduleTemplate) {
+		return new LSTTimeIterator(scheduleTemplate.findLastEntry(),
+				ScheduleSpace.LST_SLOTS_MINUTES);
 	}
 
 	private void catFilesF(File out, File... in) {
