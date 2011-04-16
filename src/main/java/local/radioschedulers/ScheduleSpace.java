@@ -1,5 +1,6 @@
 package local.radioschedulers;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 
 /**
@@ -23,8 +25,11 @@ public class ScheduleSpace implements
 	public static final int LST_SLOTS_MINUTES = 15;
 	public static final int LST_SLOTS_PER_DAY = 60 * 24 / LST_SLOTS_MINUTES;
 
-	private LSTTime last = new LSTTime(0, 0);
+	@JsonProperty
 	private Map<LSTTime, JobCombinationChoice> possibles = new TreeMap<LSTTime, JobCombinationChoice>();
+
+	@JsonIgnore
+	private LSTTime last = new LSTTime(0, 0);
 
 	/*
 	 * this stupid intermediate class is needed for JSON export. Sorry.
@@ -68,6 +73,11 @@ public class ScheduleSpace implements
 
 	Map<LSTTime, JobCombinationChoice> getPossibles() {
 		return possibles;
+	}
+	
+	void setPossibles(Map<LSTTime, JobCombinationChoice> possibles) {
+		this.possibles = possibles;
+		last = Collections.max(possibles.keySet());
 	}
 
 	@JsonIgnore

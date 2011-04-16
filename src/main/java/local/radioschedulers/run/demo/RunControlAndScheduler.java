@@ -20,8 +20,8 @@ public abstract class RunControlAndScheduler {
 	public static void main(String[] args) {
 		Collection<Proposal> proposals = new DemoProposalReader().readall();
 
-		ReusableScheduler cas = new ReusableScheduler();
-		cas.setNdays(ndays);
+		ReusableScheduler scheduler = new ReusableScheduler();
+		scheduler.setNdays(ndays);
 
 		// ControlSystem cs = new PrintControlSystem();
 		ControlSystem cs = new NraoBasedControlSystem();
@@ -33,14 +33,14 @@ public abstract class RunControlAndScheduler {
 		LSTTime currentTime = null;
 		Schedule s = null;
 		while (true) {
-			cas.setAvailableResources("antennas", mon.getAvailableAntennas());
-			cas.setAvailableResources("backends", mon.getAvailableBackends());
+			scheduler.setAvailableResources("antennas", mon.getAvailableAntennas());
+			scheduler.setAvailableResources("backends", mon.getAvailableBackends());
 
-			cas.updateScheduleSpace(proposals, currentTime, s);
+			scheduler.updateScheduleSpace(proposals, currentTime, s);
 
 			log.info("advancing schedules ...");
-			cas.advanceSchedules();
-			s = cas.getCurrentSchedule();
+			scheduler.advanceSchedules();
+			s = scheduler.getCurrentSchedule();
 			ex.export(s, currentTime);
 			log.info("executing ...");
 
