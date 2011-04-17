@@ -11,28 +11,38 @@ import java.util.Map.Entry;
 
 import local.radioschedulers.Schedule;
 
-import org.apache.log4j.Logger;
 import org.uncommons.watchmaker.framework.EvaluatedCandidate;
 
+/**
+ * The mutation counter keeps track of to how many genes an operator was
+ * applied, for each individual, over its lifetime. The counters are inherited
+ * to the children through {@link #derive(Object, Object)}.
+ * 
+ * @author Johannes Buchner
+ * 
+ * @param <K>
+ *            chromosome type
+ * @param <V>
+ *            MutationOperator type
+ */
 public class MutationCounter<K, V> {
-	private static Logger log = Logger.getLogger(MutationCounter.class);
 
-	private Map<K, Map<V, Integer>> properties = new HashMap<K, Map<V, Integer>>();
+	private Map<K, Map<V, Integer>> counts = new HashMap<K, Map<V, Integer>>();
 
 	private Map<V, Integer> ensureKnown(K key) {
-		if (!properties.containsKey(key)) {
+		if (!counts.containsKey(key)) {
 			Map<V, Integer> m = new HashMap<V, Integer>();
-			properties.put(key, m);
+			counts.put(key, m);
 			return m;
 		} else {
-			return properties.get(key);
+			return counts.get(key);
 		}
 	}
 
 	public void derive(K newKey, K parent) {
-		if (properties.containsKey(parent) && !properties.get(parent).isEmpty()) {
+		if (counts.containsKey(parent) && !counts.get(parent).isEmpty()) {
 			Map<V, Integer> p = ensureKnown(newKey);
-			for (Entry<V, Integer> e : properties.get(parent).entrySet()) {
+			for (Entry<V, Integer> e : counts.get(parent).entrySet()) {
 				if (p.containsKey(e.getKey())) {
 					p.put(e.getKey(), p.get(e.getKey()) + e.getValue());
 				} else {
@@ -52,28 +62,28 @@ public class MutationCounter<K, V> {
 	}
 
 	public Map<V, Integer> getProperties(K key) {
-		return properties.get(key);
+		return counts.get(key);
 	}
 
 	public void retain(Collection<K> keys) {
 		List<K> toRemove = new ArrayList<K>();
-		for (K key : properties.keySet()) {
+		for (K key : counts.keySet()) {
 			if (!keys.contains(key))
 				toRemove.add(key);
 		}
 		for (K key : toRemove) {
-			properties.remove(key);
+			counts.remove(key);
 		}
 	}
 
 	public void retain(List<EvaluatedCandidate<Schedule>> pop) {
-		Set<K> toRemove = new HashSet<K>(properties.keySet());
+		Set<K> toRemove = new HashSet<K>(counts.keySet());
 
 		for (EvaluatedCandidate<Schedule> c : pop) {
 			toRemove.remove(c.getCandidate());
 		}
 		for (K key : toRemove) {
-			properties.remove(key);
+			counts.remove(key);
 		}
 	}
 }

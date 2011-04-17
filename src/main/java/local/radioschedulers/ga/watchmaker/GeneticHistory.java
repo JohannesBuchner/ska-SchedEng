@@ -14,6 +14,15 @@ import local.radioschedulers.Schedule;
 import org.apache.log4j.Logger;
 import org.uncommons.watchmaker.framework.EvaluatedCandidate;
 
+/**
+ * The genetic history inherits children with their parents properties,
+ * while noting the parents influence.
+ * 
+ * @author Johannes Buchner
+ *
+ * @param <K> chromosome type
+ * @param <V> property type
+ */
 public class GeneticHistory<K, V> {
 	private static Logger log = Logger.getLogger(GeneticHistory.class);
 
