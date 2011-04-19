@@ -52,8 +52,7 @@ public class SimpleScheduleFitnessFunction implements ScheduleFitnessFunction {
 
 		for (Job j : jc.jobs) {
 			if (!timeleftMap.containsKey(j)) {
-				timeleftMap.put(j, j.hours * Schedule.LST_SLOTS_MINUTES
-						* Schedule.LST_SLOTS_PER_DAY);
+				timeleftMap.put(j, j.hours * 60);
 			}
 			timeleft = timeleftMap.get(j) - Schedule.LST_SLOTS_MINUTES;
 			timeleftMap.put(j, timeleft);

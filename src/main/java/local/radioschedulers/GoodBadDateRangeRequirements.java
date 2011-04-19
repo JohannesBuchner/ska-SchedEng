@@ -25,9 +25,7 @@ public class GoodBadDateRangeRequirements implements DateRequirements {
 	}
 
 	public GoodBadDateRangeRequirements(int goodstart, int goodend) {
-		this.good.add(goodstart);
-		this.good.add(goodend);
-		updateNgooddays();
+		addGoodRange(goodstart, goodend);
 	}
 
 	private void updateNgooddays() {
@@ -36,7 +34,7 @@ public class GoodBadDateRangeRequirements implements DateRequirements {
 			for (int d = this.good.get(i); d < this.good.get(i + 1); d++) {
 				count++;
 				for (int j = 0; j < this.bad.size(); j += 2) {
-					if (d >= this.bad.get(i) && d <= this.bad.get(i)) {
+					if (d >= this.bad.get(j) && d <= this.bad.get(j)) {
 						count--;
 						break;
 					}
@@ -49,11 +47,13 @@ public class GoodBadDateRangeRequirements implements DateRequirements {
 	public void addGoodRange(int start, int end) {
 		this.good.add(start);
 		this.good.add(end);
+		updateNgooddays();
 	}
 
 	public void addBadRange(int start, int end) {
 		this.bad.add(start);
 		this.bad.add(end);
+		updateNgooddays();
 	}
 
 	@Override

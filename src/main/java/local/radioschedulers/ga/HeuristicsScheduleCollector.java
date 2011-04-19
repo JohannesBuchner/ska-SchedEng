@@ -25,8 +25,10 @@ import local.radioschedulers.cpu.RandomizedSelector;
 import local.radioschedulers.cpu.ShortestFirstSelector;
 import local.radioschedulers.exporter.ExportFactory;
 import local.radioschedulers.exporter.IExport;
+import local.radioschedulers.greedy.GreedyLeastChoiceScheduler;
 import local.radioschedulers.greedy.GreedyPlacementScheduler;
 import local.radioschedulers.greedy.GreedyScheduler;
+import local.radioschedulers.greedy.MixedModeUnlessOneChoiceScheduler;
 import local.radioschedulers.greedy.PressureJobSortCriterion;
 import local.radioschedulers.greedy.PriorityJobSortCriterion;
 import local.radioschedulers.lp.ParallelLinearScheduler;
@@ -137,7 +139,7 @@ public class HeuristicsScheduleCollector {
 	private static List<IScheduler> getSchedulers() {
 		final List<IScheduler> schedulers = new ArrayList<IScheduler>();
 
-		schedulers.add(new ParallelLinearScheduler());
+		// schedulers.add(new ParallelLinearScheduler());
 
 		schedulers.add(new CPULikeScheduler(new FairPrioritizedSelector()));
 		schedulers.add(new CPULikeScheduler(new FairPrioritizedSelector()));
@@ -153,6 +155,20 @@ public class HeuristicsScheduleCollector {
 				new PressureJobSortCriterion()));
 		schedulers.add(new GreedyPlacementScheduler(
 				new PriorityJobSortCriterion()));
+
+		schedulers.add(new GreedyLeastChoiceScheduler(
+				new KeepingPrioritizedSelector()));
+		schedulers
+				.add(new GreedyLeastChoiceScheduler(new PrioritizedSelector()));
+		schedulers.add(new GreedyLeastChoiceScheduler(
+				new ShortestFirstSelector()));
+
+		schedulers.add(new MixedModeUnlessOneChoiceScheduler(
+				new KeepingPrioritizedSelector()));
+		schedulers.add(new MixedModeUnlessOneChoiceScheduler(
+				new PrioritizedSelector()));
+		schedulers.add(new MixedModeUnlessOneChoiceScheduler(
+				new ShortestFirstSelector()));
 
 		return schedulers;
 	}

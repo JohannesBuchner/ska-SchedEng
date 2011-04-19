@@ -88,9 +88,6 @@ public class FastRecursiveCompatibleJobFactory {
 		return result;
 	}
 
-	public static final int LST_SLOTS = 24 * 4;
-	public static final int LST_SLOTS_MINUTES = 24 * 60 / LST_SLOTS;
-
 	public ScheduleSpace getPossibleTimeLine(Collection<Job> alljobs) {
 		ScheduleSpace timeline;
 
@@ -98,8 +95,11 @@ public class FastRecursiveCompatibleJobFactory {
 
 		log.debug("Possibles:");
 		for (Job j : alljobs) {
-			for (int slot = 0; slot < LST_SLOTS; slot++) {
-				long minute = ((int) (j.lstmin * 60 + slot * LST_SLOTS_MINUTES) % (LST_SLOTS * LST_SLOTS_MINUTES));
+			for (int slot = 0; slot < ScheduleSpace.LST_SLOTS_PER_DAY; slot++) {
+				long minute = (((int) Math.ceil(j.lstmin * 60
+						/ ScheduleSpace.LST_SLOTS_MINUTES)
+						* ScheduleSpace.LST_SLOTS_MINUTES + slot
+						* ScheduleSpace.LST_SLOTS_MINUTES) % (ScheduleSpace.LST_SLOTS_PER_DAY * ScheduleSpace.LST_SLOTS_MINUTES));
 
 				if (j.lstmin < j.lstmax) {
 					if (minute < Math.round(j.lstmin * 60)

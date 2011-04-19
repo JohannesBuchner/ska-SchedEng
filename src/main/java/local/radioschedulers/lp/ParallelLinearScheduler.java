@@ -158,7 +158,7 @@ public class ParallelLinearScheduler implements IScheduler {
 					+ " variables and " + constraintCount + " constraints.");
 			log.debug("solving ...");
 			s = lpsolve(lp);
-			log.debug("solving done");
+			log.info("solving done");
 		} catch (IOException e) {
 			throw new IllegalStateException("Install lp_solve", e);
 		} finally {

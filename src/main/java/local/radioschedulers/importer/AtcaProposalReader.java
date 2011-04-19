@@ -5,15 +5,10 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-
-import org.apache.log4j.Logger;
 
 import local.radioschedulers.DateRequirements;
 import local.radioschedulers.GoodBadDateRangeRequirements;
@@ -22,6 +17,8 @@ import local.radioschedulers.JobWithResources;
 import local.radioschedulers.NoDateRequirements;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.ResourceRequirement;
+
+import org.apache.log4j.Logger;
 
 /**
  * reads output of the form
@@ -44,9 +41,12 @@ import local.radioschedulers.ResourceRequirement;
  * 
  */
 public class AtcaProposalReader implements IProposalReader {
+	private static final double MINIMUM_ALTITUDE_DEGREES = 30.;
+	private static final double LOCATION_LAT_DEGREES = -30.312778;
 	private LineNumberReader reader;
 	private Date startdate;
 	private int ndays;
+	private LSTRangeCalculator lstcalc;
 	private static final Logger log = Logger
 			.getLogger(AtcaProposalReader.class);
 
@@ -55,6 +55,9 @@ public class AtcaProposalReader implements IProposalReader {
 		reader = new LineNumberReader(new FileReader(f));
 		this.startdate = startdate;
 		this.ndays = ndays;
+		this.lstcalc = new LSTRangeCalculator();
+		this.lstcalc.setLocationLatitudeDegrees(LOCATION_LAT_DEGREES);
+		this.lstcalc.setMinimumAltitudeDegrees(MINIMUM_ALTITUDE_DEGREES);
 	}
 
 	@Override
@@ -141,14 +144,19 @@ public class AtcaProposalReader implements IProposalReader {
 					p.name = p.name + " " + l[1].trim();
 				// ignore comments
 
-				Collection<Job> jobs = new ArrayList<Job>();
+				p.jobs = new ArrayList<Job>();
 				for (int i = 0; i < n; i++) {
 					JobWithResources j = new JobWithResources();
 
 					j.date = interpreteDates(gooddates, baddates);
-					j.hours = parseHour(times[i]);
+					if (n == 1) {
+						j.hours = parseHour(times[0]);
+						for (int k = 1; k < times.length; k++)
+							j.hours += parseHour(times[k]);
+					} else
+						j.hours = parseHour(times[i]);
 					j.id = sources[i];
-					Double locationlat = -30.312778 / 180 * Math.PI;
+					Double locationlat = LOCATION_LAT_DEGREES / 180 * Math.PI;
 					interpreteRADec(j, radecs[i], locationlat);
 					j.proposal = p;
 					ResourceRequirement rr = new ResourceRequirement();
@@ -159,9 +167,8 @@ public class AtcaProposalReader implements IProposalReader {
 					rr.numberrequired = 1;
 					rr.possibles.add("Mopra");
 					j.resources.put("antennas", rr);
-					jobs.add(j);
+					p.jobs.add(j);
 				}
-				p.jobs = jobs;
 				proposals.add(p);
 			}
 		} catch (Exception e) {
@@ -191,67 +198,17 @@ public class AtcaProposalReader implements IProposalReader {
 			return;
 		}
 
-		// \sin \mathrm{a} = \cos \theta = \sin \phi \cdot \sin \delta + \cos
-		// \phi \cdot \cos \delta \cdot \cos H
-		// H = LST - ra
-		// sin alt = sin lat * sin dec + cos lat * cos dec * cos (LST - ra)
-		// alt > 10
-		Double minaltitude = 10. / 180 * Math.PI;
-		calculateLSTrange(j, radec, locationlat, minaltitude);
-		minaltitude = 30. / 180 * Math.PI;
-		calculateLSTrange(j, radec, locationlat, minaltitude);
-	}
-
-	private void calculateLSTrange(JobWithResources j, String radec,
-			Double locationlat, Double minaltitude) throws Exception {
-		Double ra = parseRA(radec.split(",")[0]);
-		Double dec = parseDec(radec.split(",")[1]);
-
-		Double acosterm = (Math.sin(minaltitude) - Math.sin(locationlat)
-				* Math.sin(dec))
-				/ (Math.cos(locationlat) * Math.cos(dec));
-
-		if (acosterm < 1) {
-			// circumpolar!
-			j.lstmin = 0.;
-			j.lstmax = 23.99;
-			return;
-		}
-		if (Math.abs(acosterm) > 1)
-			throw new Exception(" " + radec + " never rises at latitude "
-					+ locationlat);
-		Double LST = mod24(ra + Math.acos(acosterm) / Math.PI * 12);
-		Double LST2 = mod24(2 * ra - LST + 24 * 2);
-		System.out.println("dec " + dec + " \t" + LST + " ... " + LST2);
-		if (LST < LST2) {
-			j.lstmin = LST;
-			j.lstmax = LST2;
-		} else {
-			j.lstmin = LST2;
-			j.lstmax = LST;
-		}
-	}
-
-	private Double mod24(double d) {
-		d = d + 24;
-		while (d > 24) {
-			d -= 24;
-		}
-		return d;
-	}
-
-	private Double parseDec(String string) {
-		return parseDecDegrees(string) / 180 * Math.PI;
+		this.lstcalc.setRaHours(parseRAHours(radec.split(",")[0]));
+		this.lstcalc.setDecDegrees(parseDecDegrees(radec.split(",")[1]));
+		this.lstcalc.calculate();
+		j.lstmin = this.lstcalc.getLstminHours();
+		j.lstmax = this.lstcalc.getLstmaxHours();
 	}
 
 	private Double parseDecDegrees(String string) {
 		// degrees, minutes
 		String[] parts = string.split(":", 2);
 		return Double.parseDouble(parts[0]) + Double.parseDouble(parts[1]) / 60;
-	}
-
-	private Double parseRA(String string) {
-		return parseRAHours(string) / 12 * Math.PI;
 	}
 
 	private Double parseRAHours(String string) {
@@ -266,16 +223,22 @@ public class AtcaProposalReader implements IProposalReader {
 		if (gooddates.length == 0 && baddates.length == 0) {
 			return new NoDateRequirements();
 		}
-		GoodBadDateRangeRequirements dr = new GoodBadDateRangeRequirements(
-				ndays);
+		GoodBadDateRangeRequirements dr = null;
 		for (int i = 0; i < gooddates.length; i++) {
-			if (gooddates[i].length() == 0)
+			if (gooddates[i].length() == 0) {
+				dr = new GoodBadDateRangeRequirements(ndays);
 				continue;
+			}
 			String[] parts = gooddates[i].split("-");
 			Date start = str2date(parts[0]);
 			Date end = str2date(parts[1]);
-			dr.addGoodRange(getDelta(start, startdate),
-					getDelta(end, startdate));
+			if (dr == null) {
+				dr = new GoodBadDateRangeRequirements(
+						getDelta(start, startdate), getDelta(end, startdate));
+			} else {
+				dr.addGoodRange(getDelta(start, startdate), getDelta(end,
+						startdate));
+			}
 		}
 		for (int i = 0; i < baddates.length; i++) {
 			if (baddates[i].length() == 0)

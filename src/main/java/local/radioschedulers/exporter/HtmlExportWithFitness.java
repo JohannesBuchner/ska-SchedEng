@@ -21,8 +21,8 @@ public class HtmlExportWithFitness extends HtmlExport {
 
 	@Override
 	protected void appendAdditionalStats(Schedule schedule, FileWriter fw,
-			Map<Job, Integer> jobs) throws IOException {
-		super.appendAdditionalStats(schedule, fw, jobs);
+			Map<Job, Integer> jobs, int nslots) throws IOException {
+		super.appendAdditionalStats(schedule, fw, jobs, nslots);
 		this.appendFitnessValue(schedule, fw);
 	}
 

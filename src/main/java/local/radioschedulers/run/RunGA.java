@@ -1,6 +1,7 @@
 package local.radioschedulers.run;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Date;
 import java.util.ArrayList;
@@ -12,7 +13,10 @@ import local.radioschedulers.IScheduler;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
+import local.radioschedulers.exporter.CsvExport;
 import local.radioschedulers.exporter.HtmlExport;
+import local.radioschedulers.exporter.HtmlExportWithFitness;
+import local.radioschedulers.exporter.IExport;
 import local.radioschedulers.ga.GeneticAlgorithmScheduler;
 import local.radioschedulers.ga.HeuristicsScheduleCollector;
 import local.radioschedulers.ga.ScheduleFitnessFunction;
@@ -23,6 +27,9 @@ import local.radioschedulers.importer.IProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
 import local.radioschedulers.preschedule.SimpleTimelineGenerator;
 import local.radioschedulers.preschedule.parallel.ParallelRequirementGuard;
+
+import org.uncommons.watchmaker.framework.EvolutionObserver;
+import org.uncommons.watchmaker.framework.PopulationData;
 
 public class RunGA {
 	private static int ndays = 365 / 2;
@@ -42,13 +49,11 @@ public class RunGA {
 		Map<IScheduler, Schedule> schedules = HeuristicsScheduleCollector
 				.getStartSchedules(template);
 		int i = 1;
-		PrintWriter o = new PrintWriter(new File(outputDir, "schedules.html"));
+		PrintWriter o = new PrintWriter(new File(outputDir, "index.html"));
 		o.println("<h2>Initial results</h2>");
 		o.println("<ul>");
 		for (Entry<IScheduler, Schedule> e : schedules.entrySet()) {
-			File f = new File(outputDir, "schedule_" + i + ".html");
-			HtmlExport ex = new HtmlExport(f, e.getKey().toString());
-			ex.export(e.getValue());
+			File f = export(e.getKey().toString(), "schedule_" + i, e.getValue());
 			o.println("\t<li><a href='" + f.getName() + "'>" + f.getName()
 					+ " -- " + e.getKey() + "</a></li>");
 			System.out.println("Schedule of " + e.getKey() + " in " + f);
@@ -67,10 +72,8 @@ public class RunGA {
 		o.println("<h3>GA survivors</h3>");
 		o.println("<ul>");
 		int j = 1;
-		for (Schedule e : scheduler.getPopulation()) {
-			File f = new File(outputDir, "schedule_" + i + ".html");
-			HtmlExport ex = new HtmlExport(f, "GA survivor " + j);
-			ex.export(e);
+		for (Schedule s : scheduler.getPopulation()) {
+			File f = export("GA survivor " + j, "schedule_" + i, s);
 			o.println("\t<li><a href='" + f.getName() + "'>" + f.getName()
 					+ " -- " + "GA survivor " + j + "</a></li>");
 			i++;
@@ -78,14 +81,23 @@ public class RunGA {
 		}
 		o.println("</ul>");
 		o.close();
-		System.out.println("Index of results at /tmp/schedules.html");
+		System.out.println("Index of results at /tmp/index.html");
+	}
+
+	private static File export(String title, String prefix, Schedule s) throws IOException {
+		File f = new File(outputDir, prefix + ".html");
+		IExport ex = new HtmlExportWithFitness(f, title);
+		ex.export(s);
+		ex = new CsvExport(new File(outputDir, prefix + ".csv"));
+		ex.export(s);
+		return f;
 	}
 
 	private static GeneticAlgorithmScheduler getScheduler(
 			ScheduleFitnessFunction f) {
 		WFScheduler scheduler = new WFScheduler(f);
 		scheduler.setPopulationSize(30);
-		scheduler.setNumberOfGenerations(10000 / scheduler.getPopulationSize());
+		scheduler.setNumberOfGenerations(2000 / scheduler.getPopulationSize());
 		scheduler.setEliteSize(2);
 
 		scheduler.setCrossoverProbability(0.2);
@@ -96,6 +108,18 @@ public class RunGA {
 		scheduler.setMutationSimilarBackwardsProbability(0.15);
 		scheduler.setMutationSimilarPrevProbability(0.1);
 		scheduler.setMutationExchangeProbability(0.);
+
+		scheduler.setObserver(new EvolutionObserver<Schedule>() {
+
+			@Override
+			public void populationUpdate(PopulationData<? extends Schedule> data) {
+				System.out.println("Gen. " + data.getGenerationNumber()
+						+ ", pop.-qual. avg: " + data.getMeanFitness()
+						+ " best: " + data.getBestCandidateFitness()
+						+ " stdev: " + data.getFitnessStandardDeviation());
+			}
+		});
+
 		return scheduler;
 	}
 

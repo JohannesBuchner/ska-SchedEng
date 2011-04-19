@@ -8,6 +8,7 @@ import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
+import local.radioschedulers.ga.fitness.SimpleScheduleFitnessFunction;
 
 import org.apache.log4j.Logger;
 
@@ -20,7 +21,7 @@ public class IterativeLinearScheduler implements IScheduler {
 	private static Logger log = Logger
 			.getLogger(IterativeLinearScheduler.class);
 
-	private static final int SECTIONSIZE = 30;
+	private static final int SECTIONSIZE = 2;
 
 	@Override
 	public Schedule schedule(ScheduleSpace timeline) {
@@ -35,26 +36,40 @@ public class IterativeLinearScheduler implements IScheduler {
 			ParallelLinearScheduler pls = new ParallelLinearScheduler();
 			s = pls.schedule(timeline2);
 			log.debug(i + " of " + last.day / SECTIONSIZE + " sections done.");
+			log.debug("current goodness: " + getGoodness(s, 0)
+					+ " (fragmented: " + getGoodness(s, 60) + ")");
 		}
-		
 		log.debug("done with first cut");
 
 		// redo, allow shifting stuff around.
-		for (int i = 0; i < last.day / SECTIONSIZE; i++) {
-			for (int j = i + 1; j < last.day / SECTIONSIZE; j++) {
-				ScheduleSpace timeline2 = getPartialScheduleSpace(timeline, i
-						* SECTIONSIZE, (i + 1) * SECTIONSIZE, j * SECTIONSIZE,
-						(j + 1) * SECTIONSIZE, s);
+		if (false)
+			for (int i = 0; i < last.day / SECTIONSIZE / 2; i++) {
+				for (int j = i + 1; j < last.day / SECTIONSIZE / 2; j++) {
+					ScheduleSpace timeline2 = getPartialScheduleSpace(timeline,
+							i * SECTIONSIZE / 2, (i + 1) * SECTIONSIZE / 2, j
+									* SECTIONSIZE / 2, (j + 1) * SECTIONSIZE
+									/ 2, s);
 
-				ParallelLinearScheduler pls = new ParallelLinearScheduler();
-				s = pls.schedule(timeline2);
-				log.debug(i + " of " + last.day / SECTIONSIZE
-						+ " sections done.");
+					ParallelLinearScheduler pls = new ParallelLinearScheduler();
+					s = pls.schedule(timeline2);
+					log.debug((i + "|" + j + " of ")
+							+ (last.day / SECTIONSIZE / 2)
+							+ " sections "
+							+ ((last.day / SECTIONSIZE / 2 + 1) * last.day
+									/ SECTIONSIZE / 4) + "done.");
+					log.debug("current goodness: " + getGoodness(s, 0)
+							+ " (fragmented: " + getGoodness(s, 60) + ")");
+				}
 			}
-		}
 		log.debug("done");
 
 		return s;
+	}
+
+	private String getGoodness(Schedule s, int lostminutes) {
+		SimpleScheduleFitnessFunction f = new SimpleScheduleFitnessFunction();
+		f.setSwitchLostMinutes(lostminutes);
+		return Double.toString(f.evaluate(s));
 	}
 
 	private ScheduleSpace getPartialScheduleSpace(ScheduleSpace timeline,
