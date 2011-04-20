@@ -4,10 +4,9 @@
 
 	<groupId>local.arrayschedule</groupId>
 	<artifactId>engine</artifactId>
-	<version>0.5-SNAPSHOT</version>
+	<version>0.7-SNAPSHOT</version>
 	<name>SchedulingEngine</name>
-	<description>Flexible scheduling engine for large-scale radio telescope
-		arrays</description>
+	<description>Flexible scheduling engine for large-scale radio telescope arrays</description>
 	<packaging>jar</packaging>
 
 	<properties>

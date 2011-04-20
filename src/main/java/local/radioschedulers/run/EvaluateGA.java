@@ -272,9 +272,9 @@ public abstract class EvaluateGA {
 		// PopulationGeneratingProposalReader();
 		// pr.fill((int) (ndays * oversubscriptionFactor));
 		File f;
-		//f = new File("proposals_testset_ndays-" + ndays + "_oversubs-"
-		//		+ oversubscriptionFactor + ".json");
-		f = new File("proposals_testset_mopra.json");
+		f = new File("proposals_testset_ndays-" + ndays + "_oversubs-"
+				+ oversubscriptionFactor + ".json");
+		// f = new File("proposals_testset_mopra.json");
 		JsonProposalReader pr = new JsonProposalReader(f);
 		return pr;
 	}
@@ -286,11 +286,10 @@ public abstract class EvaluateGA {
 				+ maxParallel + ".csv");
 		File spaceFile = new File("space_testset_ndays-" + ndays + "_oversubs-"
 				+ oversubscriptionFactor + "_parallel-" + maxParallel + ".csv");
-		// CsvScheduleReader csv = new CsvScheduleReader(schedulesFile,
-		// spaceFile,
-		// proposals);
-		CsvScheduleReader csv = new CsvScheduleReader(new File(
-				"schedules_mopra.csv"), new File("space_mopra.csv"), proposals);
+		CsvScheduleReader csv = new CsvScheduleReader(schedulesFile, spaceFile,
+				proposals);
+		// CsvScheduleReader csv = new CsvScheduleReader(new File(
+		// "schedules_mopra.csv"), new File("space_mopra.csv"), proposals);
 		return csv;
 	}
 

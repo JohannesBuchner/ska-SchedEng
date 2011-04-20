@@ -38,7 +38,10 @@ public class CsvScheduleReader {
 	}
 
 	private Job lookup(String jobid) {
-		return jobmap.get(jobid);
+		Job j = jobmap.get(jobid);
+		if (j == null)
+			log.warn("did not find associated job/proposal for jobid=" + jobid);
+		return j;
 	}
 
 	public void write(ScheduleSpace space) throws Exception {

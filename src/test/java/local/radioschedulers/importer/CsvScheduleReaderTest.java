@@ -46,6 +46,7 @@ public class CsvScheduleReaderTest {
 		j.hours = 60.;
 		j.lstmax = 10.;
 		j.lstmin = 4.;
+		j.proposal = p;
 		p.jobs.add(j);
 		proposals.add(p);
 
@@ -54,11 +55,11 @@ public class CsvScheduleReaderTest {
 
 		space = new ScheduleSpace();
 		space.add(new LSTTime(0, 0), jc);
-		space.add(new LSTTime(0, 15), jc);
+		space.add(new LSTTime(0, Schedule.LST_SLOTS_MINUTES), jc);
 
 		schedule = new Schedule();
 		schedule.add(new LSTTime(0, 0), jc);
-		schedule.add(new LSTTime(0, 15), jc);
+		schedule.add(new LSTTime(0, Schedule.LST_SLOTS_MINUTES), jc);
 
 		schedules = new HashMap<String, Schedule>();
 		schedules.put("mysched", schedule);
@@ -75,6 +76,8 @@ public class CsvScheduleReaderTest {
 	public void testSpace() throws Exception {
 		reader.write(space);
 		ScheduleSpace readspace = reader.readspace();
+		log.info("last " + readspace.findLastEntry() + " vs "
+				+ space.findLastEntry() + " (space)");
 		Assert.assertTrue(readspace.findLastEntry().equals(
 				space.findLastEntry()));
 		for (Entry<LSTTime, Set<JobCombination>> e : readspace) {
