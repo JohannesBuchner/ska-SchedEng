@@ -54,13 +54,14 @@ public class SimpleScheduleFitnessFunction implements ScheduleFitnessFunction {
 			if (!timeleftMap.containsKey(j)) {
 				timeleftMap.put(j, j.hours * 60);
 			}
-			timeleft = timeleftMap.get(j) - Schedule.LST_SLOTS_MINUTES;
-			timeleftMap.put(j, timeleft);
+			timeleft = timeleftMap.get(j);
 
 			inPreviousSlot = previousEntry != null
 					&& previousEntry.jobs.contains(j);
 
-			value += evaluateSlotJob(t, j, timeleft, inPreviousSlot);
+			timeleft = evaluateSlotJob(t, j, timeleft, inPreviousSlot);
+			value += timeleft;
+			timeleftMap.put(j, timeleftMap.get(j) - timeleft);
 		}
 		return value * jc.calculatePriority();
 	}

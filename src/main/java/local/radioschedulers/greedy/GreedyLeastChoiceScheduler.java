@@ -128,7 +128,11 @@ public class GreedyLeastChoiceScheduler implements IScheduler {
 			// this slot certainly hasn't the same number of choices anymore
 			// log.debug("  @" + t + " -- removing timeslotsByChoice entry of "
 			// + jcs.size());
-			timeslotsByChoice.get(jcs.size()).remove(t);
+
+			if (timeslotsByChoice.containsKey(jcs.size())) {
+				// might have been deleted before
+				timeslotsByChoice.get(jcs.size()).remove(t);
+			}
 
 			choices.clear(t);
 			int newnchoices = 0;

@@ -2,7 +2,9 @@ package local.radioschedulers;
 
 import java.util.ArrayList;
 
+import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 public class GoodBadDateRangeRequirements implements DateRequirements {
 
@@ -18,6 +20,14 @@ public class GoodBadDateRangeRequirements implements DateRequirements {
 
 	public ArrayList<Integer> getBad() {
 		return bad;
+	}
+
+	@JsonCreator
+	GoodBadDateRangeRequirements(@JsonProperty("good") ArrayList<Integer> good,
+			@JsonProperty("bad") ArrayList<Integer> bad) {
+		this.good = good;
+		this.bad = bad;
+		updateNgooddays();
 	}
 
 	public GoodBadDateRangeRequirements(int ndays) {

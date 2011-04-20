@@ -32,7 +32,7 @@ public class CsvScheduleReader {
 		this.spaceFile = spaceFile;
 		for (Proposal p : proposals) {
 			for (Job j : p.jobs) {
-				jobmap.put(j.id, j);
+				jobmap.put(p.id + "." + j.id, j);
 			}
 		}
 	}
@@ -48,7 +48,7 @@ public class CsvScheduleReader {
 			p.print(";");
 			for (JobCombination jc : e.getValue()) {
 				for (Job j : jc.jobs) {
-					p.print(j.id);
+					p.print(j.proposal.id + "." + j.id);
 					p.print(",");
 				}
 				p.print(";");
@@ -69,7 +69,7 @@ public class CsvScheduleReader {
 				if (e.getValue() != null) {
 					JobCombination jc = e.getValue();
 					for (Job j : jc.jobs) {
-						p.print(j.id);
+						p.print(j.proposal.id + "." + j.id);
 						p.print(",");
 					}
 				}

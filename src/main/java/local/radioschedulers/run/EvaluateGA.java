@@ -42,6 +42,7 @@ public abstract class EvaluateGA {
 	protected double mutationSimilarBackwardsProb = 0.;
 	protected double mutationSimilarForwardsProb = 0.;
 	protected double mutationExchangeProb = 0.;
+	protected double mutationPlacementProb = 0.;
 	private boolean simpleFitnessFunction = true;
 
 	private ScheduleFitnessFunction getFitnessFunction() {
@@ -77,12 +78,14 @@ public abstract class EvaluateGA {
 			mutationSimilarPrevProb = Double.parseDouble(args[9]);
 		if (args.length >= 11)
 			mutationExchangeProb = Double.parseDouble(args[10]);
+		if (args.length >= 12)
+			mutationPlacementProb = Double.parseDouble(args[11]);
 		else
 			usage();
-		if (args.length >= 12)
-			loadSchedules = Boolean.parseBoolean(args[11]);
 		if (args.length >= 13)
-			simpleFitnessFunction = Boolean.parseBoolean(args[12]);
+			loadSchedules = Boolean.parseBoolean(args[12]);
+		if (args.length >= 14)
+			simpleFitnessFunction = Boolean.parseBoolean(args[13]);
 	}
 
 	private void usage() {
@@ -268,9 +271,11 @@ public abstract class EvaluateGA {
 		// PopulationGeneratingProposalReader pr = new
 		// PopulationGeneratingProposalReader();
 		// pr.fill((int) (ndays * oversubscriptionFactor));
-		JsonProposalReader pr = new JsonProposalReader(new File(
-				"proposals_testset_ndays-" + ndays + "_oversubs-"
-						+ oversubscriptionFactor + ".json"));
+		File f;
+		//f = new File("proposals_testset_ndays-" + ndays + "_oversubs-"
+		//		+ oversubscriptionFactor + ".json");
+		f = new File("proposals_testset_mopra.json");
+		JsonProposalReader pr = new JsonProposalReader(f);
 		return pr;
 	}
 
@@ -281,9 +286,11 @@ public abstract class EvaluateGA {
 				+ maxParallel + ".csv");
 		File spaceFile = new File("space_testset_ndays-" + ndays + "_oversubs-"
 				+ oversubscriptionFactor + "_parallel-" + maxParallel + ".csv");
-
-		CsvScheduleReader csv = new CsvScheduleReader(schedulesFile, spaceFile,
-				proposals);
+		// CsvScheduleReader csv = new CsvScheduleReader(schedulesFile,
+		// spaceFile,
+		// proposals);
+		CsvScheduleReader csv = new CsvScheduleReader(new File(
+				"schedules_mopra.csv"), new File("space_mopra.csv"), proposals);
 		return csv;
 	}
 

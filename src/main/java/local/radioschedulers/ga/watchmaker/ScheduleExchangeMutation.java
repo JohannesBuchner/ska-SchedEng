@@ -12,10 +12,7 @@ import local.radioschedulers.LSTTime;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 
-import org.uncommons.maths.number.ConstantGenerator;
-import org.uncommons.maths.number.NumberGenerator;
 import org.uncommons.maths.random.Probability;
-import org.uncommons.watchmaker.framework.EvolutionaryOperator;
 
 /**
  * selects random slot and tries to exchange with the same slot from a previous
@@ -23,50 +20,27 @@ import org.uncommons.watchmaker.framework.EvolutionaryOperator;
  * 
  * @author Johannes Buchner
  */
-public class ScheduleExchangeMutation implements EvolutionaryOperator<Schedule> {
-	private final NumberGenerator<Probability> mutationProbability;
-	private ScheduleSpace possibles;
-
-	public GeneticHistory<Schedule, ?> history;
-	private MutationCounter<Schedule, String> counter;
-
-	public void setHistory(GeneticHistory<Schedule, ?> history) {
-		this.history = history;
-	}
-
-	public void setCounter(MutationCounter<Schedule, String> counter) {
-		this.counter = counter;
-	}
+public class ScheduleExchangeMutation extends ScheduleSimilarMutation {
 
 	public ScheduleExchangeMutation(ScheduleSpace possibles,
 			Probability probability) {
-		this(possibles, new ConstantGenerator<Probability>(probability));
-	}
-
-	public ScheduleExchangeMutation(ScheduleSpace possibles,
-			NumberGenerator<Probability> mutationProbability) {
-		this.possibles = possibles;
-		this.mutationProbability = mutationProbability;
+		super(possibles, probability);
+		setForwardsKeep(true);
+		setBackwardsKeep(true);
 	}
 
 	@Override
-	public List<Schedule> apply(List<Schedule> selectedCandidates, Random rng) {
-		List<Schedule> mutatedPopulation = new ArrayList<Schedule>(
-				selectedCandidates.size());
-		for (Schedule s : selectedCandidates) {
-			mutatedPopulation.add(mutateSchedule(s, rng));
-		}
-		return mutatedPopulation;
-	}
-
-	private Schedule mutateSchedule(Schedule s1, Random rng) {
+	protected Schedule mutateSchedule(Schedule s1, Random rng) {
 		Schedule s2 = new Schedule();
 		int i = 0;
 		int n = 0;
 		Probability prob = mutationProbability.nextValue();
 		Probability u = new Probability(1. / 3);
+		long nextDay = 0;
 		for (Entry<LSTTime, JobCombination> e : s1) {
 			LSTTime t = e.getKey();
+			if (t.day < nextDay)
+				continue;
 			s2.add(t, e.getValue());
 			Set<JobCombination> jcs = possibles.get(t);
 			if ((i * 1. / n) < prob.doubleValue() && u.nextEvent(rng)) {
@@ -96,30 +70,30 @@ public class ScheduleExchangeMutation implements EvolutionaryOperator<Schedule> 
 								&& (jc == null || !jc.equals(jc2))) {
 
 							// switch
-							if (jc != null)
+							if (jc != null) {
 								s2.add(t2, jc);
-							if (jc2 != null)
+								i += 1 + makeSimilarAround(t2, jc, possibles,
+										s2);
+							}
+							if (jc2 != null) {
 								s2.add(t, jc2);
+								i += 1 + makeSimilarAround(t, jc2, possibles,
+										s2);
+							}
 							foundPartner = true;
+							nextDay = t.day + 1;
 							break;
 						}
 					}
-					if (foundPartner) {
-						i++; /* we let this count */
-					} else {
+					if (!foundPartner) {
 						s2.add(t, e.getValue());
 					}
 				}
 			}
 			n++;
 		}
-		if (history != null) {
-			history.derive(s2, s1, i * 1. / n);
-		}
-		if (counter != null) {
-			counter.derive(s2, s1);
-			counter.add(s2, this.toString(), i);
-		}
+		updateHistory(s2, s1, i, n);
+		updateCounters(s2, s1, i);
 
 		return s2;
 	}

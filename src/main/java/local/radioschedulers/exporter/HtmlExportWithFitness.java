@@ -7,16 +7,16 @@ import java.util.Map;
 
 import local.radioschedulers.Job;
 import local.radioschedulers.Schedule;
-import local.radioschedulers.ga.fitness.SimpleScheduleFitnessFunction;
+import local.radioschedulers.ga.ScheduleFitnessFunction;
 
 public class HtmlExportWithFitness extends HtmlExport {
 
-	public HtmlExportWithFitness(File f, String title) {
-		super(f, title);
-	}
+	private ScheduleFitnessFunction function;
 
-	public HtmlExportWithFitness(File f) {
-		super(f);
+	public HtmlExportWithFitness(File f, String title,
+			ScheduleFitnessFunction function) {
+		super(f, title);
+		this.function = function;
 	}
 
 	@Override
@@ -32,7 +32,7 @@ public class HtmlExportWithFitness extends HtmlExport {
 	}
 
 	private double getValue(Schedule s) {
-		return new SimpleScheduleFitnessFunction().evaluate(s);
+		return function.evaluate(s);
 	}
 
 }

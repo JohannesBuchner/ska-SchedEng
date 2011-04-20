@@ -190,7 +190,7 @@ public class ReusableScheduler {
 		wfs.setCounter(counter);
 		GeneticAlgorithmScheduler scheduler = wfs;
 		scheduler.setNumberOfGenerations(numberOfEvaluations / populationSize);
-		scheduler.setEliteSize(2);
+		scheduler.setEliteSize(1);
 		scheduler.setCrossoverProbability(crossoverProb);
 		scheduler.setMutationProbability(mutationProb);
 		scheduler.setPopulationSize(populationSize);

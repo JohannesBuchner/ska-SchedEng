@@ -89,6 +89,13 @@ public abstract class AbstractScheduleMutation implements
 		}
 	}
 
+	protected void updateHistory(Schedule s2, Schedule s1, Integer i, Integer n) {
+		if (history != null) {
+			history.derive(s2, s1, 1 - i * 1. / n);
+			// rest is random
+		}
+	}
+
 	@Override
 	public String toString() {
 		return getClass().getSimpleName();

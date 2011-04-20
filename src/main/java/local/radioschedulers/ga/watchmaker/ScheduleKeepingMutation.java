@@ -66,10 +66,7 @@ public class ScheduleKeepingMutation extends ScheduleSimilarMutation {
 			}
 		}
 		log.debug("changed " + i + " of " + n);
-		if (history != null) {
-			history.derive(s2, s1, i * 1. / n);
-			// rest is random
-		}
+		updateHistory(s2, s1, i, n);
 		updateCounters(s2, s1, i);
 
 		return s2;

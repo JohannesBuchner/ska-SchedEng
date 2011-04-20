@@ -80,7 +80,7 @@ public class AtcaProposalReader implements IProposalReader {
 				}
 				log.debug("Line " + reader.getLineNumber());
 				Proposal p = new Proposal();
-				p.id = l[1];
+				p.id = l[1].trim();
 
 				l = readLine();
 				if (!l[0].equals("Requested time")) {
@@ -155,7 +155,7 @@ public class AtcaProposalReader implements IProposalReader {
 							j.hours += parseHour(times[k]);
 					} else
 						j.hours = parseHour(times[i]);
-					j.id = sources[i];
+					j.id = sources[i].trim();
 					Double locationlat = LOCATION_LAT_DEGREES / 180 * Math.PI;
 					interpreteRADec(j, radecs[i], locationlat);
 					j.proposal = p;

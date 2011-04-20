@@ -35,6 +35,7 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 	private double mutationSimilarBackwardsProbability = 0.;
 	private double mutationSimilarForwardsProbability = 0.;
 	private double mutationExchangeProbability = 0.;
+	private double mutationJobPlacementProbability = 0.;
 
 	public void setHistory(GeneticHistory<Schedule, String> history) {
 		this.history = history;
@@ -170,6 +171,15 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 			operators.add(mutationExchange);
 		}
 
+		if (getMutationJobPlacementProbability() > 0) {
+			ScheduleJobPlacementMutation mutPlace = new ScheduleJobPlacementMutation(
+					possibles, new Probability(
+							getMutationJobPlacementProbability()));
+			mutPlace.setHistory(history);
+			mutPlace.setCounter(counter);
+			operators.add(mutPlace);
+		}
+
 		// operators.add(new StringExchangeMutation(new Probability(0.001)));
 		EvolutionaryOperator<Schedule> pipeline = new EvolutionPipeline<Schedule>(
 				operators);
@@ -196,6 +206,10 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 		return mutationSimilarForwardsProbability;
 	}
 
+	public double getMutationJobPlacementProbability() {
+		return mutationJobPlacementProbability;
+	}
+
 	public void setMutationKeepingProbability(double mutationKeepingProbability) {
 		this.mutationKeepingProbability = mutationKeepingProbability;
 	}
@@ -218,6 +232,11 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 	public void setMutationExchangeProbability(
 			double mutationExchangeProbability) {
 		this.mutationExchangeProbability = mutationExchangeProbability;
+	}
+
+	public void setMutationJobPlacementProbability(
+			double mutationJobPlacementProbability) {
+		this.mutationJobPlacementProbability = mutationJobPlacementProbability;
 	}
 
 	public void setObserver(EvolutionObserver<Schedule> observer) {

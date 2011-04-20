@@ -28,7 +28,7 @@ public class EvaluateJGAP extends EvaluateGA {
 		for (int i = 0; i < numberOfEvaluations / populationSize; i++) {
 			GeneticAlgorithmScheduler scheduler = new JGAPScheduler(f);
 			scheduler.setNumberOfGenerations(1);
-			scheduler.setEliteSize(2);
+			scheduler.setEliteSize(1);
 			scheduler.setCrossoverProbability(crossoverProb);
 			scheduler.setMutationProbability(mutationProb);
 			scheduler.setPopulationSize(populationSize);

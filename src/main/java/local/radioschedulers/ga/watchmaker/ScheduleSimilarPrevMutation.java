@@ -9,7 +9,6 @@ import local.radioschedulers.LSTTime;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 
-import org.uncommons.maths.number.NumberGenerator;
 import org.uncommons.maths.random.Probability;
 
 /**
@@ -23,11 +22,6 @@ public class ScheduleSimilarPrevMutation extends AbstractScheduleMutation {
 	public ScheduleSimilarPrevMutation(ScheduleSpace possibles,
 			Probability probability) {
 		super(possibles, probability);
-	}
-
-	public ScheduleSimilarPrevMutation(ScheduleSpace possibles,
-			NumberGenerator<Probability> mutationProbability) {
-		super(possibles, mutationProbability);
 	}
 
 	@Override
@@ -56,10 +50,7 @@ public class ScheduleSimilarPrevMutation extends AbstractScheduleMutation {
 			}
 			lastJc = jc;
 		}
-		if (history != null) {
-			history.derive(s2, s1, i * 1. / n);
-			// rest is random
-		}
+		updateHistory(s2, s1, i, n);
 		updateCounters(s2, s1, i);
 
 		return s2;
