@@ -34,7 +34,7 @@ import local.radioschedulers.greedy.GreedyLeastChoiceScheduler;
 import local.radioschedulers.greedy.GreedyPlacementScheduler;
 import local.radioschedulers.greedy.PressureJobSortCriterion;
 import local.radioschedulers.greedy.PriorityJobSortCriterion;
-import local.radioschedulers.greedy.SmoothenedGreedyLeastChoiceChoiceScheduler;
+import local.radioschedulers.greedy.SmoothenedGreedyLeastChoiceScheduler;
 
 import org.apache.log4j.Logger;
 
@@ -181,7 +181,7 @@ public class HeuristicsScheduleCollector {
 					.add(new ContinuousLeastChoiceScheduler(getJobSelector(i)));
 			schedulers
 					.add(new ExtendingLeastChoiceScheduler(getJobSelector(i)));
-			schedulers.add(new SmoothenedGreedyLeastChoiceChoiceScheduler(
+			schedulers.add(new SmoothenedGreedyLeastChoiceScheduler(
 					getJobSelector(i)));
 		}
 		return schedulers;
