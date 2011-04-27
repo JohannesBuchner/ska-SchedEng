@@ -14,10 +14,33 @@ import org.uncommons.watchmaker.framework.operators.AbstractCrossover;
 
 public class ScheduleCrossover extends AbstractCrossover<Schedule> {
 
+	private boolean singleCrossover = false;
 	@SuppressWarnings("unused")
 	private static Logger log = Logger.getLogger(ScheduleCrossover.class);
 	public GeneticHistory<Schedule, ?> history;
 	private MutationCounter<Schedule, String> counter;
+	private int maxdays = 0;
+
+	public void setSingleCrossover(boolean singleCrossover) {
+		this.singleCrossover = singleCrossover;
+	}
+
+	public boolean isSingleCrossover() {
+		return singleCrossover;
+	}
+
+	/**
+	 * crossover, limited to this many days
+	 * 
+	 * @param maxdays
+	 */
+	public void setMaxdays(int maxdays) {
+		this.maxdays = maxdays;
+	}
+
+	public int getMaxdays() {
+		return maxdays;
+	}
 
 	public void setHistory(GeneticHistory<Schedule, ?> history) {
 		this.history = history;
@@ -45,9 +68,20 @@ public class ScheduleCrossover extends AbstractCrossover<Schedule> {
 		Schedule mix2 = new Schedule();
 
 		LSTTime a = new LSTTime(rng.nextInt(last.day.intValue()), rng
-				.nextInt(Schedule.LST_SLOTS_PER_DAY));
-		LSTTime b = new LSTTime(rng.nextInt(last.day.intValue()), rng
-				.nextInt(Schedule.LST_SLOTS_PER_DAY));
+				.nextInt(Schedule.MINUTES_PER_DAY));
+
+		LSTTime b;
+		if (isSingleCrossover()) {
+			b = last;
+		} else {
+			if (getMaxdays() == 0) {
+				b = new LSTTime(rng.nextInt(last.day.intValue()), rng
+						.nextInt(Schedule.MINUTES_PER_DAY));
+			} else {
+				b = new LSTTime(a.day.intValue() + 1 + rng.nextInt(maxdays),
+						rng.nextInt(Schedule.MINUTES_PER_DAY));
+			}
+		}
 		if (!b.isAfter(a)) {
 			LSTTime tmp = b;
 			b = a;

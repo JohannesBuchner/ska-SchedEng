@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import local.radioschedulers.greedy.GreedyScheduler;
+import local.radioschedulers.greedy.GreedyDifficultyScheduler;
 import local.radioschedulers.importer.GeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
 import local.radioschedulers.preschedule.RequirementGuard;
@@ -48,7 +48,7 @@ public class GreedySchedulersTest {
 
 	@Test
 	public void testSingleFirst() throws Exception {
-		GreedyScheduler scheduler = new GreedyScheduler();
+		GreedyDifficultyScheduler scheduler = new GreedyDifficultyScheduler();
 		Schedule s = scheduler.schedule(template);
 		checkSchedule(s);
 	}

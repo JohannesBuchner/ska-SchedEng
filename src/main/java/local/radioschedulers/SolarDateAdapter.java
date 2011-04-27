@@ -17,10 +17,9 @@ public class SolarDateAdapter implements DateRequirements {
 	public Double requires(LSTTime t) {
 		LSTTime tsolar = new LSTTime(t.day, t.minute);
 		tsolar.minute = (t.minute - (t.day * conversion))
-				% (Schedule.LST_SLOTS_PER_DAY * Schedule.LST_SLOTS_MINUTES);
+				% Schedule.MINUTES_PER_DAY;
 		while (tsolar.minute < 0) {
-			tsolar.minute += Schedule.LST_SLOTS_PER_DAY
-					* Schedule.LST_SLOTS_MINUTES;
+			tsolar.minute += Schedule.MINUTES_PER_DAY;
 			tsolar.day -= 1;
 		}
 		return parent.requires(tsolar);

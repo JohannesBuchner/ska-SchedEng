@@ -3,46 +3,44 @@ package local.radioschedulers;
 import java.util.Iterator;
 
 public class LSTTimeIterator implements Iterator<LSTTime> {
-	private LSTTime current;
+	private LSTTime next;
 	private LSTTime last;
 	private final int minuteSteps;
 
 	public LSTTimeIterator(LSTTime last, int minuteSteps) {
 		this(new LSTTime(0, 0), last, minuteSteps);
 	}
+
 	public LSTTimeIterator(LSTTime start, LSTTime last, int minuteSteps) {
 		this.last = last;
 		this.minuteSteps = minuteSteps;
-		this.current = new LSTTime(start.day, start.day);
+		this.next = new LSTTime(start.day, start.minute);
 	}
 
 	@Override
 	public boolean hasNext() {
-		if (current.isBeforeOrEqual(last))
+		if (next.isBeforeOrEqual(last) && next.day >= 0)
 			return true;
 		else
 			return false;
 	}
 
+	/**
+	 * returns current value, then forwards internal current value
+	 * @return current value
+	 */
 	@Override
 	public LSTTime next() {
-		LSTTime entry = new LSTTime(current.day, current.minute);
-		current.minute += minuteSteps;
+		LSTTime entry = new LSTTime(next.day, next.minute);
+		next.minute += minuteSteps;
 
-		if (current.minute >= 24 * 60) {
-			current.day++;
-			current.minute = 0L;
+		if (next.minute < 0) {
+			next.day--;
+			next.minute += 24 * 60;
 		}
-		return entry;
-	}
-
-	public LSTTime prev() {
-		LSTTime entry = new LSTTime(current.day, current.minute);
-		current.minute -= minuteSteps;
-
-		if (current.minute < 0) {
-			current.day--;
-			current.minute += 24 * 60;
+		if (next.minute >= 24 * 60) {
+			next.day++;
+			next.minute = 0L;
 		}
 		return entry;
 	}

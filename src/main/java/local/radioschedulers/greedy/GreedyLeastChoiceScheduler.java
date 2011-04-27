@@ -61,7 +61,7 @@ public class GreedyLeastChoiceScheduler implements IScheduler {
 	 * @param timeline
 	 * @param s
 	 */
-	protected void updateChoices(ScheduleSpace timeline, Schedule s) {
+	protected void updateChoices(ScheduleSpace timeline) {
 		choices = new ScheduleSpace();
 		for (Entry<LSTTime, Set<JobCombination>> e : timeline) {
 			LSTTime t = e.getKey();
@@ -106,6 +106,10 @@ public class GreedyLeastChoiceScheduler implements IScheduler {
 
 		choices.clear(t);
 		choices.add(t, jc);
+		reduceTimeleft(jc, s);
+	}
+
+	private void reduceTimeleft(JobCombination jc, Schedule s) {
 		for (Job j : jc.jobs) {
 			timeleft.put(j, timeleft.get(j) - 1. / Schedule.LST_SLOTS_PER_HOUR);
 			if (timeleft.get(j) <= 0) {
@@ -115,12 +119,12 @@ public class GreedyLeastChoiceScheduler implements IScheduler {
 	}
 
 	protected void removeChoice(Job j, Schedule s) {
-		log.debug("done scheduling " + j);
+		// log.debug("done scheduling " + j);
 		timeleft.remove(j);
 		// this only contains the other slots, because we removed the
 		// current before
 		Collection<LSTTime> slots = possibleSlots.remove(j);
-		log.debug("  removing choices from other slots " + slots.size());
+		// log.debug("  removing choices from other slots " + slots.size());
 
 		// reduce choices from the effected slots
 		for (LSTTime t : slots) {
@@ -192,7 +196,7 @@ public class GreedyLeastChoiceScheduler implements IScheduler {
 		Schedule s = new Schedule();
 
 		// Sort timeslots by number of jobs to choose from.
-		updateChoices(timeline, s);
+		updateChoices(timeline);
 
 		while (!possibleSlots.isEmpty()) {
 			LSTTime t = nextUnassignedSlot();

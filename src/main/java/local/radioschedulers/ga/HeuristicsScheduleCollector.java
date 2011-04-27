@@ -19,19 +19,22 @@ import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.cpu.CPULikeScheduler;
 import local.radioschedulers.cpu.FairPrioritizedSelector;
+import local.radioschedulers.cpu.JobSelector;
 import local.radioschedulers.cpu.KeepingPrioritizedSelector;
 import local.radioschedulers.cpu.PrioritizedSelector;
 import local.radioschedulers.cpu.RandomizedSelector;
 import local.radioschedulers.cpu.ShortestFirstSelector;
 import local.radioschedulers.exporter.ExportFactory;
 import local.radioschedulers.exporter.IExport;
+import local.radioschedulers.greedy.ContinuousLeastChoiceScheduler;
+import local.radioschedulers.greedy.ContinuousUnlessOneChoiceScheduler;
+import local.radioschedulers.greedy.ExtendingLeastChoiceScheduler;
+import local.radioschedulers.greedy.GreedyDifficultyScheduler;
 import local.radioschedulers.greedy.GreedyLeastChoiceScheduler;
 import local.radioschedulers.greedy.GreedyPlacementScheduler;
-import local.radioschedulers.greedy.GreedyScheduler;
-import local.radioschedulers.greedy.MixedModeUnlessOneChoiceScheduler;
 import local.radioschedulers.greedy.PressureJobSortCriterion;
 import local.radioschedulers.greedy.PriorityJobSortCriterion;
-import local.radioschedulers.lp.ParallelLinearScheduler;
+import local.radioschedulers.greedy.SmoothenedGreedyLeastChoiceChoiceScheduler;
 
 import org.apache.log4j.Logger;
 
@@ -70,7 +73,8 @@ public class HeuristicsScheduleCollector {
 				long duration = System.currentTimeMillis() - start;
 				log.debug("scheduling "
 						+ (schedule == null ? "FAILED" : "done"));
-				executionTimeLog.println(duration + "\t" + s.toString());
+				executionTimeLog
+						.println(duration / 1000. + "\t" + s.toString());
 				executionTimeLog.flush();
 
 				schedules.put(s, schedule);
@@ -136,40 +140,50 @@ public class HeuristicsScheduleCollector {
 		return schedules;
 	}
 
+	private static int getNJobSelectors() {
+		return 5;
+	}
+
+	private static JobSelector getJobSelector(int i) {
+		if (i == 0)
+			return new KeepingPrioritizedSelector();
+		if (i == 1)
+			return new PrioritizedSelector();
+		if (i == 2)
+			return new ShortestFirstSelector();
+		if (i == 3)
+			return new RandomizedSelector();
+		if (i == 4)
+			return new FairPrioritizedSelector();
+		return null;
+	}
+
 	private static List<IScheduler> getSchedulers() {
 		final List<IScheduler> schedulers = new ArrayList<IScheduler>();
 
 		// schedulers.add(new ParallelLinearScheduler());
 
-		schedulers.add(new CPULikeScheduler(new FairPrioritizedSelector()));
-		schedulers.add(new CPULikeScheduler(new FairPrioritizedSelector()));
-		schedulers.add(new CPULikeScheduler(new KeepingPrioritizedSelector()));
-		schedulers.add(new CPULikeScheduler(new PrioritizedSelector()));
-		schedulers.add(new CPULikeScheduler(new ShortestFirstSelector()));
-		schedulers.add(new CPULikeScheduler(new RandomizedSelector()));
-		schedulers.add(new CPULikeScheduler(new RandomizedSelector()));
+		for (int i = 0; i < getNJobSelectors(); i++)
+			schedulers.add(new CPULikeScheduler(getJobSelector(i)));
 
-		schedulers.add(new GreedyScheduler());
+		schedulers.add(new GreedyDifficultyScheduler());
 
 		schedulers.add(new GreedyPlacementScheduler(
 				new PressureJobSortCriterion()));
 		schedulers.add(new GreedyPlacementScheduler(
 				new PriorityJobSortCriterion()));
 
-		schedulers.add(new GreedyLeastChoiceScheduler(
-				new KeepingPrioritizedSelector()));
-		schedulers
-				.add(new GreedyLeastChoiceScheduler(new PrioritizedSelector()));
-		schedulers.add(new GreedyLeastChoiceScheduler(
-				new ShortestFirstSelector()));
-
-		schedulers.add(new MixedModeUnlessOneChoiceScheduler(
-				new KeepingPrioritizedSelector()));
-		schedulers.add(new MixedModeUnlessOneChoiceScheduler(
-				new PrioritizedSelector()));
-		schedulers.add(new MixedModeUnlessOneChoiceScheduler(
-				new ShortestFirstSelector()));
-
+		for (int i = 0; i < getNJobSelectors(); i++) {
+			schedulers.add(new GreedyLeastChoiceScheduler(getJobSelector(i)));
+			schedulers.add(new ContinuousUnlessOneChoiceScheduler(
+					getJobSelector(i)));
+			schedulers
+					.add(new ContinuousLeastChoiceScheduler(getJobSelector(i)));
+			schedulers
+					.add(new ExtendingLeastChoiceScheduler(getJobSelector(i)));
+			schedulers.add(new SmoothenedGreedyLeastChoiceChoiceScheduler(
+					getJobSelector(i)));
+		}
 		return schedulers;
 	}
 }

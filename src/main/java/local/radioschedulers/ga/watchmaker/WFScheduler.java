@@ -36,6 +36,8 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 	private double mutationSimilarForwardsProbability = 0.;
 	private double mutationExchangeProbability = 0.;
 	private double mutationJobPlacementProbability = 0.;
+	private double doubleCrossoverProbability = 0.;
+	private int crossoverDays = 0;
 
 	public void setHistory(GeneticHistory<Schedule, String> history) {
 		this.history = history;
@@ -118,6 +120,16 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 					new Probability(getCrossoverProbability()));
 			crossover.setHistory(history);
 			crossover.setCounter(counter);
+			crossover.setSingleCrossover(true);
+			operators.add(crossover);
+		}
+		if (getDoubleCrossoverProbability() > 0) {
+			ScheduleCrossover crossover = new ScheduleCrossover(1,
+					new Probability(getDoubleCrossoverProbability()));
+			crossover.setHistory(history);
+			crossover.setCounter(counter);
+			crossover.setSingleCrossover(false);
+			crossover.setMaxdays(getCrossoverDays());
 			operators.add(crossover);
 		}
 		if (getMutationProbability() > 0) {
@@ -186,6 +198,14 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 		return pipeline;
 	}
 
+	private int getCrossoverDays() {
+		return crossoverDays;
+	}
+
+	private double getDoubleCrossoverProbability() {
+		return doubleCrossoverProbability;
+	}
+
 	private double getMutationSimilarPrevProbability() {
 		return mutationSimilarPrevProbability;
 	}
@@ -237,6 +257,14 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 	public void setMutationJobPlacementProbability(
 			double mutationJobPlacementProbability) {
 		this.mutationJobPlacementProbability = mutationJobPlacementProbability;
+	}
+
+	public void setCrossoverDays(int crossoverDays) {
+		this.crossoverDays = crossoverDays;
+	}
+
+	public void setDoubleCrossoverProbability(double doubleCrossoverProbability) {
+		this.doubleCrossoverProbability = doubleCrossoverProbability;
 	}
 
 	public void setObserver(EvolutionObserver<Schedule> observer) {

@@ -60,8 +60,7 @@ public class HtmlExport implements IExport {
 		LSTTime t = new LSTTime(0L, 0L);
 		for (t.day = 0L; t.day <= lastday.day + 1; t.day++) {
 			fw.append("\n\t\t<tr>\n\t\t\t<th>" + t.day + "</th>");
-			for (t.minute = 0L; t.minute < Schedule.LST_SLOTS_MINUTES
-					* Schedule.LST_SLOTS_PER_DAY;) {
+			for (t.minute = 0L; t.minute < Schedule.MINUTES_PER_DAY;) {
 				fw.append("\n\t\t\t");
 				// keep track of number of slots, but if we skip to the next
 				// day, we mustn't count that as a interrupt.
@@ -73,8 +72,7 @@ public class HtmlExport implements IExport {
 				LSTTime t2 = new LSTTime(t.day, t.minute
 						+ Schedule.LST_SLOTS_MINUTES);
 				if (MERGESAME)
-					for (; t2.minute < Schedule.LST_SLOTS_MINUTES
-							* Schedule.LST_SLOTS_PER_DAY; t2.minute += Schedule.LST_SLOTS_MINUTES) {
+					for (; t2.minute < Schedule.MINUTES_PER_DAY; t2.minute += Schedule.LST_SLOTS_MINUTES) {
 						JobCombination jc2 = schedule.get(new LSTTime(t2.day,
 								t2.minute));
 						if ((jc == null && jc2 == null)

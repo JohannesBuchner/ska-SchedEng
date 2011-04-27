@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import local.radioschedulers.cpu.FirstSelector;
+import local.radioschedulers.ga.wf.ScheduleFactoryTest;
 import local.radioschedulers.greedy.GreedyLeastChoiceScheduler;
 import local.radioschedulers.importer.GeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
@@ -21,7 +22,8 @@ import org.junit.Test;
 public class GreedyLeastChoiceSchedulerTest {
 
 	@SuppressWarnings("unused")
-	private static Logger log = Logger.getLogger(GreedyLeastChoiceSchedulerTest.class);
+	private static Logger log = Logger
+			.getLogger(GreedyLeastChoiceSchedulerTest.class);
 
 	public static int ndays = 10;
 
@@ -49,12 +51,14 @@ public class GreedyLeastChoiceSchedulerTest {
 
 	@Test
 	public void testSingleFirst() throws Exception {
-		GreedyLeastChoiceScheduler scheduler = new GreedyLeastChoiceScheduler(new FirstSelector());
+		GreedyLeastChoiceScheduler scheduler = new GreedyLeastChoiceScheduler(
+				new FirstSelector());
 		Schedule s = scheduler.schedule(template);
-		checkSchedule(s);
+		checkSchedule(s, template);
 	}
 
-	private void checkSchedule(Schedule s) {
+	private static void checkSchedule(Schedule s, ScheduleSpace template) {
+		ScheduleFactoryTest.assertScheduleIsWithinTemplate(s, template, ndays);
 		Assert.assertEquals("ScheduleSpace and Schedule have the same length",
 				template.findLastEntry().day, s.findLastEntry().day);
 		int i = 0;
@@ -79,7 +83,7 @@ public class GreedyLeastChoiceSchedulerTest {
 
 		// Test if it is any good
 		Assert.assertTrue("Job slots filled: " + i, i > ndays);
-		Assert.assertTrue("Jobs scheduled: " + scheduledJobs.size() + " of "
-				+ proposals.size(), scheduledJobs.size() > 1);
+		Assert.assertTrue("Jobs scheduled: " + scheduledJobs.size(),
+				scheduledJobs.size() > 1);
 	}
 }

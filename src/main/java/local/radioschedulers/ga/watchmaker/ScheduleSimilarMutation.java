@@ -101,13 +101,10 @@ public class ScheduleSimilarMutation extends AbstractScheduleMutation {
 			if (posContinue) {
 				LSTTime tPlus = new LSTTime(t.day + tDelta.day, t.minute
 						+ tDelta.minute);
-				if (tPlus.minute > Schedule.LST_SLOTS_PER_DAY
-						* Schedule.LST_SLOTS_MINUTES) {
-					long extraDays = tPlus.minute
-							/ (Schedule.LST_SLOTS_PER_DAY * Schedule.LST_SLOTS_MINUTES);
+				if (tPlus.minute > Schedule.MINUTES_PER_DAY) {
+					long extraDays = tPlus.minute / (Schedule.MINUTES_PER_DAY);
 					tPlus.day += extraDays;
-					tPlus.minute -= extraDays
-							* (Schedule.LST_SLOTS_PER_DAY * Schedule.LST_SLOTS_MINUTES);
+					tPlus.minute -= extraDays * (Schedule.MINUTES_PER_DAY);
 				}
 				log.debug("tPlus " + tPlus);
 
@@ -133,12 +130,10 @@ public class ScheduleSimilarMutation extends AbstractScheduleMutation {
 				LSTTime tMinus = new LSTTime(t.day - tDelta.day, t.minute
 						- tDelta.minute);
 				if (tMinus.minute < 0) {
-					long extraDays = tMinus.minute
-							/ (Schedule.LST_SLOTS_PER_DAY * Schedule.LST_SLOTS_MINUTES)
+					long extraDays = tMinus.minute / (Schedule.MINUTES_PER_DAY)
 							+ 1;
 					tMinus.day -= extraDays;
-					tMinus.minute += extraDays
-							* (Schedule.LST_SLOTS_PER_DAY * Schedule.LST_SLOTS_MINUTES);
+					tMinus.minute += extraDays * (Schedule.MINUTES_PER_DAY);
 				}
 				log.debug("tMinus " + tMinus);
 

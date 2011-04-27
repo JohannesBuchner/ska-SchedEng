@@ -30,10 +30,10 @@ import org.apache.log4j.Logger;
  * 
  * @author Johannes Buchner
  */
-public class GreedyScheduler implements IScheduler {
+public class GreedyDifficultyScheduler implements IScheduler {
 	protected static final boolean IGNORE_LONG_TASKS = true;
 
-	private static Logger log = Logger.getLogger(GreedyScheduler.class);
+	private static Logger log = Logger.getLogger(GreedyDifficultyScheduler.class);
 
 	protected Map<Job, Collection<LSTTime>> possibleSlots = new HashMap<Job, Collection<LSTTime>>();
 	protected Map<Job, Integer> npossibleSlots = new HashMap<Job, Integer>();

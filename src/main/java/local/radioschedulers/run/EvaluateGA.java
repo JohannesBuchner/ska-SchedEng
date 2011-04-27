@@ -36,6 +36,8 @@ public abstract class EvaluateGA {
 	protected int maxParallel = 4;
 	protected int populationSize = 20;
 	protected double crossoverProb = 0.3;
+	protected double crossoverDoubleProb = 0.;
+	protected int crossoverDays = 0;
 	protected double mutationProb = 0.3;
 	protected double mutationSimilarPrevProb = 0.;
 	protected double mutationKeepingProb = 0.;
@@ -80,12 +82,16 @@ public abstract class EvaluateGA {
 			mutationExchangeProb = Double.parseDouble(args[10]);
 		if (args.length >= 12)
 			mutationPlacementProb = Double.parseDouble(args[11]);
+		if (args.length >= 13)
+			crossoverDoubleProb = Double.parseDouble(args[12]);
+		if (args.length >= 14)
+			crossoverDays = Integer.parseInt(args[13]);
 		else
 			usage();
-		if (args.length >= 13)
-			loadSchedules = Boolean.parseBoolean(args[12]);
-		if (args.length >= 14)
-			simpleFitnessFunction = Boolean.parseBoolean(args[13]);
+		if (args.length >= 15)
+			loadSchedules = Boolean.parseBoolean(args[14]);
+		if (args.length >= 16)
+			simpleFitnessFunction = Boolean.parseBoolean(args[15]);
 	}
 
 	private void usage() {
@@ -96,52 +102,53 @@ public abstract class EvaluateGA {
 						+ "<mutationProb> <mutationKeepingProb> "
 						+ "<mutationSimilarForwardsProb> <mutationSimilarBackwardsProb> "
 						+ "<mutationSimilarPrevProb> <mutationExchangeProb> "
+						+ "<mutationPlacementProb> "
+						+ "<doubleCrossoverProb> <nCrossoverDays> "
 						+ "[loadSchedule [blockFitnessFunction]]");
 		System.err.println();
 		System.err
-				.println("prefix                           output file prefix");
+				.println("prefix                     output file prefix     ");
 		System.err
-				.println("mutation{,Similar,Exchange}Prob  probability for mutation operators");
+				.println("mutation*Prob              probability for mutation operators");
 		System.err
-				.println("loadSchedule                     if given, load stored schedules");
+				.println("crossoverProb              probability for crossover operator");
 		System.err
-				.println("blockFitnessFunction             if given, use blockFitnessFunction");
+				.println("nCrossoverDays             maximum number of days to use for double crossover");
+		System.err
+				.println("loadSchedule               if given, load stored schedules");
+		System.err
+				.println("blockFitnessFunction       if given, use blockFitnessFunction");
 
-		throw new IllegalArgumentException("expected at least 8 arguments!");
+		throw new IllegalArgumentException("expected more arguments!");
+	}
+
+	private void logSetting(PrintStream ps, String s) {
+		ps.println(s);
+		log.info("{" + s + "}");
+	}
+
+	private void logSettings(PrintStream ps) {
+		logSetting(ps, "ndays: " + ndays);
+		logSetting(ps, "oversubscriptionFactor: " + oversubscriptionFactor);
+		logSetting(ps, "populationSize: " + populationSize);
+		logSetting(ps, "crossoverProb: " + crossoverProb);
+		logSetting(ps, "mutationProb: " + mutationProb);
+		logSetting(ps, "mutationKeepingProb: " + mutationKeepingProb);
+		logSetting(ps, "mutationSimilarForwardsProb: "
+				+ mutationSimilarForwardsProb);
+		logSetting(ps, "mutationSimilarBackwardsProb: "
+				+ mutationSimilarBackwardsProb);
+		logSetting(ps, "mutationSimilarPrevProb: " + mutationSimilarPrevProb);
+		logSetting(ps, "mutationExchangeProb: " + mutationExchangeProb);
+		logSetting(ps, "crossoverDoubleProb: " + crossoverDoubleProb);
+		logSetting(ps, "crossoverDays: " + crossoverDays);
+		logSetting(ps, "simpleFitnessFunction: " + simpleFitnessFunction);
+		logSetting(ps, "loadSchedules: " + loadSchedules);
 	}
 
 	public void run() throws Exception {
 		PrintStream ps = getOutputFile("ga-settings.txt");
-		ps.println("ndays: " + ndays);
-		ps.println("oversubscriptionFactor: " + oversubscriptionFactor);
-		ps.println("populationSize: " + populationSize);
-		ps.println("crossoverProb: " + crossoverProb);
-		ps.println("mutationProb: " + mutationProb);
-		ps.println("mutationKeepingProb: " + mutationKeepingProb);
-		ps.println("mutationSimilarForwardsProb: "
-				+ mutationSimilarForwardsProb);
-		ps.println("mutationSimilarBackwardsProb: "
-				+ mutationSimilarBackwardsProb);
-		ps.println("mutationSimilarPrevProb: " + mutationSimilarPrevProb);
-		ps.println("mutationExchangeProb: " + mutationExchangeProb);
-		ps.println("simpleFitnessFunction: " + simpleFitnessFunction);
-		ps.println("loadSchedules: " + loadSchedules);
-		log.info("{ ndays: " + ndays + " }");
-		log.info("{ oversubscriptionFactor: " + oversubscriptionFactor + " } ");
-		log.info("{ populationSize: " + populationSize + " }");
-		log.info("{ mutationProb: " + mutationProb + " }");
-		log.info("{ mutationKeepingProb: " + mutationKeepingProb + " }");
-		log.info("{ mutationSimilarForwardsProb: "
-				+ mutationSimilarForwardsProb + " }");
-		log.info("{ mutationSimilarBackwardsProb: "
-				+ mutationSimilarBackwardsProb + " }");
-		log
-				.info("{ mutationSimilarPrevProb: " + mutationSimilarPrevProb
-						+ " }");
-		log.info("{ mutationExchangeProb: " + mutationExchangeProb + " }");
-		log.info("{ crossoverProb: " + crossoverProb + " }");
-		log.info("{ simpleFitnessFunction: " + simpleFitnessFunction + " }");
-		log.info("{ loadSchedules: " + loadSchedules + " }");
+		logSettings(ps);
 
 		IProposalReader pr = getProposalReader();
 		Collection<Proposal> proposals = pr.readall();

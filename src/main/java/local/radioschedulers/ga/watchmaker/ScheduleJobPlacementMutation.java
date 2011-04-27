@@ -1,7 +1,6 @@
 package local.radioschedulers.ga.watchmaker;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,12 +8,12 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.uncommons.maths.random.Probability;
-
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
+
+import org.uncommons.maths.random.Probability;
 
 /**
  * Operator that randomly mutates a slot and tries to extend the previous Job if

@@ -21,7 +21,7 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
 public class Schedule implements Iterable<Entry<LSTTime, JobCombination>> {
 	public static final int LST_SLOTS_MINUTES = ScheduleSpace.LST_SLOTS_MINUTES;
 	public static final int LST_SLOTS_PER_HOUR = 60 / LST_SLOTS_MINUTES;
-	public static final int LST_SLOTS_PER_DAY = LST_SLOTS_PER_HOUR * 24;
+	public static final int MINUTES_PER_DAY = 60 * 24;
 
 	@JsonProperty
 	private Map<LSTTime, JobCombination> content = new TreeMap<LSTTime, JobCombination>();

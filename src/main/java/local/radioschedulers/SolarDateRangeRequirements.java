@@ -59,9 +59,9 @@ public class SolarDateRangeRequirements implements DateRequirements {
 		}
 
 		long a = (start.minute + (t.day * conversion))
-				% (Schedule.LST_SLOTS_PER_DAY * Schedule.LST_SLOTS_MINUTES);
+				% (Schedule.MINUTES_PER_DAY);
 		long e = (end.minute + (t.day * conversion))
-				% (Schedule.LST_SLOTS_PER_DAY * Schedule.LST_SLOTS_MINUTES);
+				% (Schedule.MINUTES_PER_DAY);
 		if (a > e) {
 			if (t.minute >= a || t.minute < e)
 				return 1. / rangesize;
