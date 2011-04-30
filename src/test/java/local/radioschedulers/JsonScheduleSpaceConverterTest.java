@@ -7,7 +7,6 @@ import java.util.Collection;
 import local.radioschedulers.alg.serial.FirstSelector;
 import local.radioschedulers.alg.serial.SerialListingScheduler;
 import local.radioschedulers.exporter.ExportFactory;
-import local.radioschedulers.exporter.HtmlExport;
 import local.radioschedulers.exporter.IExport;
 import local.radioschedulers.importer.GeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;

@@ -23,15 +23,12 @@ import local.radioschedulers.alg.ga.fitness.SimpleScheduleFitnessFunction;
 import local.radioschedulers.alg.ga.watchmaker.GeneticHistory;
 import local.radioschedulers.alg.ga.watchmaker.MutationCounter;
 import local.radioschedulers.alg.ga.watchmaker.WFScheduler;
-import local.radioschedulers.ga.wf.OperatorNoopTest;
 import local.radioschedulers.preschedule.ITimelineGenerator;
 import local.radioschedulers.preschedule.RequirementGuard;
 import local.radioschedulers.preschedule.SimpleTimelineGenerator;
 import local.radioschedulers.preschedule.parallel.ParallelRequirementGuard;
 
 import org.apache.log4j.Logger;
-import org.jgap.BaseGeneticOperator;
-import org.jgap.impl.MutationOperator;
 
 /**
  * TODO: add executor that does SCHED/FS execution

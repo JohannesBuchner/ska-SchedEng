@@ -18,7 +18,7 @@ import org.junit.Test;
 
 public class AtcaProposalReaderTest {
 
-	private File f = new File("mp-johannes.txt");
+	private File f = new File("target/test-classes/mp-johannes.txt");
 	private AtcaProposalReader reader;
 	private int ndays = 182;
 

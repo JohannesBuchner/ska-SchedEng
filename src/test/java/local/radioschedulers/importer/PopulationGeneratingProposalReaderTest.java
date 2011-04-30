@@ -19,7 +19,7 @@ import org.junit.Test;
 
 public class PopulationGeneratingProposalReaderTest {
 
-	private static final String PROPOSALS_CSV = "ata-proposals.csv";
+	private static final String PROPOSALS_CSV = "target/test-classes/ata-proposals.csv";
 	private static final String TMPDIR = "testoutput";
 	private PopulationGeneratingProposalReader reader;
 
