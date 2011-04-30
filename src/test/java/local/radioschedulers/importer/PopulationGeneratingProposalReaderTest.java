@@ -19,14 +19,18 @@ import org.junit.Test;
 
 public class PopulationGeneratingProposalReaderTest {
 
-	private static final String PROPOSALS_CSV = "target/test-classes/ata-proposals.csv";
-	private static final String TMPDIR = "testoutput";
+	private static final File TMPDIR = new File(
+			"target/test-classes/testoutput/");
+	private static final File PROPOSALS_CSV = new File(
+			"target/test-classes/ata-proposals.csv");
 	private PopulationGeneratingProposalReader reader;
 
 	@Before
 	public void setUp() throws Exception {
 		reader = new PopulationGeneratingProposalReader();
 		reader.fill(10000);
+		TMPDIR.mkdir();
+		TMPDIR.deleteOnExit();
 	}
 
 	@Test
@@ -131,7 +135,9 @@ public class PopulationGeneratingProposalReaderTest {
 	}
 
 	private File getOutputFile(String filename) {
-		return new File(TMPDIR, filename);
+		File f = new File(TMPDIR, filename);
+		f.deleteOnExit();
+		return f;
 	}
 
 	private void dumpHistogramInt(Histogram<Integer> durationhist,
@@ -188,7 +194,7 @@ public class PopulationGeneratingProposalReaderTest {
 
 	@Test
 	public void fetchDataHistogram() throws IOException {
-		File f = new File(PROPOSALS_CSV);
+		File f = PROPOSALS_CSV;
 		// List<Double> start = new ArrayList<Double>();
 		// List<Double> end = new ArrayList<Double>();
 		List<Double> duration = new ArrayList<Double>();
