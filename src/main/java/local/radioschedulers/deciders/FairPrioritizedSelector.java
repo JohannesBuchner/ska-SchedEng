@@ -1,4 +1,4 @@
-package local.radioschedulers.cpu;
+package local.radioschedulers.deciders;
 
 import java.util.ArrayList;
 import java.util.Collection;

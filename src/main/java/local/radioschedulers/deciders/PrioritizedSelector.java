@@ -1,7 +1,7 @@
-package local.radioschedulers.cpu;
+package local.radioschedulers.deciders;
 
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.Map;
 
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
@@ -14,7 +14,7 @@ public class PrioritizedSelector extends ShortestFirstSelector {
 
 	@Override
 	protected Comparator<JobCombination> generateComparator(
-			HashMap<Job, Double> timeleft) {
+			Map<Job, Double> timeleft) {
 		return new Comparator<JobCombination>() {
 
 			@Override

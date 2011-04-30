@@ -1,4 +1,4 @@
-package local.radioschedulers.greedy;
+package local.radioschedulers.parallel;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,19 +15,20 @@ import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.ga.watchmaker.SortedCollection;
 import local.radioschedulers.ga.watchmaker.SortedCollection.MappingFunction;
+import local.radioschedulers.greedy.JobSortCriterion;
 
 import org.apache.log4j.Logger;
 
-public class GreedyPlacementScheduler implements IScheduler {
+public class ParallelListingScheduler implements IScheduler {
 	protected static final boolean IGNORE_LONG_TASKS = true;
 
 	private static Logger log = Logger
-			.getLogger(GreedyPlacementScheduler.class);
+			.getLogger(ParallelListingScheduler.class);
 
 	protected Map<Job, Collection<LSTTime>> possibleSlots = new HashMap<Job, Collection<LSTTime>>();
 	private JobSortCriterion sortFunction;
 
-	public GreedyPlacementScheduler(JobSortCriterion sortFunction) {
+	public ParallelListingScheduler(JobSortCriterion sortFunction) {
 		this.sortFunction = sortFunction;
 		this.sortFunction.setPossibleSlots(possibleSlots);
 	}
@@ -44,51 +45,7 @@ public class GreedyPlacementScheduler implements IScheduler {
 	 */
 	public Schedule schedule(ScheduleSpace timeline) {
 		Schedule s = new Schedule();
-
-		log
-				.debug("scanning schedulespace for number of possible slot for each job");
-		for (Entry<LSTTime, Set<JobCombination>> e : timeline) {
-			LSTTime t = e.getKey();
-			Set<JobCombination> jcs = e.getValue();
-			if (jcs.size() == 0) {
-				log.debug("@" + t + " empty");
-			}
-			if (jcs.size() == 1) {
-				// make trivial choice now
-				// log.debug("@" + t +
-				// ": only one possible job, selecting it.");
-				JobCombination jc = jcs.iterator().next();
-				for (Job j : jc.jobs) {
-					// log.debug("     " + j);
-					if (!timeleft.containsKey(j)) {
-						s.add(t, jc);
-						timeleft.put(j, j.hours - 1.
-								/ Schedule.LST_SLOTS_PER_HOUR);
-					} else {
-						if (timeleft.get(j) > 0) {
-							s.add(t, jc);
-							timeleft.put(j, timeleft.get(j) - 1.
-									/ Schedule.LST_SLOTS_PER_HOUR);
-						}
-					}
-
-				}
-				continue;
-			}
-			for (JobCombination jc : jcs) {
-				for (Job j : jc.jobs) {
-					if (!timeleft.containsKey(j))
-						timeleft.put(j, (double) j.hours);
-
-					Collection<LSTTime> l = possibleSlots.get(j);
-					if (l == null) {
-						l = new ArrayList<LSTTime>();
-						possibleSlots.put(j, l);
-					}
-					l.add(t);
-				}
-			}
-		}
+		fillTimeleft(timeline, s);
 
 		log.debug("sorting jobs by pressure");
 		SortedCollection<Job> jobsSortedByPressure = new SortedCollection<Job>(
@@ -130,6 +87,33 @@ public class GreedyPlacementScheduler implements IScheduler {
 		}
 
 		return s;
+	}
+
+	protected void fillTimeleft(ScheduleSpace timeline, Schedule s) {
+		for (Entry<LSTTime, Set<JobCombination>> e : timeline) {
+			LSTTime t = e.getKey();
+			Set<JobCombination> jcs = e.getValue();
+			if (jcs.size() == 0) {
+				log.debug("@" + t + " empty");
+			}
+			for (JobCombination jc : jcs) {
+				for (Job j : jc.jobs) {
+					if (!timeleft.containsKey(j))
+						timeleft.put(j, (double) j.hours);
+
+					Collection<LSTTime> l = possibleSlots.get(j);
+					if (l == null) {
+						l = new ArrayList<LSTTime>();
+						possibleSlots.put(j, l);
+					}
+					l.add(t);
+				}
+			}
+		}
+	}
+
+	protected boolean handleTrivialChoice(LSTTime t, JobCombination jc, Schedule s) {
+		return false;
 	}
 
 	private JobCombination findSupersetJobCombination(Job j, JobCombination jc,

@@ -13,9 +13,8 @@ import local.radioschedulers.LSTTime;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
-import local.radioschedulers.cpu.CPULikeScheduler;
-import local.radioschedulers.cpu.FirstSelector;
-import local.radioschedulers.cpu.RandomizedSelector;
+import local.radioschedulers.deciders.FirstSelector;
+import local.radioschedulers.deciders.RandomizedSelector;
 import local.radioschedulers.ga.GeneticAlgorithmScheduler;
 import local.radioschedulers.ga.fitness.SimpleScheduleFitnessFunction;
 import local.radioschedulers.ga.watchmaker.WFScheduler;
@@ -23,6 +22,7 @@ import local.radioschedulers.importer.GeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
 import local.radioschedulers.preschedule.SimpleTimelineGenerator;
 import local.radioschedulers.preschedule.parallel.ParallelRequirementGuard;
+import local.radioschedulers.serial.SerialListingScheduler;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -87,9 +87,9 @@ public class WFSchedulerTest {
 	@Test
 	public void testWithInitialPopulation() throws Exception {
 		List<Schedule> schedules = new ArrayList<Schedule>();
-		CPULikeScheduler s = new CPULikeScheduler(new FirstSelector());
+		SerialListingScheduler s = new SerialListingScheduler(new FirstSelector());
 		schedules.add(s.schedule(template));
-		s = new CPULikeScheduler(new RandomizedSelector());
+		s = new SerialListingScheduler(new RandomizedSelector());
 		schedules.add(s.schedule(template));
 		scheduler.setPopulation(schedules);
 		testGA();

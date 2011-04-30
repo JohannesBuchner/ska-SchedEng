@@ -13,7 +13,7 @@ public class SolarDateRangeRequirements implements DateRequirements {
 	private Long rangesize;
 	// how many minutes per day are difference between LST and normal date
 	// calculations. i.e. 4 minutes per day
-	public static int conversion = (24 * 60 - (23 * 60 + 56));
+	public static final int conversion = (24 * 60 - (23 * 60 + 56));
 
 	@JsonCreator
 	public SolarDateRangeRequirements(@JsonProperty("start") LSTTime start,
@@ -38,10 +38,12 @@ public class SolarDateRangeRequirements implements DateRequirements {
 		return end;
 	}
 
+	@JsonProperty("nweekdays") 
 	public Integer getNweekdays() {
 		return nweekdays;
 	}
 
+	@JsonProperty("daynumber") 
 	public Integer getDaynumber() {
 		return daynumber;
 	}

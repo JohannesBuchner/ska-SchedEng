@@ -1,11 +1,11 @@
 package local.radioschedulers.greedy;
 
 import local.radioschedulers.LSTTime;
-import local.radioschedulers.cpu.CPULikeScheduler;
-import local.radioschedulers.cpu.JobSelector;
+import local.radioschedulers.deciders.JobSelector;
+import local.radioschedulers.serial.SerialListingScheduler;
 
 /**
- * Acts like {@link CPULikeScheduler}, until a timeslot has only one choice
+ * Acts like {@link SerialListingScheduler}, until a timeslot has only one choice
  * left, at which point it acts like {@link GreedyLeastChoiceScheduler}.
  * 
  * @author Johannes Buchner

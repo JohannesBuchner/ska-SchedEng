@@ -10,7 +10,7 @@ import local.radioschedulers.LSTTime;
 import local.radioschedulers.LSTTimeIterator;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
-import local.radioschedulers.cpu.JobSelector;
+import local.radioschedulers.deciders.JobSelector;
 
 /**
  * Takes the solution of {@link GreedyLeastChoiceScheduler}, and extends each

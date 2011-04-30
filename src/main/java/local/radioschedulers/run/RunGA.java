@@ -102,7 +102,7 @@ public class RunGA {
 		o.flush();
 		oq.flush();
 
-		// scheduler.setPopulation(new ArrayList<Schedule>(schedules.values()));
+		scheduler.setPopulation(new ArrayList<Schedule>(schedules.values()));
 		scheduler.schedule(template);
 
 		o.println("<h2>GA survivors</h2>");

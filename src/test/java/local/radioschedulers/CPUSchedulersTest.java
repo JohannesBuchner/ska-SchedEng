@@ -5,17 +5,17 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import local.radioschedulers.cpu.CPULikeScheduler;
-import local.radioschedulers.cpu.FairPrioritizedSelector;
-import local.radioschedulers.cpu.FirstSelector;
-import local.radioschedulers.cpu.PrioritizedSelector;
-import local.radioschedulers.cpu.RandomizedSelector;
-import local.radioschedulers.cpu.ShortestFirstSelector;
+import local.radioschedulers.deciders.FairPrioritizedSelector;
+import local.radioschedulers.deciders.FirstSelector;
+import local.radioschedulers.deciders.PrioritizedSelector;
+import local.radioschedulers.deciders.RandomizedSelector;
+import local.radioschedulers.deciders.ShortestFirstSelector;
 import local.radioschedulers.importer.GeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
 import local.radioschedulers.preschedule.RequirementGuard;
 import local.radioschedulers.preschedule.SimpleTimelineGenerator;
 import local.radioschedulers.preschedule.SingleRequirementGuard;
+import local.radioschedulers.serial.SerialListingScheduler;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -53,14 +53,14 @@ public class CPUSchedulersTest {
 
 	@Test
 	public void testSingleFirst() throws Exception {
-		CPULikeScheduler scheduler = new CPULikeScheduler(new FirstSelector());
+		SerialListingScheduler scheduler = new SerialListingScheduler(new FirstSelector());
 		Schedule s = scheduler.schedule(template);
 		checkSchedule(s);
 	}
 
 	@Test
 	public void testSingleFair() throws Exception {
-		CPULikeScheduler scheduler = new CPULikeScheduler(
+		SerialListingScheduler scheduler = new SerialListingScheduler(
 				new FairPrioritizedSelector());
 		Schedule s = scheduler.schedule(template);
 		checkSchedule(s);
@@ -68,7 +68,7 @@ public class CPUSchedulersTest {
 
 	@Test
 	public void testSinglePrio() throws Exception {
-		CPULikeScheduler scheduler = new CPULikeScheduler(
+		SerialListingScheduler scheduler = new SerialListingScheduler(
 				new PrioritizedSelector());
 		Schedule s = scheduler.schedule(template);
 		checkSchedule(s);
@@ -76,7 +76,7 @@ public class CPUSchedulersTest {
 
 	@Test
 	public void testSingleShortest() throws Exception {
-		CPULikeScheduler scheduler = new CPULikeScheduler(
+		SerialListingScheduler scheduler = new SerialListingScheduler(
 				new ShortestFirstSelector());
 		Schedule s = scheduler.schedule(template);
 		checkSchedule(s);
@@ -84,7 +84,7 @@ public class CPUSchedulersTest {
 
 	@Test
 	public void testSingleRand() throws Exception {
-		CPULikeScheduler scheduler = new CPULikeScheduler(
+		SerialListingScheduler scheduler = new SerialListingScheduler(
 				new RandomizedSelector());
 		Schedule s = scheduler.schedule(template);
 		checkSchedule(s);

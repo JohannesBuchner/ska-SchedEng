@@ -8,8 +8,7 @@ import local.radioschedulers.IScheduler;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
-import local.radioschedulers.cpu.CPULikeScheduler;
-import local.radioschedulers.cpu.ShortestFirstSelector;
+import local.radioschedulers.deciders.ShortestFirstSelector;
 import local.radioschedulers.exporter.ExportFactory;
 import local.radioschedulers.exporter.IExport;
 import local.radioschedulers.importer.IProposalReader;
@@ -17,6 +16,7 @@ import local.radioschedulers.importer.PopulationGeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
 import local.radioschedulers.preschedule.SimpleTimelineGenerator;
 import local.radioschedulers.preschedule.parallel.ParallelRequirementGuard;
+import local.radioschedulers.serial.SerialListingScheduler;
 
 public class RunMain {
 
@@ -47,7 +47,7 @@ public class RunMain {
 	}
 
 	private static IScheduler getScheduler() {
-		return new CPULikeScheduler(new ShortestFirstSelector());
+		return new SerialListingScheduler(new ShortestFirstSelector());
 		// return new LinearScheduler2();
 	}
 

@@ -1,9 +1,9 @@
-package local.radioschedulers.cpu;
+package local.radioschedulers.deciders;
 
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
@@ -19,7 +19,7 @@ public class KeepingPrioritizedSelector extends PrioritizedSelector {
 
 	@Override
 	protected Comparator<JobCombination> generateComparator(
-			HashMap<Job, Double> timeleft) {
+			Map<Job, Double> timeleft) {
 		return new Comparator<JobCombination>() {
 
 			@Override

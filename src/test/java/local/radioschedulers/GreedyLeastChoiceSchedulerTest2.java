@@ -3,7 +3,7 @@ package local.radioschedulers;
 import java.util.ArrayList;
 import java.util.Map.Entry;
 
-import local.radioschedulers.cpu.PrioritizedSelector;
+import local.radioschedulers.deciders.PrioritizedSelector;
 import local.radioschedulers.ga.wf.ScheduleFactoryTest;
 import local.radioschedulers.greedy.ContinuousLeastChoiceScheduler;
 import local.radioschedulers.greedy.ContinuousUnlessOneChoiceScheduler;

@@ -1,12 +1,14 @@
-package local.radioschedulers.cpu;
+package local.radioschedulers.deciders;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
+import local.radioschedulers.LSTTime;
 
 /**
  * Class to order a list of jobs by execution preference
@@ -18,12 +20,13 @@ import local.radioschedulers.JobCombination;
  */
 public class JobSelector {
 
-	protected HashMap<Job, Double> timeleft;
+	protected Map<Job, Double> timeleft;
+	protected Map<Job, List<LSTTime>> possibles;
 
 	public JobSelector() {
 	}
 
-	public void setTimeleft(HashMap<Job, Double> timeleft) {
+	public void setTimeleft(Map<Job, Double> timeleft) {
 		this.timeleft = timeleft;
 	}
 
@@ -49,7 +52,7 @@ public class JobSelector {
 				if (!timeleft.containsKey(j) || timeleft.get(j) <= 0) {
 					complete = true;
 				}
-			}
+	}
 			if (!complete)
 				selected.add(jc);
 		}
@@ -59,6 +62,10 @@ public class JobSelector {
 	@Override
 	public String toString() {
 		return getClass().getSimpleName();
+	}
+
+	public void setPossibles(Map<Job, List<LSTTime>> possibles) {
+		this.possibles = possibles;
 	}
 
 }

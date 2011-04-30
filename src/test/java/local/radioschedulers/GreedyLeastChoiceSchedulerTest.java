@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import local.radioschedulers.cpu.FirstSelector;
+import local.radioschedulers.deciders.FirstSelector;
 import local.radioschedulers.ga.wf.ScheduleFactoryTest;
 import local.radioschedulers.greedy.GreedyLeastChoiceScheduler;
 import local.radioschedulers.importer.GeneratingProposalReader;

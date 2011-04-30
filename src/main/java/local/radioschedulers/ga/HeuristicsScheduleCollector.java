@@ -17,13 +17,12 @@ import java.util.concurrent.TimeUnit;
 import local.radioschedulers.IScheduler;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
-import local.radioschedulers.cpu.CPULikeScheduler;
-import local.radioschedulers.cpu.FairPrioritizedSelector;
-import local.radioschedulers.cpu.JobSelector;
-import local.radioschedulers.cpu.KeepingPrioritizedSelector;
-import local.radioschedulers.cpu.PrioritizedSelector;
-import local.radioschedulers.cpu.RandomizedSelector;
-import local.radioschedulers.cpu.ShortestFirstSelector;
+import local.radioschedulers.deciders.FairPrioritizedSelector;
+import local.radioschedulers.deciders.JobSelector;
+import local.radioschedulers.deciders.KeepingPrioritizedSelector;
+import local.radioschedulers.deciders.PrioritizedSelector;
+import local.radioschedulers.deciders.RandomizedSelector;
+import local.radioschedulers.deciders.ShortestFirstSelector;
 import local.radioschedulers.exporter.ExportFactory;
 import local.radioschedulers.exporter.IExport;
 import local.radioschedulers.greedy.ContinuousLeastChoiceScheduler;
@@ -31,10 +30,11 @@ import local.radioschedulers.greedy.ContinuousUnlessOneChoiceScheduler;
 import local.radioschedulers.greedy.ExtendingLeastChoiceScheduler;
 import local.radioschedulers.greedy.GreedyDifficultyScheduler;
 import local.radioschedulers.greedy.GreedyLeastChoiceScheduler;
-import local.radioschedulers.greedy.GreedyPlacementScheduler;
 import local.radioschedulers.greedy.PressureJobSortCriterion;
 import local.radioschedulers.greedy.PriorityJobSortCriterion;
 import local.radioschedulers.greedy.SmoothenedGreedyLeastChoiceScheduler;
+import local.radioschedulers.parallel.TrivialFirstParallelListingScheduler;
+import local.radioschedulers.serial.SerialListingScheduler;
 
 import org.apache.log4j.Logger;
 
@@ -164,13 +164,13 @@ public class HeuristicsScheduleCollector {
 		// schedulers.add(new ParallelLinearScheduler());
 
 		for (int i = 0; i < getNJobSelectors(); i++)
-			schedulers.add(new CPULikeScheduler(getJobSelector(i)));
+			schedulers.add(new SerialListingScheduler(getJobSelector(i)));
 
 		schedulers.add(new GreedyDifficultyScheduler());
 
-		schedulers.add(new GreedyPlacementScheduler(
+		schedulers.add(new TrivialFirstParallelListingScheduler(
 				new PressureJobSortCriterion()));
-		schedulers.add(new GreedyPlacementScheduler(
+		schedulers.add(new TrivialFirstParallelListingScheduler(
 				new PriorityJobSortCriterion()));
 
 		for (int i = 0; i < getNJobSelectors(); i++) {

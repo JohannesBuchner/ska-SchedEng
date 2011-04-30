@@ -1,8 +1,11 @@
-package local.radioschedulers.cpu;
+package local.radioschedulers.serial;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
@@ -12,22 +15,30 @@ import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
+import local.radioschedulers.deciders.JobSelector;
 
 import org.apache.log4j.Logger;
 
-public class CPULikeScheduler implements IScheduler {
-	private static Logger log = Logger.getLogger(CPULikeScheduler.class);
+public class SerialListingScheduler implements IScheduler {
+	private static Logger log = Logger.getLogger(SerialListingScheduler.class);
 
 	/**
 	 * how many hours are left for this job
 	 */
-	protected HashMap<Job, Double> timeleft = new HashMap<Job, Double>();
+	protected Map<Job, Double> timeleft = new HashMap<Job, Double>();
+
+	/**
+	 * which timeslots are left for this job
+	 */
+	protected Map<Job, List<LSTTime>> possibles = new HashMap<Job, List<LSTTime>>();
+	protected List<LSTTime> unassignedTimeslots = new ArrayList<LSTTime>();
 
 	protected JobSelector jobselector;
 
-	public CPULikeScheduler(JobSelector jobselector) {
+	public SerialListingScheduler(JobSelector jobselector) {
 		this.jobselector = jobselector;
 		this.jobselector.setTimeleft(timeleft);
+		this.jobselector.setPossibles(possibles);
 	}
 
 	@Override
@@ -48,14 +59,15 @@ public class CPULikeScheduler implements IScheduler {
 
 		log.debug("Allocating:");
 
-		for (Entry<LSTTime, Set<JobCombination>> e : timeline) {
+		while(!unassignedTimeslots.isEmpty()) {
+			LSTTime t = getNextUnassignedTimeslot();
+
 			cleanup(timeleft);
 			if (timeleft.isEmpty()) {
 				break;
 			}
 
-			Set<JobCombination> list = e.getValue();
-			LSTTime t = e.getKey();
+			Set<JobCombination> list = timeline.get(t);
 
 			if (list == null || list.isEmpty()) {
 				log.debug("nothing to do @" + t);
@@ -65,6 +77,12 @@ public class CPULikeScheduler implements IScheduler {
 			// select next
 			JobCombination selected = selectJobs(list);
 
+			for (JobCombination jc : list ) {
+				for (Job j : jc.jobs) {
+					possibles.get(j).remove(t);
+				}
+			}
+			
 			if (selected == null) {
 				log.debug("@" + t + " : nothing");
 			} else {
@@ -88,11 +106,28 @@ public class CPULikeScheduler implements IScheduler {
 
 	}
 
+	private LSTTime getNextUnassignedTimeslot() {
+		return unassignedTimeslots.remove(0);
+	}
+
 	private void fillTimeLeft(ScheduleSpace timeline) {
 		HashSet<JobCombination> alljobCombinations = new HashSet<JobCombination>();
 		Set<Job> alljobs = new HashSet<Job>();
 		for (Entry<LSTTime, Set<JobCombination>> e : timeline) {
+			unassignedTimeslots.add(e.getKey());
 			alljobCombinations.addAll(e.getValue());
+			if (e.getValue() != null) {
+				for (JobCombination jc : e.getValue()) {
+					for (Job j : jc.jobs) {
+						List<LSTTime> l = possibles.get(j);
+						if (l == null) {
+							l = new ArrayList<LSTTime>();
+							possibles.put(j, l);
+						}
+						l.add(e.getKey());
+					}
+				}
+			}
 		}
 		for (JobCombination jc : alljobCombinations) {
 			alljobs.addAll(jc.jobs);
@@ -110,11 +145,11 @@ public class CPULikeScheduler implements IScheduler {
 			return jcs.iterator().next();
 	}
 
-	private void cleanup(HashMap<Job, Double> timeleft) {
+	private void cleanup(Map<Job, Double> timeleft) {
 		for (Job j2 : timeleft.keySet()) {
 			if (timeleft.get(j2) <= 0) {
 				timeleft.remove(j2);
-				log.debug("only " + timeleft.size() + " proposals left");
+				log.debug("only " + timeleft.size() + " jobs left");
 			}
 		}
 		// log.debug(timeleft.size() + " proposals left");

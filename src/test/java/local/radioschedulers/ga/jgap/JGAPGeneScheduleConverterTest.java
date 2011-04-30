@@ -8,13 +8,13 @@ import local.radioschedulers.LSTTime;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
-import local.radioschedulers.cpu.CPULikeScheduler;
-import local.radioschedulers.cpu.RandomizedSelector;
+import local.radioschedulers.deciders.RandomizedSelector;
 import local.radioschedulers.ga.jgap.JGAPGeneScheduleConverter;
 import local.radioschedulers.importer.GeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
 import local.radioschedulers.preschedule.SimpleTimelineGenerator;
 import local.radioschedulers.preschedule.parallel.ParallelRequirementGuard;
+import local.radioschedulers.serial.SerialListingScheduler;
 
 import org.apache.log4j.Logger;
 import org.jgap.Configuration;
@@ -45,7 +45,7 @@ public class JGAPGeneScheduleConverterTest {
 		ITimelineGenerator tlg = new SimpleTimelineGenerator(
 				new ParallelRequirementGuard());
 		template = tlg.schedule(proposals, ndays);
-		CPULikeScheduler scheduler = new CPULikeScheduler(
+		SerialListingScheduler scheduler = new SerialListingScheduler(
 				new RandomizedSelector());
 		schedule = scheduler.schedule(template);
 		Configuration.reset();

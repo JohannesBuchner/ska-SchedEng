@@ -9,7 +9,7 @@ import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.LSTTimeIterator;
 import local.radioschedulers.ScheduleSpace;
-import local.radioschedulers.cpu.JobSelector;
+import local.radioschedulers.deciders.JobSelector;
 
 import org.apache.log4j.Logger;
 

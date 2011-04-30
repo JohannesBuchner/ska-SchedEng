@@ -1,22 +1,22 @@
-package local.radioschedulers.cpu;
+package local.radioschedulers.deciders;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-
-import org.apache.log4j.Logger;
+import java.util.Map;
 
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
+
+import org.apache.log4j.Logger;
 
 public class ShortestFirstSelector extends JobSelector {
 
 	private static Logger log = Logger.getLogger(ShortestFirstSelector.class);
 
 	@Override
-	public void setTimeleft(HashMap<Job, Double> timeleft) {
+	public void setTimeleft(Map<Job, Double> timeleft) {
 		super.setTimeleft(timeleft);
 		this.cmp = generateComparator(timeleft);
 	}
@@ -24,7 +24,7 @@ public class ShortestFirstSelector extends JobSelector {
 	protected Comparator<JobCombination> cmp;
 
 	protected Comparator<JobCombination> generateComparator(
-			final HashMap<Job, Double> timeleft) {
+			final Map<Job, Double> timeleft) {
 		log.debug("generating ShortestFirstSelector Comparator");
 		return new Comparator<JobCombination>() {
 			@Override
