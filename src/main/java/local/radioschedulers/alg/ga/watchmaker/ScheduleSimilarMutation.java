@@ -91,12 +91,12 @@ public class ScheduleSimilarMutation extends AbstractScheduleMutation {
 		boolean negContinue = backwardsKeep;
 		int countChanged = 0;
 		LSTTime last = template.findLastEntry();
-		LSTTimeIterator it = new LSTTimeIterator(new LSTTime(0, 1),
-				new LSTTime(1, 0), Schedule.LST_SLOTS_MINUTES);
+		LSTTimeIterator it = new LSTTimeIterator(new LSTTime(1, 0),
+				Schedule.LST_SLOTS_MINUTES);
 		log.debug("jc " + thisjc);
 		for (; it.hasNext();) {
 			LSTTime tDelta = it.next();
-			// log.debug("tDelta " + tDelta);
+			log.debug("tDelta " + tDelta);
 
 			if (posContinue) {
 				LSTTime tPlus = new LSTTime(t.day + tDelta.day, t.minute

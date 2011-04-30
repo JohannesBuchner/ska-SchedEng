@@ -12,7 +12,7 @@ import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.alg.ga.watchmaker.ScheduleSimilarMutation;
-import local.radioschedulers.alg.serial.PrioritizedSelector;
+import local.radioschedulers.alg.serial.RandomizedSelector;
 import local.radioschedulers.alg.serial.SerialListingScheduler;
 import local.radioschedulers.importer.GeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
@@ -49,7 +49,7 @@ public class ScheduleSimilarMutationTest {
 				new ParallelRequirementGuard());
 		template = tlg.schedule(proposals, ndays);
 		SerialListingScheduler scheduler = new SerialListingScheduler(
-				new PrioritizedSelector());
+				new RandomizedSelector());
 		schedule1 = scheduler.schedule(template);
 	}
 
