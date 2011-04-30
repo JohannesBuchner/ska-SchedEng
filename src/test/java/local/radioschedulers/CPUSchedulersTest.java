@@ -5,17 +5,17 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import local.radioschedulers.deciders.FairPrioritizedSelector;
-import local.radioschedulers.deciders.FirstSelector;
-import local.radioschedulers.deciders.PrioritizedSelector;
-import local.radioschedulers.deciders.RandomizedSelector;
-import local.radioschedulers.deciders.ShortestFirstSelector;
 import local.radioschedulers.importer.GeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
 import local.radioschedulers.preschedule.RequirementGuard;
 import local.radioschedulers.preschedule.SimpleTimelineGenerator;
 import local.radioschedulers.preschedule.SingleRequirementGuard;
+import local.radioschedulers.serial.FairPrioritizedSelector;
+import local.radioschedulers.serial.FirstSelector;
+import local.radioschedulers.serial.PrioritizedSelector;
+import local.radioschedulers.serial.RandomizedSelector;
 import local.radioschedulers.serial.SerialListingScheduler;
+import local.radioschedulers.serial.ShortestFirstSelector;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;

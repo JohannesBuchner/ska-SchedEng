@@ -17,24 +17,24 @@ import java.util.concurrent.TimeUnit;
 import local.radioschedulers.IScheduler;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
-import local.radioschedulers.deciders.FairPrioritizedSelector;
-import local.radioschedulers.deciders.JobSelector;
-import local.radioschedulers.deciders.KeepingPrioritizedSelector;
-import local.radioschedulers.deciders.PrioritizedSelector;
-import local.radioschedulers.deciders.RandomizedSelector;
-import local.radioschedulers.deciders.ShortestFirstSelector;
 import local.radioschedulers.exporter.ExportFactory;
 import local.radioschedulers.exporter.IExport;
-import local.radioschedulers.greedy.ContinuousLeastChoiceScheduler;
-import local.radioschedulers.greedy.ContinuousUnlessOneChoiceScheduler;
-import local.radioschedulers.greedy.ExtendingLeastChoiceScheduler;
-import local.radioschedulers.greedy.GreedyDifficultyScheduler;
-import local.radioschedulers.greedy.GreedyLeastChoiceScheduler;
-import local.radioschedulers.greedy.PressureJobSortCriterion;
-import local.radioschedulers.greedy.PriorityJobSortCriterion;
-import local.radioschedulers.greedy.SmoothenedGreedyLeastChoiceScheduler;
+import local.radioschedulers.parallel.GreedyPressureScheduler;
+import local.radioschedulers.parallel.PressureJobSortCriterion;
+import local.radioschedulers.parallel.PriorityJobSortCriterion;
 import local.radioschedulers.parallel.TrivialFirstParallelListingScheduler;
+import local.radioschedulers.serial.ContinuousLeastChoiceScheduler;
+import local.radioschedulers.serial.ContinuousUnlessOneChoiceScheduler;
+import local.radioschedulers.serial.ExtendingLeastChoiceScheduler;
+import local.radioschedulers.serial.FairPrioritizedSelector;
+import local.radioschedulers.serial.JobSelector;
+import local.radioschedulers.serial.KeepingPrioritizedSelector;
+import local.radioschedulers.serial.PrioritizedSelector;
+import local.radioschedulers.serial.RandomizedSelector;
+import local.radioschedulers.serial.SerialLeastChoiceScheduler;
 import local.radioschedulers.serial.SerialListingScheduler;
+import local.radioschedulers.serial.ShortestFirstSelector;
+import local.radioschedulers.serial.SmootheningScheduler;
 
 import org.apache.log4j.Logger;
 
@@ -166,7 +166,7 @@ public class HeuristicsScheduleCollector {
 		for (int i = 0; i < getNJobSelectors(); i++)
 			schedulers.add(new SerialListingScheduler(getJobSelector(i)));
 
-		schedulers.add(new GreedyDifficultyScheduler());
+		schedulers.add(new GreedyPressureScheduler());
 
 		schedulers.add(new TrivialFirstParallelListingScheduler(
 				new PressureJobSortCriterion()));
@@ -174,15 +174,15 @@ public class HeuristicsScheduleCollector {
 				new PriorityJobSortCriterion()));
 
 		for (int i = 0; i < getNJobSelectors(); i++) {
-			schedulers.add(new GreedyLeastChoiceScheduler(getJobSelector(i)));
+			schedulers.add(new SerialLeastChoiceScheduler(getJobSelector(i)));
 			schedulers.add(new ContinuousUnlessOneChoiceScheduler(
 					getJobSelector(i)));
 			schedulers
 					.add(new ContinuousLeastChoiceScheduler(getJobSelector(i)));
 			schedulers
 					.add(new ExtendingLeastChoiceScheduler(getJobSelector(i)));
-			schedulers.add(new SmoothenedGreedyLeastChoiceScheduler(
-					getJobSelector(i)));
+			schedulers.add(new SmootheningScheduler(
+					new SerialLeastChoiceScheduler(getJobSelector(i))));
 		}
 		return schedulers;
 	}

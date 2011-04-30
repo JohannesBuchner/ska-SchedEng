@@ -1,4 +1,4 @@
-package local.radioschedulers.greedy;
+package local.radioschedulers.parallel;
 
 import local.radioschedulers.Job;
 import local.radioschedulers.ga.watchmaker.SortedCollection.MappingFunction;

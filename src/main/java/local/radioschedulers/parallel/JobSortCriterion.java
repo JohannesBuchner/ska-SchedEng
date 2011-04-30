@@ -1,7 +1,7 @@
-package local.radioschedulers.greedy;
+package local.radioschedulers.parallel;
 
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import local.radioschedulers.Job;
@@ -9,9 +9,9 @@ import local.radioschedulers.LSTTime;
 import local.radioschedulers.ga.watchmaker.SortedCollection.MappingFunction;
 
 public abstract class JobSortCriterion {
-	protected Map<Job, Collection<LSTTime>> possibleSlots = new HashMap<Job, Collection<LSTTime>>();
+	protected Map<Job, List<LSTTime>> possibleSlots = new HashMap<Job, List<LSTTime>>();
 
-	public void setPossibleSlots(Map<Job, Collection<LSTTime>> possibleSlots) {
+	public void setPossibleSlots(Map<Job, List<LSTTime>> possibleSlots) {
 		this.possibleSlots = possibleSlots;
 	}
 

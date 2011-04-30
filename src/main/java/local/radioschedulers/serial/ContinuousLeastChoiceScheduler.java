@@ -1,4 +1,4 @@
-package local.radioschedulers.greedy;
+package local.radioschedulers.serial;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,17 +9,16 @@ import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.LSTTimeIterator;
 import local.radioschedulers.ScheduleSpace;
-import local.radioschedulers.deciders.JobSelector;
 
 import org.apache.log4j.Logger;
 
 /**
- * Acts like {@link GreedyLeastChoiceScheduler}, but extends the task where
+ * Acts like {@link SerialLeastChoiceScheduler}, but extends the task where
  * unassigned.
  * 
  * @author Johannes Buchner
  */
-public class ContinuousLeastChoiceScheduler extends GreedyLeastChoiceScheduler {
+public class ContinuousLeastChoiceScheduler extends SerialLeastChoiceScheduler {
 	public ContinuousLeastChoiceScheduler(JobSelector selector) {
 		super(selector);
 	}
@@ -32,7 +31,7 @@ public class ContinuousLeastChoiceScheduler extends GreedyLeastChoiceScheduler {
 	protected JobCombination lastJc;
 
 	@Override
-	protected LSTTime nextUnassignedSlot() {
+	protected LSTTime getNextUnassignedTimeslot() {
 		boolean canContinue = false;
 		if (!neighbors.isEmpty()) {
 			// probe neighbors for unassigned
@@ -53,7 +52,7 @@ public class ContinuousLeastChoiceScheduler extends GreedyLeastChoiceScheduler {
 			Set<JobCombination> jcs = super.choices.get(lastSlot);
 			if (!jcs.isEmpty()) {
 				lastJc = jcs.iterator().next();
-				findNeighborsLike(lastJc);
+				neighbors = findNeighborsLike(lastJc);
 				log.debug("found " + neighbors.size() + " neighbors");
 			}
 		}
@@ -62,15 +61,15 @@ public class ContinuousLeastChoiceScheduler extends GreedyLeastChoiceScheduler {
 			lastSlot = neighbors.remove(0);
 			log.debug("@" + lastSlot + " using neighbor");
 		} else {
-			lastSlot = super.nextUnassignedSlot();
+			lastSlot = super.getNextUnassignedTimeslot();
 			log.debug("@" + lastSlot + " using least choice");
 		}
-		unassigned.remove(lastSlot);
+		unassignedTimeslots.remove(lastSlot);
 		return lastSlot;
 	}
 
-	protected void findNeighborsLike(JobCombination jc) {
-		// find neighbors
+	protected List<LSTTime> findNeighborsLike(JobCombination jc) {
+		List<LSTTime> neighbors = new ArrayList<LSTTime>();
 		LSTTimeIterator itbw = new LSTTimeIterator(lastSlot, new LSTTime(
 				lastSlot.day + 1, lastSlot.minute),
 				-ScheduleSpace.LST_SLOTS_MINUTES);
@@ -85,7 +84,7 @@ public class ContinuousLeastChoiceScheduler extends GreedyLeastChoiceScheduler {
 		while (backward || forward) {
 			if (backward) {
 				LSTTime tBack = itbw.next();
-				if (unassigned.contains(tBack) && tBack.day >= lastSlot.day - 1
+				if (unassignedTimeslots.contains(tBack) && tBack.day >= lastSlot.day - 1
 						&& choices.get(tBack).contains(jc)) {
 					neighbors.add(tBack);
 				} else {
@@ -94,7 +93,7 @@ public class ContinuousLeastChoiceScheduler extends GreedyLeastChoiceScheduler {
 			}
 			if (forward) {
 				LSTTime t = it.next();
-				if (unassigned.contains(t) && it.hasNext()
+				if (unassignedTimeslots.contains(t) && it.hasNext()
 						&& choices.get(t).contains(jc)) {
 					neighbors.add(t);
 				} else {
@@ -104,5 +103,6 @@ public class ContinuousLeastChoiceScheduler extends GreedyLeastChoiceScheduler {
 		}
 		log.debug("@" + lastSlot + " ... extended to " + itbw.next() + ".."
 				+ it.next());
+		return neighbors;
 	}
 }

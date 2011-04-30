@@ -1,23 +1,18 @@
-package local.radioschedulers.greedy;
+package local.radioschedulers.serial;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import local.radioschedulers.IScheduler;
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
-import local.radioschedulers.deciders.JobSelector;
 
 import org.apache.log4j.Logger;
 
@@ -32,28 +27,22 @@ import org.apache.log4j.Logger;
  * <li>continue from 1 until no more jobs or timeslots available.
  * </ul>
  * 
+ * This is basically how one can solve sudokus. Always resolve the one with only
+ * 1 choice, and propagate the consequences.
+ * 
  * @author Johannes Buchner
  */
-public class GreedyLeastChoiceScheduler implements IScheduler {
-	private static Logger log = Logger
-			.getLogger(GreedyLeastChoiceScheduler.class);
+public class SerialLeastChoiceScheduler extends SerialListingScheduler {
+	public SerialLeastChoiceScheduler(JobSelector jobselector) {
+		super(jobselector);
+	}
 
-	protected Map<Job, List<LSTTime>> possibleSlots = new HashMap<Job, List<LSTTime>>();
+	private static Logger log = Logger
+			.getLogger(SerialLeastChoiceScheduler.class);
+
 	protected Map<Integer, List<LSTTime>> timeslotsByChoice = new HashMap<Integer, List<LSTTime>>();
-	protected List<LSTTime> unassigned = new LinkedList<LSTTime>();
 
 	protected ScheduleSpace choices;
-
-	/**
-	 * how many hours are left for this job
-	 */
-	protected HashMap<Job, Double> timeleft = new HashMap<Job, Double>();
-	protected JobSelector selector;
-
-	public GreedyLeastChoiceScheduler(JobSelector selector) {
-		this.selector = selector;
-		selector.setTimeleft(timeleft);
-	}
 
 	/**
 	 * fill nchoices and timeslotsByChoice; and timeleft
@@ -74,21 +63,7 @@ public class GreedyLeastChoiceScheduler implements IScheduler {
 			l.add(t);
 			for (JobCombination jc : jcs) {
 				choices.add(t, jc);
-				for (Job j : jc.jobs) {
-					if (!timeleft.containsKey(j)) {
-						timeleft.put(j, j.hours);
-					}
-
-					l = possibleSlots.get(j);
-					if (l == null) {
-						l = new ArrayList<LSTTime>();
-						possibleSlots.put(j, l);
-					}
-					l.add(t);
-				}
 			}
-			if (!choices.isEmpty(t))
-				unassigned.add(t);
 		}
 		for (Entry<Integer, List<LSTTime>> e : timeslotsByChoice.entrySet()) {
 			log.debug(e.getKey() + " choices -- " + e.getValue().size()
@@ -96,36 +71,22 @@ public class GreedyLeastChoiceScheduler implements IScheduler {
 		}
 	}
 
-	protected void choose(LSTTime t, JobCombination jc, Schedule s) {
-		s.add(t, jc);
-		for (JobCombination jc1 : choices.get(t)) {
-			for (Job j : jc1.jobs) {
-				possibleSlots.get(j).remove(t);
-			}
-		}
+	@Override
+	protected void beforeSchedule(ScheduleSpace timeline) {
+		super.beforeSchedule(timeline);
+		updateChoices(timeline);
+	}
 
+	@Override
+	protected void choose(LSTTime t, JobCombination jc, Schedule s) {
+		super.choose(t, jc, s);
 		choices.clear(t);
 		choices.add(t, jc);
-		reduceTimeleft(jc, s);
 	}
 
-	private void reduceTimeleft(JobCombination jc, Schedule s) {
-		for (Job j : jc.jobs) {
-			timeleft.put(j, timeleft.get(j) - 1. / Schedule.LST_SLOTS_PER_HOUR);
-			if (timeleft.get(j) <= 0) {
-				removeChoice(j, s);
-			}
-		}
-	}
-
-	protected void removeChoice(Job j, Schedule s) {
-		// log.debug("done scheduling " + j);
-		timeleft.remove(j);
-		// this only contains the other slots, because we removed the
-		// current before
-		Collection<LSTTime> slots = possibleSlots.remove(j);
-		// log.debug("  removing choices from other slots " + slots.size());
-
+	@Override
+	protected List<LSTTime> removeChoice(Job j, Schedule s) {
+		List<LSTTime> slots = super.removeChoice(j, s);
 		// reduce choices from the effected slots
 		for (LSTTime t : slots) {
 			Set<JobCombination> jcs = choices.get(t);
@@ -157,15 +118,16 @@ public class GreedyLeastChoiceScheduler implements IScheduler {
 				timeslotsByChoice.get(newnchoices).add(t);
 			} else {
 				// lost this one
-				unassigned.remove(t);
+				unassignedTimeslots.remove(t);
 			}
 			// log.debug("  @" + t + " -- new timeslotsByChoice entry of "
 			// + newnchoices);
 		}
-
+		return slots;
 	}
 
-	protected LSTTime nextUnassignedSlot() {
+	@Override
+	protected LSTTime getNextUnassignedTimeslot() {
 		ArrayList<Integer> keys = new ArrayList<Integer>(timeslotsByChoice
 				.keySet());
 		Collections.sort(keys);
@@ -180,49 +142,11 @@ public class GreedyLeastChoiceScheduler implements IScheduler {
 				slots.remove(t);
 				if (slots.isEmpty())
 					timeslotsByChoice.remove(k);
-				unassigned.remove(t);
+				unassignedTimeslots.remove(t);
 				return t;
 			}
 		}
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see IScheduler#schedule(java.util.Collection)
-	 */
-	public Schedule schedule(ScheduleSpace timeline) {
-		Schedule s = new Schedule();
-
-		// Sort timeslots by number of jobs to choose from.
-		updateChoices(timeline);
-
-		while (!possibleSlots.isEmpty()) {
-			LSTTime t = nextUnassignedSlot();
-			if (t == null)
-				break;
-			JobCombination jc = select(t);
-			// log.debug("choosing @" + t + " -- " + jc);
-			if (jc != null)
-				choose(t, jc, s);
-		}
-
-		return s;
-	}
-
-	private JobCombination select(LSTTime t) {
-		Set<JobCombination> jcs = choices.get(t);
-		Collection<JobCombination> jc = selector.select(jcs);
-		Iterator<JobCombination> it = jc.iterator();
-		if (!it.hasNext())
-			return null;
-		return jc.iterator().next();
-	}
-
-	@Override
-	public String toString() {
-		return getClass().getSimpleName() + " with jobselector "
-				+ selector.toString() + " instance " + hashCode();
-	}
 }

@@ -1,4 +1,4 @@
-package local.radioschedulers.deciders;
+package local.radioschedulers.serial;
 
 import java.util.Collection;
 import java.util.Collections;

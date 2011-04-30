@@ -1,21 +1,21 @@
-package local.radioschedulers.deciders;
+package local.radioschedulers.serial;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import local.radioschedulers.JobCombination;
 
 /**
- * select jobs in random order
- * 
+ * Simply selects the first available JobCombination
  * @author Johannes Buchner
  */
-public class RandomizedSelector extends JobSelector {
+public class FirstSelector extends JobSelector {
 	@Override
 	public Collection<JobCombination> select(Collection<JobCombination> list) {
 		List<JobCombination> jobs = pruneDone(list);
-		Collections.shuffle(jobs);
+		for (int i = 1; i < jobs.size(); i++) {
+			jobs.remove(i);
+		}
 		return super.select(jobs);
 	}
 

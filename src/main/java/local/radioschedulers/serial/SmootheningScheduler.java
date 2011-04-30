@@ -1,37 +1,41 @@
-package local.radioschedulers.greedy;
+package local.radioschedulers.serial;
 
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
-
+import local.radioschedulers.IScheduler;
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.LSTTimeIterator;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
-import local.radioschedulers.deciders.JobSelector;
+
+import org.apache.log4j.Logger;
 
 /**
- * Takes the solution of {@link GreedyLeastChoiceScheduler}, and extends each
- * task onto empty fields.
+ * Takes the solution of another Scheduler, and extends each task onto empty
+ * fields.
  * 
  * @author Johannes Buchner
  */
-public class SmoothenedGreedyLeastChoiceScheduler extends
-		GreedyLeastChoiceScheduler {
-	public SmoothenedGreedyLeastChoiceScheduler(JobSelector selector) {
-		super(selector);
+public class SmootheningScheduler extends ListingScheduler {
+	private IScheduler scheduler;
+
+	public SmootheningScheduler(IScheduler scheduler) {
+		this.scheduler = scheduler;
 	}
 
-	private static Logger log = Logger
-			.getLogger(SmoothenedGreedyLeastChoiceScheduler.class);
+	private static Logger log = Logger.getLogger(SmootheningScheduler.class);
 
 	@Override
-	public Schedule schedule(ScheduleSpace timeline) {
-		Schedule s = super.schedule(timeline);
+	protected Schedule createEmptySchedule(ScheduleSpace timeline) {
+		return scheduler.schedule(timeline);
+	}
+
+	@Override
+	public Schedule doSchedule(ScheduleSpace timeline, Schedule s) {
 		timeleft.clear();
-		super.updateChoices(timeline);
+		super.fillTimeleft(timeline);
 		Schedule s2 = new Schedule();
 		for (Entry<LSTTime, JobCombination> e : s) {
 			if (e.getValue() == null || isFinished(e.getValue()))
@@ -60,8 +64,7 @@ public class SmoothenedGreedyLeastChoiceScheduler extends
 		while (backward || forward) {
 			if (backward) {
 				LSTTime tBack = itbw.next();
-				if (fragmentedSchedule.isEmpty(tBack) && s.isEmpty(tBack)
-						&& tBack.day >= t.day - 1
+				if (s.isEmpty(tBack) && tBack.day >= t.day - 1
 						&& timeline.get(tBack).contains(jc) && !isFinished(jc)) {
 					log.debug("extending backwards @" + tBack);
 					s.add(tBack, jc);
@@ -72,9 +75,8 @@ public class SmoothenedGreedyLeastChoiceScheduler extends
 			}
 			if (forward) {
 				LSTTime tFw = it.next();
-				if (fragmentedSchedule.isEmpty(tFw) && s.isEmpty(tFw)
-						&& it.hasNext() && timeline.get(tFw).contains(jc)
-						&& !isFinished(jc)) {
+				if (s.isEmpty(tFw) && it.hasNext()
+						&& timeline.get(tFw).contains(jc) && !isFinished(jc)) {
 					log.debug("extending forwards @" + tFw);
 					s.add(tFw, jc);
 					reduceTimeleft(jc);

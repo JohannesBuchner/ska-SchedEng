@@ -2,35 +2,22 @@ package local.radioschedulers.serial;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import local.radioschedulers.IScheduler;
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
-import local.radioschedulers.deciders.JobSelector;
 
 import org.apache.log4j.Logger;
 
-public class SerialListingScheduler implements IScheduler {
+public class SerialListingScheduler extends ListingScheduler {
 	private static Logger log = Logger.getLogger(SerialListingScheduler.class);
 
-	/**
-	 * how many hours are left for this job
-	 */
-	protected Map<Job, Double> timeleft = new HashMap<Job, Double>();
-
-	/**
-	 * which timeslots are left for this job
-	 */
-	protected Map<Job, List<LSTTime>> possibles = new HashMap<Job, List<LSTTime>>();
 	protected List<LSTTime> unassignedTimeslots = new ArrayList<LSTTime>();
 
 	protected JobSelector jobselector;
@@ -38,7 +25,7 @@ public class SerialListingScheduler implements IScheduler {
 	public SerialListingScheduler(JobSelector jobselector) {
 		this.jobselector = jobselector;
 		this.jobselector.setTimeleft(timeleft);
-		this.jobselector.setPossibles(possibles);
+		this.jobselector.setPossibles(possibleSlots);
 	}
 
 	@Override
@@ -47,111 +34,73 @@ public class SerialListingScheduler implements IScheduler {
 				+ " instance " + hashCode();
 	}
 
+	protected void choose(LSTTime t, JobCombination jc, Schedule s) {
+		s.add(t, jc);
+		reduceTimeleft(jc, s);
+	}
+
+	private void reduceTimeleft(JobCombination jc, Schedule s) {
+		for (Job j : jc.jobs) {
+			timeleft.put(j, timeleft.get(j) - 1. / Schedule.LST_SLOTS_PER_HOUR);
+			if (timeleft.get(j) <= 0) {
+				log.debug("done scheduling " + j);
+				timeleft.remove(j);
+				removeChoice(j, s);
+			}
+		}
+	}
+
+	protected List<LSTTime> removeChoice(Job j, Schedule s) {
+		return possibleSlots.remove(j);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see IScheduler#schedule(java.util.Collection)
 	 */
-	public Schedule schedule(ScheduleSpace timeline) {
-		Schedule s = new Schedule();
-
-		fillTimeLeft(timeline);
-
-		log.debug("Allocating:");
-
-		while(!unassignedTimeslots.isEmpty()) {
+	public Schedule doSchedule(ScheduleSpace timeline, Schedule s) {
+		while (!possibleSlots.isEmpty()) {
 			LSTTime t = getNextUnassignedTimeslot();
-
-			cleanup(timeleft);
-			if (timeleft.isEmpty()) {
+			if (t == null)
 				break;
-			}
+			Collection<JobCombination> list = getChoices(timeline, t);
+			JobCombination jc = select(list);
+			if (jc != null)
+				choose(t, jc, s);
 
-			Set<JobCombination> list = timeline.get(t);
-
-			if (list == null || list.isEmpty()) {
-				log.debug("nothing to do @" + t);
-				continue;
-			}
-
-			// select next
-			JobCombination selected = selectJobs(list);
-
-			for (JobCombination jc : list ) {
-				for (Job j : jc.jobs) {
-					possibles.get(j).remove(t);
-				}
-			}
-			
-			if (selected == null) {
-				log.debug("@" + t + " : nothing");
-			} else {
-				log.debug("@" + t + " : #jobs: " + selected.jobs.size());
-				s.add(new LSTTime(t.day, t.minute), selected);
-				/* count down time left */
-				for (Job j : selected.jobs) {
-					Double newtime = timeleft.get(j) - 1.
-							/ Schedule.LST_SLOTS_PER_HOUR;
-					log.debug("@" + t + " : " + j + " (" + newtime + " left)");
-					if (newtime <= 0) {
-						timeleft.remove(j);
-					} else {
-						timeleft.put(j, newtime);
-					}
+			for (JobCombination jc1 : list) {
+				for (Job j : jc1.jobs) {
+					possibleSlots.get(j).remove(t);
 				}
 			}
 		}
-
 		return s;
-
 	}
 
-	private LSTTime getNextUnassignedTimeslot() {
+	@Override
+	protected void beforeSchedule(ScheduleSpace timeline) {
+		super.beforeSchedule(timeline);
+		for (Entry<LSTTime, Set<JobCombination>> e : timeline) {
+			this.unassignedTimeslots.add(e.getKey());
+		}
+	}
+
+	private Collection<JobCombination> getChoices(ScheduleSpace timeline,
+			LSTTime t) {
+		return timeline.get(t);
+	}
+
+	protected LSTTime getNextUnassignedTimeslot() {
 		return unassignedTimeslots.remove(0);
 	}
 
-	private void fillTimeLeft(ScheduleSpace timeline) {
-		HashSet<JobCombination> alljobCombinations = new HashSet<JobCombination>();
-		Set<Job> alljobs = new HashSet<Job>();
-		for (Entry<LSTTime, Set<JobCombination>> e : timeline) {
-			unassignedTimeslots.add(e.getKey());
-			alljobCombinations.addAll(e.getValue());
-			if (e.getValue() != null) {
-				for (JobCombination jc : e.getValue()) {
-					for (Job j : jc.jobs) {
-						List<LSTTime> l = possibles.get(j);
-						if (l == null) {
-							l = new ArrayList<LSTTime>();
-							possibles.put(j, l);
-						}
-						l.add(e.getKey());
-					}
-				}
-			}
-		}
-		for (JobCombination jc : alljobCombinations) {
-			alljobs.addAll(jc.jobs);
-		}
-		for (Job j : alljobs) {
-			timeleft.put(j, (double) j.hours);
-		}
-	}
-
-	protected JobCombination selectJobs(Collection<JobCombination> list) {
-		Collection<JobCombination> jcs = this.jobselector.select(list);
-		if (jcs.isEmpty())
+	protected JobCombination select(Collection<JobCombination> jcs) {
+		Collection<JobCombination> jc = this.jobselector.select(jcs);
+		Iterator<JobCombination> it = jc.iterator();
+		if (!it.hasNext())
 			return null;
-		else
-			return jcs.iterator().next();
+		return jc.iterator().next();
 	}
 
-	private void cleanup(Map<Job, Double> timeleft) {
-		for (Job j2 : timeleft.keySet()) {
-			if (timeleft.get(j2) <= 0) {
-				timeleft.remove(j2);
-				log.debug("only " + timeleft.size() + " jobs left");
-			}
-		}
-		// log.debug(timeleft.size() + " proposals left");
-	}
 }

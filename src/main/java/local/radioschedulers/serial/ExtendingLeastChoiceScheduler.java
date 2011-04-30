@@ -1,4 +1,4 @@
-package local.radioschedulers.greedy;
+package local.radioschedulers.serial;
 
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
@@ -6,17 +6,16 @@ import local.radioschedulers.LSTTime;
 import local.radioschedulers.LSTTimeIterator;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
-import local.radioschedulers.deciders.JobSelector;
 
 import org.apache.log4j.Logger;
 
 /**
- * Acts like {@link GreedyLeastChoiceScheduler}, but extends the task where
+ * Acts like {@link SerialLeastChoiceScheduler}, but extends the task where
  * unassigned.
  * 
  * @author Johannes Buchner
  */
-public class ExtendingLeastChoiceScheduler extends GreedyLeastChoiceScheduler {
+public class ExtendingLeastChoiceScheduler extends SerialLeastChoiceScheduler {
 	public ExtendingLeastChoiceScheduler(JobSelector selector) {
 		super(selector);
 	}
@@ -32,11 +31,14 @@ public class ExtendingLeastChoiceScheduler extends GreedyLeastChoiceScheduler {
 		// handle this slot
 		log.debug("assigning @" + t + " :: " + jc);
 		super.choose(t, jc, s);
-		
-		// if (timeslotsByChoice.containsKey(1))
-		//	return;
 
-		// find neighbors
+		// if (timeslotsByChoice.containsKey(1))
+		// return;
+
+		findNeighborsLike(t, jc, s);
+	}
+
+	private void findNeighborsLike(LSTTime t, JobCombination jc, Schedule s) {
 		LSTTimeIterator itbw = new LSTTimeIterator(t, new LSTTime(t.day + 1,
 				t.minute), -ScheduleSpace.LST_SLOTS_MINUTES);
 		itbw.next();
@@ -49,7 +51,8 @@ public class ExtendingLeastChoiceScheduler extends GreedyLeastChoiceScheduler {
 		while (backward || forward) {
 			if (backward) {
 				LSTTime tBack = itbw.next();
-				if (unassigned.contains(tBack) && tBack.day >= t.day - 1
+				if (unassignedTimeslots.contains(tBack)
+						&& tBack.day >= t.day - 1
 						&& choices.get(tBack).contains(jc) && !isFinished(jc)) {
 					log.debug("extending backwards @" + tBack);
 					super.choose(tBack, jc, s);
@@ -59,7 +62,7 @@ public class ExtendingLeastChoiceScheduler extends GreedyLeastChoiceScheduler {
 			}
 			if (forward) {
 				LSTTime tFw = it.next();
-				if (unassigned.contains(tFw) && it.hasNext()
+				if (unassignedTimeslots.contains(tFw) && it.hasNext()
 						&& choices.get(tFw).contains(jc) && !isFinished(jc)) {
 					log.debug("extending forwards @" + tFw);
 					super.choose(tFw, jc, s);

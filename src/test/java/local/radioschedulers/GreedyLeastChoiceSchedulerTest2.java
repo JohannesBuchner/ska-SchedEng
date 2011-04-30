@@ -3,14 +3,14 @@ package local.radioschedulers;
 import java.util.ArrayList;
 import java.util.Map.Entry;
 
-import local.radioschedulers.deciders.PrioritizedSelector;
 import local.radioschedulers.ga.wf.ScheduleFactoryTest;
-import local.radioschedulers.greedy.ContinuousLeastChoiceScheduler;
-import local.radioschedulers.greedy.ContinuousUnlessOneChoiceScheduler;
-import local.radioschedulers.greedy.ExtendingLeastChoiceScheduler;
-import local.radioschedulers.greedy.GreedyLeastChoiceScheduler;
 import local.radioschedulers.preschedule.RequirementGuard;
 import local.radioschedulers.preschedule.parallel.ParallelRequirementGuard;
+import local.radioschedulers.serial.ContinuousLeastChoiceScheduler;
+import local.radioschedulers.serial.ContinuousUnlessOneChoiceScheduler;
+import local.radioschedulers.serial.ExtendingLeastChoiceScheduler;
+import local.radioschedulers.serial.PrioritizedSelector;
+import local.radioschedulers.serial.SerialLeastChoiceScheduler;
 
 import org.apache.log4j.Logger;
 import org.junit.Before;
@@ -83,7 +83,7 @@ public class GreedyLeastChoiceSchedulerTest2 {
 
 	@Test
 	public void testLeastChoiceScheduler() throws Exception {
-		GreedyLeastChoiceScheduler scheduler = new GreedyLeastChoiceScheduler(
+		SerialLeastChoiceScheduler scheduler = new SerialLeastChoiceScheduler(
 				new PrioritizedSelector());
 		Schedule s = scheduler.schedule(space);
 		ScheduleFactoryTest.assertScheduleIsWithinTemplate(s, space, 0);
