@@ -32,8 +32,9 @@ public class Schedule implements Iterable<Entry<LSTTime, JobCombination>> {
 
 	public void add(LSTTime t, JobCombination jc) {
 		if (jc == null)
-			throw new NullPointerException();
-		content.put(t, jc);
+			clear(t);
+		else
+			content.put(t, jc);
 	}
 
 	public boolean isEmpty(LSTTime t) {

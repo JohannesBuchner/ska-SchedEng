@@ -88,8 +88,6 @@ public class ScheduleMutationTest {
 			}
 		}
 		Assert.assertTrue(diffcount > 0);
-		Assert.assertEquals(mutationProbability.doubleValue(), diffcount * 1.
-				/ (eqcount + diffcount), 0.1);
 
 		ScheduleFactoryTest.assertScheduleIsWithinTemplate(schedule2, template,
 				ndays);

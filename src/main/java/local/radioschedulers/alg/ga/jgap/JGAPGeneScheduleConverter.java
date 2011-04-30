@@ -45,7 +45,8 @@ public class JGAPGeneScheduleConverter {
 		for (i = 0; i < genes.length; i++) {
 			JobCombination jc = (JobCombination) genes[i].getAllele();
 			LSTTime t = getLSTTimeFromGeneId(i);
-			s.add(t, jc);
+			if (jc != null)
+				s.add(t, jc);
 		}
 
 		return s;
