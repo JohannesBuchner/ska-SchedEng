@@ -11,8 +11,8 @@ import local.radioschedulers.LSTTime;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
-import local.radioschedulers.alg.ga.watchmaker.AbstractScheduleMutation;
-import local.radioschedulers.alg.ga.watchmaker.ScheduleMutation;
+import local.radioschedulers.alg.ga.watchmaker.op.AbstractScheduleMutation;
+import local.radioschedulers.alg.ga.watchmaker.op.ScheduleMutation;
 import local.radioschedulers.alg.serial.RandomizedSelector;
 import local.radioschedulers.alg.serial.SerialListingScheduler;
 import local.radioschedulers.importer.GeneratingProposalReader;
@@ -24,13 +24,11 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import static org.mockito.Mockito.*;
 import org.uncommons.maths.random.MersenneTwisterRNG;
 import org.uncommons.maths.random.Probability;
 
 public class ScheduleMutationTest {
-	protected static final Probability MUTATION_PROBABILITY = new Probability(
-			0.1);
-
 	@SuppressWarnings("unused")
 	private static Logger log = Logger.getLogger(ScheduleMutationTest.class);
 
@@ -43,8 +41,13 @@ public class ScheduleMutationTest {
 
 	protected AbstractScheduleMutation op;
 
+	protected Probability mutationProbability;
+
 	@Before
 	public void setup() throws Exception {
+		mutationProbability = mock(Probability.class);
+		when(mutationProbability.nextEvent(rng)).thenReturn(true, false);
+
 		GeneratingProposalReader gpr = new GeneratingProposalReader();
 		gpr.fill();
 		proposals = gpr.readall();
@@ -85,7 +88,7 @@ public class ScheduleMutationTest {
 			}
 		}
 		Assert.assertTrue(diffcount > 0);
-		Assert.assertEquals(MUTATION_PROBABILITY.doubleValue(), diffcount * 1.
+		Assert.assertEquals(mutationProbability.doubleValue(), diffcount * 1.
 				/ (eqcount + diffcount), 0.1);
 
 		ScheduleFactoryTest.assertScheduleIsWithinTemplate(schedule2, template,
@@ -95,7 +98,7 @@ public class ScheduleMutationTest {
 
 	protected AbstractScheduleMutation getOperator() {
 		ScheduleMutation op = new ScheduleMutation(template,
-				MUTATION_PROBABILITY);
+				mutationProbability);
 		return op;
 	}
 

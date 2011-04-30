@@ -1,4 +1,4 @@
-package local.radioschedulers.alg.ga.watchmaker;
+package local.radioschedulers.alg.ga.watchmaker.op;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +9,9 @@ import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
+import local.radioschedulers.alg.ga.watchmaker.GeneticHistory;
+import local.radioschedulers.alg.ga.watchmaker.MutationCounter;
+import local.radioschedulers.alg.ga.watchmaker.SortedCollection;
 import local.radioschedulers.alg.ga.watchmaker.SortedCollection.MappingFunction;
 
 import org.uncommons.maths.number.ConstantGenerator;

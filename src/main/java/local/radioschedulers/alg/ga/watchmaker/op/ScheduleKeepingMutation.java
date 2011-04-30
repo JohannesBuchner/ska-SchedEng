@@ -1,4 +1,4 @@
-package local.radioschedulers.alg.ga.watchmaker;
+package local.radioschedulers.alg.ga.watchmaker.op;
 
 import java.util.Random;
 import java.util.Set;
@@ -38,7 +38,7 @@ public class ScheduleKeepingMutation extends ScheduleSimilarMutation {
 		int i = 0;
 		int n = 0;
 		int toSkip = 0;
-		Probability u = new Probability(2. / 5.);
+		Probability u = new Probability(1. / 15.);
 
 		for (Entry<LSTTime, JobCombination> e : s1) {
 			LSTTime t = e.getKey();

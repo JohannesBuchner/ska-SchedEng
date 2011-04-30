@@ -1,4 +1,4 @@
-package local.radioschedulers.alg.ga.watchmaker;
+package local.radioschedulers.alg.ga.watchmaker.op;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +7,8 @@ import java.util.Random;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.LSTTimeIterator;
 import local.radioschedulers.Schedule;
+import local.radioschedulers.alg.ga.watchmaker.GeneticHistory;
+import local.radioschedulers.alg.ga.watchmaker.MutationCounter;
 
 import org.apache.log4j.Logger;
 import org.uncommons.maths.random.Probability;

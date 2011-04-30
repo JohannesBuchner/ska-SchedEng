@@ -1,4 +1,4 @@
-package local.radioschedulers.alg.ga.watchmaker;
+package local.radioschedulers.alg.ga.watchmaker.op;
 
 import java.util.Random;
 import java.util.Set;
@@ -30,6 +30,7 @@ public class ScheduleSimilarPrevMutation extends AbstractScheduleMutation {
 		int i = 0;
 		int n = 0;
 		JobCombination lastJc = null;
+		Probability u = new Probability(2. / 3);
 		for (Entry<LSTTime, JobCombination> e : s1) {
 			LSTTime t = e.getKey();
 			JobCombination jc = s1.get(t);
@@ -38,7 +39,8 @@ public class ScheduleSimilarPrevMutation extends AbstractScheduleMutation {
 			if (e.getValue() != null && !jcs.isEmpty()) {
 				s2.add(t, jc);
 				if (lastJc != null && !lastJc.equals(jc)) {
-					if (mutationProbability.nextValue().nextEvent(rng)) {
+					if (u.nextEvent(rng)
+							&& mutationProbability.nextValue().nextEvent(rng)) {
 						jc = getMostSimilar(lastJc, jcs);
 						if (jc != null) {
 							s2.add(t, jc);

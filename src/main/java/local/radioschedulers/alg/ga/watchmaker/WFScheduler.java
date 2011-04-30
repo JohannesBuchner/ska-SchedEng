@@ -10,6 +10,13 @@ import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.alg.ga.GeneticAlgorithmScheduler;
 import local.radioschedulers.alg.ga.ScheduleFitnessFunction;
+import local.radioschedulers.alg.ga.watchmaker.op.ScheduleCrossover;
+import local.radioschedulers.alg.ga.watchmaker.op.ScheduleExchangeMutation;
+import local.radioschedulers.alg.ga.watchmaker.op.ScheduleJobPlacementMutation;
+import local.radioschedulers.alg.ga.watchmaker.op.ScheduleKeepingMutation;
+import local.radioschedulers.alg.ga.watchmaker.op.ScheduleMutation;
+import local.radioschedulers.alg.ga.watchmaker.op.ScheduleSimilarMutation;
+import local.radioschedulers.alg.ga.watchmaker.op.ScheduleSimilarPrevMutation;
 
 import org.apache.log4j.Logger;
 import org.uncommons.maths.random.MersenneTwisterRNG;

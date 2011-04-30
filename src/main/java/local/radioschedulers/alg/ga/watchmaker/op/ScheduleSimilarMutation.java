@@ -1,4 +1,4 @@
-package local.radioschedulers.alg.ga.watchmaker;
+package local.radioschedulers.alg.ga.watchmaker.op;
 
 import java.util.Iterator;
 import java.util.Random;
@@ -52,9 +52,10 @@ public class ScheduleSimilarMutation extends AbstractScheduleMutation {
 		int i = 0;
 		int n = 0;
 
-		JobCombination lastJc = null;
-
 		int toSkip = 0;
+		// Probability u;
+		// if (forwardsKeep) u = new Probability();
+		boolean lastFailed = false;
 		for (Iterator<Entry<LSTTime, JobCombination>> it = s1.iterator(); it
 				.hasNext();) {
 			Entry<LSTTime, JobCombination> e = it.next();
@@ -67,16 +68,26 @@ public class ScheduleSimilarMutation extends AbstractScheduleMutation {
 					toSkip--;
 				} else {
 					/* only if we have a change, we should consider it */
-					if ((lastJc == null || !lastJc.equals(jc))
-							&& (mutationProbability.nextValue().nextEvent(rng))) {
+					if (lastFailed
+							|| mutationProbability.nextValue().nextEvent(rng)) {
 						log.debug("mutating around " + t);
 						toSkip = makeSimilarAround(t, jc, possibles, s2);
-						i += toSkip;
+						if (toSkip == 0) {
+							lastFailed = true;
+						} else {
+							i += toSkip;
+							lastFailed = false;
+						}
+						// fw probability is underestimated, bw is overestimated
+						if (forwardsKeep && !backwardsKeep)
+							toSkip = 0;
+						else {
+							toSkip *= 2;
+						}
 					}
 				}
 				n++;
 			}
-			lastJc = jc;
 		}
 		log.debug("changed " + i + " of " + n);
 		updateHistory(s2, s1, i, n);
