@@ -1,36 +1,27 @@
 package local.radioschedulers.preschedule.parallel;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
-import local.radioschedulers.LSTTime;
-import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.preschedule.RequirementGuard;
 
 import org.apache.log4j.Logger;
 
-public class CompatibleJobFactory {
-	private static Logger log = Logger.getLogger(CompatibleJobFactory.class);
-
-	private Collection<Job> base;
-	private Set<JobCombination> combinations;
-	private RequirementGuard guard;
-
-	public CompatibleJobFactory(Collection<Job> base, RequirementGuard req) {
-		this.base = base;
-		this.guard = req;
-		generateAllCombinations();
+public class SimpleCompatibleJobFactory extends CompatibleJobFactory {
+	public SimpleCompatibleJobFactory(Collection<Job> base, RequirementGuard req) {
+		super(base, req);
 	}
+
+	private static Logger log = Logger
+			.getLogger(SimpleCompatibleJobFactory.class);
 
 	private Set<JobCombination> all;
 
-	private void generateAllCombinations() {
+	@Override
+	protected void generateAllCombinations() {
 		combinations = new HashSet<JobCombination>();
 		all = new HashSet<JobCombination>();
 
@@ -100,6 +91,7 @@ public class CompatibleJobFactory {
 		return successful;
 	}
 
+	@Override
 	protected Set<JobCombination> getCombinationsInternal(Set<Job> jobs) {
 		Set<JobCombination> combo = new HashSet<JobCombination>();
 		for (JobCombination c : combinations) {
@@ -114,70 +106,5 @@ public class CompatibleJobFactory {
 				combo.add(c);
 		}
 		return combo;
-	}
-
-	public Collection<JobCombination> getCombinations() {
-		return combinations;
-	}
-
-	private Map<Set<Job>, Set<JobCombination>> combinationsCache = new HashMap<Set<Job>, Set<JobCombination>>();
-
-	public Set<JobCombination> getCombinations(Set<Job> jobs) {
-		Set<JobCombination> result = combinationsCache.get(jobs);
-		if (result == null) {
-			result = getCombinationsInternal(jobs);
-			combinationsCache.put(jobs, result);
-		}
-		return result;
-	}
-
-	public static final int LST_SLOTS = 24 * 4;
-	public static final int LST_SLOTS_MINUTES = 24 * 60 / LST_SLOTS;
-
-	public ScheduleSpace getPossibleTimeLine(Collection<Job> alljobs) {
-		ScheduleSpace timeline;
-
-		HashMap<LSTTime, Set<Job>> possibles = new HashMap<LSTTime, Set<Job>>();
-
-		log.debug("Possibles:");
-		for (Job j : alljobs) {
-			for (int slot = 0; slot < LST_SLOTS; slot++) {
-				long minute = ((int) (j.lstmin * 60 + slot * LST_SLOTS_MINUTES) % (LST_SLOTS * LST_SLOTS_MINUTES));
-
-				if (j.lstmin < j.lstmax) {
-					if (minute < Math.round(j.lstmin) * 60
-							|| minute > Math.round(j.lstmax) * 60)
-						break;
-				} else {
-					if (minute < Math.round(j.lstmin) * 60
-							&& minute > Math.round(j.lstmax) * 60)
-						break;
-				}
-
-				LSTTime t = new LSTTime(0L, minute);
-				Set<Job> list;
-				if (possibles.containsKey(t)) {
-					list = possibles.get(t);
-				} else {
-					list = new HashSet<Job>();
-					possibles.put(t, list);
-				}
-				list.add(j);
-				log.debug("@" + t + " : " + j);
-			}
-		}
-
-		timeline = new ScheduleSpace();
-		for (Entry<LSTTime, Set<Job>> e : possibles.entrySet()) {
-			LSTTime t = e.getKey();
-			Set<Job> jobs = e.getValue();
-
-			for (JobCombination jc : getCombinations(jobs)) {
-				timeline.add(t, jc);
-			}
-		}
-
-		return timeline;
-
 	}
 }

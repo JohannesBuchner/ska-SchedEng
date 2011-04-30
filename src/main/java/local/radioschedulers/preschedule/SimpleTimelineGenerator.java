@@ -11,6 +11,7 @@ import local.radioschedulers.LSTTime;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.preschedule.parallel.FastRecursiveCompatibleJobFactory;
+import local.radioschedulers.preschedule.parallel.CompatibleJobFactory;
 
 import org.apache.log4j.Logger;
 
@@ -33,7 +34,7 @@ public class SimpleTimelineGenerator implements ITimelineGenerator {
 		// alljobs, requirementGuard);
 		// log.debug("got compatibleJobFactory with "
 		// + compatibles1.getCombinations().size() + " combinations.");
-		FastRecursiveCompatibleJobFactory compatibles = new FastRecursiveCompatibleJobFactory(
+		CompatibleJobFactory compatibles = new FastRecursiveCompatibleJobFactory(
 				alljobs, requirementGuard);
 		log.debug("got FRcompatibleJobFactory with "
 				+ compatibles.getCombinations().size() + " combinations.");

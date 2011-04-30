@@ -71,7 +71,8 @@ public class SerialListingScheduler extends ListingScheduler {
 
 			for (JobCombination jc1 : list) {
 				for (Job j : jc1.jobs) {
-					possibleSlots.get(j).remove(t);
+					if (possibleSlots.containsKey(j))
+						possibleSlots.get(j).remove(t);
 				}
 			}
 		}
@@ -92,7 +93,10 @@ public class SerialListingScheduler extends ListingScheduler {
 	}
 
 	protected LSTTime getNextUnassignedTimeslot() {
-		return unassignedTimeslots.remove(0);
+		if (unassignedTimeslots.isEmpty())
+			return null;
+		else
+			return unassignedTimeslots.remove(0);
 	}
 
 	protected JobCombination select(Collection<JobCombination> jcs) {

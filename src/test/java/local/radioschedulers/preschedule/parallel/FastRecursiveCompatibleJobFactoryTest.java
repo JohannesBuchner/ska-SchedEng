@@ -22,7 +22,7 @@ public class FastRecursiveCompatibleJobFactoryTest {
 
 	private static Logger log = Logger
 			.getLogger(CompatibleJobFactoryTest.class);
-	private FastRecursiveCompatibleJobFactory cjf;
+	private CompatibleJobFactory cjf;
 	private Set<Job> alljobs;
 	int njobs;
 	private Collection<Proposal> proposals;

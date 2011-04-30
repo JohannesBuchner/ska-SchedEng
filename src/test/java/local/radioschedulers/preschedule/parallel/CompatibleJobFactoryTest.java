@@ -22,7 +22,7 @@ public class CompatibleJobFactoryTest {
 
 	private static Logger log = Logger
 			.getLogger(CompatibleJobFactoryTest.class);
-	private CompatibleJobFactory cjf;
+	private SimpleCompatibleJobFactory cjf;
 	private Set<Job> alljobs;
 	int njobs;
 	private Collection<Proposal> proposals;
@@ -47,7 +47,7 @@ public class CompatibleJobFactoryTest {
 	@Test
 	public void testNoParallel() throws Exception {
 		RequirementGuard req = new SingleRequirementGuard();
-		cjf = new CompatibleJobFactory(alljobs, req);
+		cjf = new SimpleCompatibleJobFactory(alljobs, req);
 		Collection<JobCombination> combinations = cjf.getCombinations();
 		int ncomb = combinations.size();
 		Assert.assertEquals("all single jobs", njobs, ncomb);
@@ -56,7 +56,7 @@ public class CompatibleJobFactoryTest {
 	@Test
 	public void testOneParallel() throws Exception {
 		RequirementGuard req = new TwoParallelRequirementGuard();
-		cjf = new CompatibleJobFactory(alljobs, req);
+		cjf = new SimpleCompatibleJobFactory(alljobs, req);
 		Collection<JobCombination> combinations = cjf.getCombinations();
 		int ncomb = combinations.size();
 		Assert.assertEquals("tuples, singles ", (njobs * (njobs - 1)) / 2
@@ -66,7 +66,7 @@ public class CompatibleJobFactoryTest {
 	@Test
 	public void testFullParallel() throws Exception {
 		RequirementGuard req = new ParallelRequirementGuard();
-		cjf = new CompatibleJobFactory(alljobs, req);
+		cjf = new SimpleCompatibleJobFactory(alljobs, req);
 		Collection<JobCombination> combinations = cjf.getCombinations();
 		int ncomb = combinations.size();
 		Assert.assertEquals("full combination", (1 << njobs) - 1, ncomb);
@@ -80,7 +80,7 @@ public class CompatibleJobFactoryTest {
 
 		RequirementGuard req = new ParallelRequirementGuard();
 		log.debug("getting combinations...");
-		cjf = new CompatibleJobFactory(alljobs, req);
+		cjf = new SimpleCompatibleJobFactory(alljobs, req);
 		Collection<JobCombination> combinations = cjf.getCombinations();
 		int ncomb = combinations.size();
 		log.debug("got " + ncomb + " combinations");

@@ -5,9 +5,10 @@ import java.util.Collection;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
-import local.radioschedulers.cpu.CPULikeScheduler;
-import local.radioschedulers.cpu.FirstSelector;
-import local.radioschedulers.ga.fitness.SimpleScheduleFitnessFunction;
+import local.radioschedulers.alg.ga.ScheduleFitnessFunction;
+import local.radioschedulers.alg.ga.fitness.SimpleScheduleFitnessFunction;
+import local.radioschedulers.alg.serial.FirstSelector;
+import local.radioschedulers.alg.serial.SerialListingScheduler;
 import local.radioschedulers.importer.GeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
 import local.radioschedulers.preschedule.SimpleTimelineGenerator;
@@ -34,7 +35,7 @@ public class FitnessFunctionTest {
 		ITimelineGenerator tlg = new SimpleTimelineGenerator(
 				new ParallelRequirementGuard());
 		template = tlg.schedule(proposals, ndays);
-		CPULikeScheduler scheduler = new CPULikeScheduler(new FirstSelector());
+		SerialListingScheduler scheduler = new SerialListingScheduler(new FirstSelector());
 		schedule1 = scheduler.schedule(template);
 		emptyschedule = new Schedule();
 	}
