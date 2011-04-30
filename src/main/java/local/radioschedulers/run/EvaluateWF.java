@@ -12,13 +12,13 @@ import java.util.Map.Entry;
 
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
+import local.radioschedulers.alg.ga.GeneticAlgorithmScheduler;
+import local.radioschedulers.alg.ga.ScheduleFitnessFunction;
+import local.radioschedulers.alg.ga.watchmaker.GeneticHistory;
+import local.radioschedulers.alg.ga.watchmaker.MutationCounter;
+import local.radioschedulers.alg.ga.watchmaker.WFScheduler;
 import local.radioschedulers.exporter.ExportFactory;
 import local.radioschedulers.exporter.IExport;
-import local.radioschedulers.ga.GeneticAlgorithmScheduler;
-import local.radioschedulers.ga.ScheduleFitnessFunction;
-import local.radioschedulers.ga.watchmaker.GeneticHistory;
-import local.radioschedulers.ga.watchmaker.MutationCounter;
-import local.radioschedulers.ga.watchmaker.WFScheduler;
 
 import org.apache.log4j.Logger;
 import org.uncommons.watchmaker.framework.EvolutionObserver;

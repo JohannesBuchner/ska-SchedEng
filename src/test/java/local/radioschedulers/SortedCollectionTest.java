@@ -5,8 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.Assert;
-import local.radioschedulers.ga.watchmaker.SortedCollection;
-import local.radioschedulers.ga.watchmaker.SortedCollection.MappingFunction;
+import local.radioschedulers.alg.ga.watchmaker.SortedCollection;
+import local.radioschedulers.alg.ga.watchmaker.SortedCollection.MappingFunction;
 
 import org.apache.log4j.Logger;
 import org.junit.Before;

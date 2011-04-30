@@ -7,7 +7,7 @@ import java.util.Map;
 
 import local.radioschedulers.Job;
 import local.radioschedulers.Schedule;
-import local.radioschedulers.ga.ScheduleFitnessFunction;
+import local.radioschedulers.alg.ga.ScheduleFitnessFunction;
 
 public class HtmlExportWithFitness extends HtmlExport {
 

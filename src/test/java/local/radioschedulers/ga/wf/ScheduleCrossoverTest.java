@@ -11,13 +11,13 @@ import local.radioschedulers.LSTTime;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
-import local.radioschedulers.ga.watchmaker.ScheduleCrossover;
+import local.radioschedulers.alg.ga.watchmaker.ScheduleCrossover;
+import local.radioschedulers.alg.serial.RandomizedSelector;
+import local.radioschedulers.alg.serial.SerialListingScheduler;
 import local.radioschedulers.importer.GeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
 import local.radioschedulers.preschedule.SimpleTimelineGenerator;
 import local.radioschedulers.preschedule.parallel.ParallelRequirementGuard;
-import local.radioschedulers.serial.RandomizedSelector;
-import local.radioschedulers.serial.SerialListingScheduler;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;

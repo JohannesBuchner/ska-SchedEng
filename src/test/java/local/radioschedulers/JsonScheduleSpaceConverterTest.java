@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.StringWriter;
 import java.util.Collection;
 
+import local.radioschedulers.alg.serial.FirstSelector;
+import local.radioschedulers.alg.serial.SerialListingScheduler;
 import local.radioschedulers.exporter.ExportFactory;
 import local.radioschedulers.exporter.HtmlExport;
 import local.radioschedulers.exporter.IExport;
@@ -11,8 +13,6 @@ import local.radioschedulers.importer.GeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
 import local.radioschedulers.preschedule.SimpleTimelineGenerator;
 import local.radioschedulers.preschedule.SingleRequirementGuard;
-import local.radioschedulers.serial.FirstSelector;
-import local.radioschedulers.serial.SerialListingScheduler;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;

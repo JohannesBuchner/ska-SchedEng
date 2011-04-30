@@ -2,7 +2,7 @@ package local.radioschedulers.exporter;
 
 import java.io.File;
 
-import local.radioschedulers.ga.fitness.SimpleScheduleFitnessFunction;
+import local.radioschedulers.alg.ga.fitness.SimpleScheduleFitnessFunction;
 
 public class ExportFactory {
 	public static IExport getExport(File f, String title) {

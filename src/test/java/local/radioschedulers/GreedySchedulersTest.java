@@ -5,8 +5,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import local.radioschedulers.alg.parallel.GreedyPressureScheduler;
 import local.radioschedulers.importer.GeneratingProposalReader;
-import local.radioschedulers.parallel.GreedyPressureScheduler;
 import local.radioschedulers.preschedule.ITimelineGenerator;
 import local.radioschedulers.preschedule.RequirementGuard;
 import local.radioschedulers.preschedule.SimpleTimelineGenerator;

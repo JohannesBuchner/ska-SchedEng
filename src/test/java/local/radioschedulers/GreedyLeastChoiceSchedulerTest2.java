@@ -3,14 +3,14 @@ package local.radioschedulers;
 import java.util.ArrayList;
 import java.util.Map.Entry;
 
+import local.radioschedulers.alg.serial.ContinuousLeastChoiceScheduler;
+import local.radioschedulers.alg.serial.ContinuousUnlessOneChoiceScheduler;
+import local.radioschedulers.alg.serial.ExtendingLeastChoiceScheduler;
+import local.radioschedulers.alg.serial.PrioritizedSelector;
+import local.radioschedulers.alg.serial.SerialLeastChoiceScheduler;
 import local.radioschedulers.ga.wf.ScheduleFactoryTest;
 import local.radioschedulers.preschedule.RequirementGuard;
 import local.radioschedulers.preschedule.parallel.ParallelRequirementGuard;
-import local.radioschedulers.serial.ContinuousLeastChoiceScheduler;
-import local.radioschedulers.serial.ContinuousUnlessOneChoiceScheduler;
-import local.radioschedulers.serial.ExtendingLeastChoiceScheduler;
-import local.radioschedulers.serial.PrioritizedSelector;
-import local.radioschedulers.serial.SerialLeastChoiceScheduler;
 
 import org.apache.log4j.Logger;
 import org.junit.Before;

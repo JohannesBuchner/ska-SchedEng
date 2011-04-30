@@ -36,6 +36,8 @@ public class Proposal implements Comparable<Proposal> {
 
 	/**
 	 * We are committed to this project. It has to be done (highest priority).
+	 * 
+	 * not used at the moment
 	 **/
 	public boolean mustcomplete;
 

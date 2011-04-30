@@ -6,10 +6,10 @@ import java.util.Set;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
-import local.radioschedulers.ga.GeneticAlgorithmScheduler;
-import local.radioschedulers.ga.ScheduleFitnessFunction;
-import local.radioschedulers.ga.fitness.SimpleScheduleFitnessFunction;
-import local.radioschedulers.ga.jgap.JGAPScheduler;
+import local.radioschedulers.alg.ga.GeneticAlgorithmScheduler;
+import local.radioschedulers.alg.ga.ScheduleFitnessFunction;
+import local.radioschedulers.alg.ga.fitness.SimpleScheduleFitnessFunction;
+import local.radioschedulers.alg.ga.jgap.JGAPScheduler;
 import local.radioschedulers.preschedule.RequirementGuard;
 import local.radioschedulers.preschedule.SimpleTimelineGenerator;
 

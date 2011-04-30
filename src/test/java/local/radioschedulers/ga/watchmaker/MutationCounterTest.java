@@ -3,6 +3,7 @@ package local.radioschedulers.ga.watchmaker;
 import java.util.Map;
 
 import junit.framework.Assert;
+import local.radioschedulers.alg.ga.watchmaker.MutationCounter;
 
 import org.apache.log4j.Logger;
 import org.junit.Before;

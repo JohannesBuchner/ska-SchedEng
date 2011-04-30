@@ -8,6 +8,8 @@ import local.radioschedulers.IScheduler;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
+import local.radioschedulers.alg.serial.SerialListingScheduler;
+import local.radioschedulers.alg.serial.ShortestFirstSelector;
 import local.radioschedulers.exporter.ExportFactory;
 import local.radioschedulers.exporter.IExport;
 import local.radioschedulers.importer.IProposalReader;
@@ -15,8 +17,6 @@ import local.radioschedulers.importer.PopulationGeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
 import local.radioschedulers.preschedule.SimpleTimelineGenerator;
 import local.radioschedulers.preschedule.parallel.ParallelRequirementGuard;
-import local.radioschedulers.serial.SerialListingScheduler;
-import local.radioschedulers.serial.ShortestFirstSelector;
 
 public class RunMain {
 

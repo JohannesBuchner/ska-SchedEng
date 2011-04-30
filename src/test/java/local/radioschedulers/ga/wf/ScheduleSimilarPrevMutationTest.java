@@ -1,7 +1,7 @@
 package local.radioschedulers.ga.wf;
 
-import local.radioschedulers.ga.watchmaker.AbstractScheduleMutation;
-import local.radioschedulers.ga.watchmaker.ScheduleSimilarPrevMutation;
+import local.radioschedulers.alg.ga.watchmaker.AbstractScheduleMutation;
+import local.radioschedulers.alg.ga.watchmaker.ScheduleSimilarPrevMutation;
 
 import org.apache.log4j.Logger;
 

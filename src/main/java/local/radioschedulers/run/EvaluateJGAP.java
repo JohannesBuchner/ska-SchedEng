@@ -7,9 +7,9 @@ import java.util.Map;
 
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
-import local.radioschedulers.ga.GeneticAlgorithmScheduler;
-import local.radioschedulers.ga.ScheduleFitnessFunction;
-import local.radioschedulers.ga.jgap.JGAPScheduler;
+import local.radioschedulers.alg.ga.GeneticAlgorithmScheduler;
+import local.radioschedulers.alg.ga.ScheduleFitnessFunction;
+import local.radioschedulers.alg.ga.jgap.JGAPScheduler;
 
 public class EvaluateJGAP extends EvaluateGA {
 	public static void main(String[] args) throws Exception {
