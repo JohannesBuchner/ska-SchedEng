@@ -1,33 +1,45 @@
 package local.radioschedulers.serial;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
+import local.radioschedulers.Schedule;
 
+/**
+ * select job(combination) with least last-finish time, i.e. distance between
+ * number of possible slots and time left:
+ * 
+ * Laxity := NumberOfPossibleTimeslots - TaskDuration
+ * 
+ * @author Johannes Buchner
+ */
 public class MinimumLaxitySelector extends PrioritizedSelector {
 
 	@Override
 	protected Comparator<JobCombination> generateComparator(
-			Map<Job, Double> timeleft) {
+			final Map<Job, Double> timeleft) {
 		return new Comparator<JobCombination>() {
 
 			@Override
 			public int compare(JobCombination o1, JobCombination o2) {
-				Integer n1 = getMinimumDeadline(o1);
-				Integer n2 = getMinimumDeadline(o2);
+				Double n1 = getMinimumLaxity(o1);
+				Double n2 = getMinimumLaxity(o2);
 
 				return n1.compareTo(n2);
 			}
 
-			private Integer getMinimumDeadline(JobCombination jc) {
-				Integer n = null;
+			private Double getMinimumLaxity(JobCombination jc) {
+				List<Double> h = new ArrayList<Double>();
 				for (Job j : jc.jobs) {
-					if (n == null || possibles.get(j).size() < n)
-						n = possibles.get(j).size();
+					h.add(possibles.get(j).size() * 1.
+							/ Schedule.LST_SLOTS_PER_HOUR - timeleft.get(j));
 				}
-				return n;
+				return Collections.min(h);
 			}
 		};
 	}

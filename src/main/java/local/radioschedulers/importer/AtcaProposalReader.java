@@ -10,13 +10,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
-import local.radioschedulers.DateRequirements;
-import local.radioschedulers.GoodBadDateRangeRequirements;
 import local.radioschedulers.Job;
 import local.radioschedulers.JobWithResources;
-import local.radioschedulers.NoDateRequirements;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.ResourceRequirement;
+import local.radioschedulers.preschedule.date.DateRequirements;
+import local.radioschedulers.preschedule.date.GoodBadDateRangeRequirements;
+import local.radioschedulers.preschedule.date.NoDateRequirements;
 
 import org.apache.log4j.Logger;
 

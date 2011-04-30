@@ -5,10 +5,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 
-import local.radioschedulers.DateRequirements;
 import local.radioschedulers.Job;
 import local.radioschedulers.JobWithResources;
 import local.radioschedulers.LSTTime;
+import local.radioschedulers.preschedule.date.DateRequirements;
 
 /**
  * Makes sure the requirements are respected

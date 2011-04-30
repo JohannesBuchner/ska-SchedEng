@@ -1,4 +1,7 @@
-package local.radioschedulers;
+package local.radioschedulers.preschedule.date;
+
+import local.radioschedulers.LSTTime;
+import local.radioschedulers.Schedule;
 
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonIgnore;

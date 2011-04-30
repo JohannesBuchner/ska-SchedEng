@@ -14,7 +14,7 @@ import local.radioschedulers.JobWithResources;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.ResourceRequirement;
-import local.radioschedulers.SolarDateRangeRequirements;
+import local.radioschedulers.preschedule.date.SolarDateRangeRequirements;
 
 import org.apache.log4j.Logger;
 

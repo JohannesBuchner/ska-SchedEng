@@ -8,10 +8,10 @@ import java.util.Collection;
 import java.util.Date;
 
 import junit.framework.Assert;
-import local.radioschedulers.GoodBadDateRangeRequirements;
 import local.radioschedulers.Job;
 import local.radioschedulers.JobWithResources;
 import local.radioschedulers.Proposal;
+import local.radioschedulers.preschedule.date.GoodBadDateRangeRequirements;
 
 import org.junit.Before;
 import org.junit.Test;

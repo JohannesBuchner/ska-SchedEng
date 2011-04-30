@@ -3,6 +3,9 @@ package local.radioschedulers;
 import java.util.HashMap;
 import java.util.Map;
 
+import local.radioschedulers.preschedule.date.DateRequirements;
+import local.radioschedulers.preschedule.date.NoDateRequirements;
+
 /**
  * A job with resource and date requirement specifications.
  * 
