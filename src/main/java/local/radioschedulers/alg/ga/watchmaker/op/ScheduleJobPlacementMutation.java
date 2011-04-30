@@ -13,6 +13,7 @@ import local.radioschedulers.LSTTime;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 
+import org.apache.log4j.Logger;
 import org.uncommons.maths.random.Probability;
 
 /**
@@ -22,6 +23,8 @@ import org.uncommons.maths.random.Probability;
  * @author Johannes Buchner
  */
 public class ScheduleJobPlacementMutation extends ScheduleSimilarMutation {
+	private static Logger log = Logger
+			.getLogger(ScheduleJobPlacementMutation.class);
 
 	protected Map<JobCombination, List<LSTTime>> possibleSlots = new HashMap<JobCombination, List<LSTTime>>();
 	protected List<JobCombination> jobs;
@@ -64,6 +67,7 @@ public class ScheduleJobPlacementMutation extends ScheduleSimilarMutation {
 			if (this.mutationProbability.nextValue().nextEvent(rng)) {
 				List<LSTTime> slots = possibleSlots.get(jc);
 				LSTTime t = slots.get(rng.nextInt(slots.size()));
+				log.debug("placing " + jc + " at " + t);
 				s2.add(t, jc);
 				i += 1 + makeSimilarAround(t, jc, possibles, s2);
 			}

@@ -35,14 +35,14 @@ public class ScheduleMutation extends AbstractScheduleMutation {
 		boolean lastFailed = false;
 		for (Entry<LSTTime, JobCombination> e : s1) {
 			LSTTime t = e.getKey();
-			if (s1.get(t) != null)
-				s2.add(t, s1.get(t));
+			JobCombination jc = e.getValue();
+			if (jc != null)
+				s2.add(t, jc);
 			Set<JobCombination> jcs = possibles.get(t);
-			if (!jcs.isEmpty()) {
+			if (!jcs.isEmpty() && (e.getValue() == null || jcs.size() > 1)) {
 				if (lastFailed
 						|| mutationProbability.nextValue().nextEvent(rng)) {
-					JobCombination jc = (JobCombination) jcs.toArray()[rng
-							.nextInt(jcs.size())];
+					jc = chooseRandomOther(rng, jcs, jc);
 					s2.add(t, jc);
 					if (jc.equals(e.getValue())) {
 						lastFailed = true;

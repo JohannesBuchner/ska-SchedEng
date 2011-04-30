@@ -12,6 +12,7 @@ import local.radioschedulers.LSTTime;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 
+import org.apache.log4j.Logger;
 import org.uncommons.maths.random.Probability;
 
 /**
@@ -21,6 +22,8 @@ import org.uncommons.maths.random.Probability;
  * @author Johannes Buchner
  */
 public class ScheduleExchangeMutation extends ScheduleSimilarMutation {
+	private static Logger log = Logger
+			.getLogger(ScheduleExchangeMutation.class);
 
 	public ScheduleExchangeMutation(ScheduleSpace possibles,
 			Probability probability) {
@@ -68,6 +71,9 @@ public class ScheduleExchangeMutation extends ScheduleSimilarMutation {
 							&& !(jc2 == null && jc == null)
 							&& (jc == null || !jc.equals(jc2))) {
 
+						if (log.isDebugEnabled())
+							log.debug("exchanging @" + t + " " + jc + " and @"
+									+ t2 + " " + jc2);
 						// switch
 						if (jc != null) {
 							s2.add(t2, jc);

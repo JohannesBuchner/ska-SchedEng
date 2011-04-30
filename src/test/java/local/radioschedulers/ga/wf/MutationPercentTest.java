@@ -32,7 +32,7 @@ import org.uncommons.maths.random.Probability;
 import org.uncommons.watchmaker.framework.EvolutionaryOperator;
 
 public class MutationPercentTest {
-	private static final Probability TEST_PROBABILITY = new Probability(0.01);
+	protected Probability testProbability = new Probability(0.05);
 	@SuppressWarnings("unused")
 	private static Logger log = Logger.getLogger(MutationPercentTest.class);
 
@@ -59,18 +59,18 @@ public class MutationPercentTest {
 
 	@Test
 	public void testExchangeMutation() throws Exception {
-		apply(new ScheduleExchangeMutation(template, TEST_PROBABILITY));
+		apply(new ScheduleExchangeMutation(template, testProbability));
 	}
 
 	@Test
 	public void testMutation() throws Exception {
-		apply(new ScheduleMutation(template, TEST_PROBABILITY));
+		apply(new ScheduleMutation(template, testProbability));
 	}
 
 	@Test
 	public void testSimilarMutationBoth() throws Exception {
 		ScheduleSimilarMutation op = new ScheduleSimilarMutation(template,
-				TEST_PROBABILITY);
+				testProbability);
 		op.setBackwardsKeep(true);
 		op.setForwardsKeep(true);
 		apply(op);
@@ -79,7 +79,7 @@ public class MutationPercentTest {
 	@Test
 	public void testSimilarMutationFw() throws Exception {
 		ScheduleSimilarMutation op = new ScheduleSimilarMutation(template,
-				TEST_PROBABILITY);
+				testProbability);
 		op.setBackwardsKeep(false);
 		op.setForwardsKeep(true);
 		apply(op);
@@ -88,7 +88,7 @@ public class MutationPercentTest {
 	@Test
 	public void testSimilarMutationBw() throws Exception {
 		ScheduleSimilarMutation op = new ScheduleSimilarMutation(template,
-				TEST_PROBABILITY);
+				testProbability);
 		op.setBackwardsKeep(true);
 		op.setForwardsKeep(false);
 		apply(op);
@@ -96,12 +96,12 @@ public class MutationPercentTest {
 
 	@Test
 	public void testSimilarPrevMutation() throws Exception {
-		apply(new ScheduleSimilarPrevMutation(template, TEST_PROBABILITY));
+		apply(new ScheduleSimilarPrevMutation(template, testProbability));
 	}
 
 	@Test
 	public void testKeepingMutation() throws Exception {
-		apply(new ScheduleKeepingMutation(template, TEST_PROBABILITY));
+		apply(new ScheduleKeepingMutation(template, testProbability));
 	}
 
 	public void apply(EvolutionaryOperator<Schedule> op) {
@@ -135,9 +135,16 @@ public class MutationPercentTest {
 				}
 			}
 		}
-		Assert.assertTrue(diffcount > 0);
-		Assert.assertEquals(TEST_PROBABILITY.doubleValue(), diffcount * 1.
-				/ (eqcount + diffcount), 0.003);
+		Assert.assertTrue("something should have changed", diffcount > 0);
+		sameMagnitude(testProbability.doubleValue(), diffcount * 1.
+				/ (eqcount + diffcount));
+	}
+
+	private void sameMagnitude(double expected, double actual) {
+		Assert.assertTrue("same magnitude: actual:" + actual + ", expected: "
+				+ expected + " [" + expected / Math.E + ".." + expected
+				* Math.E + "]", actual < expected * Math.E
+				&& actual > expected / Math.E);
 	}
 
 	private static Schedule getCopy(Schedule orig) {

@@ -1,6 +1,5 @@
 package local.radioschedulers.alg.ga.watchmaker.op;
 
-import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -25,6 +24,12 @@ import org.uncommons.maths.random.Probability;
 public class ScheduleSimilarMutation extends AbstractScheduleMutation {
 	private boolean forwardsKeep = false;
 	private boolean backwardsKeep = true;
+
+	protected Probability u = new Probability(1. / 15.);
+
+	protected boolean normalizeProbability(Random rng) {
+		return u.nextEvent(rng);
+	}
 
 	private static Logger log = Logger.getLogger(ScheduleSimilarMutation.class);
 
@@ -56,40 +61,39 @@ public class ScheduleSimilarMutation extends AbstractScheduleMutation {
 		// Probability u;
 		// if (forwardsKeep) u = new Probability();
 		boolean lastFailed = false;
-		for (Iterator<Entry<LSTTime, JobCombination>> it = s1.iterator(); it
-				.hasNext();) {
-			Entry<LSTTime, JobCombination> e = it.next();
+		for (Entry<LSTTime, JobCombination> e : s1) {
 			LSTTime t = e.getKey();
 			JobCombination jc = e.getValue();
 			Set<JobCombination> jcs = possibles.get(t);
-			if (jc != null && !jcs.isEmpty()) {
+			// can only make non-empty similar
+			if (jc != null && !jcs.isEmpty() && s2.isEmpty(t)) {
 				s2.add(t, jc);
 				if (toSkip > 0) {
 					toSkip--;
 				} else {
 					/* only if we have a change, we should consider it */
-					if (lastFailed
-							|| mutationProbability.nextValue().nextEvent(rng)) {
+					if (lastFailed || normalizeProbability(rng)
+							&& mutationProbability.nextValue().nextEvent(rng)) {
 						log.debug("mutating around " + t);
 						toSkip = makeSimilarAround(t, jc, possibles, s2);
+						i += toSkip;
 						if (toSkip == 0) {
 							lastFailed = true;
 						} else {
-							i += toSkip;
 							lastFailed = false;
 						}
-						// fw probability is underestimated, bw is overestimated
-						if (forwardsKeep && !backwardsKeep)
-							toSkip = 0;
-						else {
-							toSkip *= 2;
-						}
+						// lastFailed = false;
+						// if (forwardsKeep)
+						// toSkip = 4 * toSkip + 16;
+						// if (backwardsKeep)
+						// toSkip = 4 * toSkip + 16;
 					}
 				}
 				n++;
 			}
 		}
-		log.debug("changed " + i + " of " + n);
+		if (log.isDebugEnabled())
+			log.debug("changed " + i + " of " + n);
 		updateHistory(s2, s1, i, n);
 		updateCounters(s2, s1, i);
 
@@ -104,10 +108,15 @@ public class ScheduleSimilarMutation extends AbstractScheduleMutation {
 		LSTTime last = template.findLastEntry();
 		LSTTimeIterator it = new LSTTimeIterator(new LSTTime(1, 0),
 				Schedule.LST_SLOTS_MINUTES);
-		log.debug("jc " + thisjc);
-		for (; it.hasNext();) {
+		// skip t
+		it.next();
+
+		if (log.isDebugEnabled())
+			log.debug("@" + t + " -- jc " + thisjc);
+		while (it.hasNext() && (posContinue || negContinue)) {
 			LSTTime tDelta = it.next();
-			log.debug("tDelta " + tDelta);
+			if (log.isDebugEnabled())
+				log.debug("tDelta " + tDelta);
 
 			if (posContinue) {
 				LSTTime tPlus = new LSTTime(t.day + tDelta.day, t.minute
@@ -117,7 +126,9 @@ public class ScheduleSimilarMutation extends AbstractScheduleMutation {
 					tPlus.day += extraDays;
 					tPlus.minute -= extraDays * (Schedule.MINUTES_PER_DAY);
 				}
-				log.debug("tPlus " + tPlus);
+				if (log.isDebugEnabled())
+
+					log.debug("tPlus " + tPlus);
 
 				if (tPlus.isAfter(last)) {
 					posContinue = false;
@@ -126,8 +137,9 @@ public class ScheduleSimilarMutation extends AbstractScheduleMutation {
 					if (!jcs.isEmpty()) {
 						JobCombination jc = getMostSimilar(thisjc, jcs);
 						if (jc != null) {
-							log.debug("jc " + jc);
+							log.debug(" new jc " + jc);
 							s2.add(tPlus, jc);
+							// if (!jc.equals(thisjc))
 							countChanged++;
 						} else {
 							posContinue = false;
@@ -146,7 +158,8 @@ public class ScheduleSimilarMutation extends AbstractScheduleMutation {
 					tMinus.day -= extraDays;
 					tMinus.minute += extraDays * (Schedule.MINUTES_PER_DAY);
 				}
-				log.debug("tMinus " + tMinus);
+				if (log.isDebugEnabled())
+					log.debug("tMinus " + tMinus);
 
 				if (tMinus.day < 0) {
 					negContinue = false;
@@ -155,8 +168,9 @@ public class ScheduleSimilarMutation extends AbstractScheduleMutation {
 					if (!jcs.isEmpty()) {
 						JobCombination jc = getMostSimilar(thisjc, jcs);
 						if (jc != null) {
-							log.debug("jc " + jc);
+							log.debug(" new jc " + jc);
 							s2.add(tMinus, jc);
+							// if (!jc.equals(thisjc))
 							countChanged++;
 						} else {
 							negContinue = false;

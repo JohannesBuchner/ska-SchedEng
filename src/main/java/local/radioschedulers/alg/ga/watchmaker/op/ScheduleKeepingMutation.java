@@ -32,29 +32,29 @@ public class ScheduleKeepingMutation extends ScheduleSimilarMutation {
 		super(possibles, mutationProbability);
 	}
 
+	protected Probability u = new Probability(1. / 15.);
+
 	@Override
 	protected Schedule mutateSchedule(Schedule s1, Random rng) {
 		Schedule s2 = new Schedule();
 		int i = 0;
 		int n = 0;
 		int toSkip = 0;
-		Probability u = new Probability(1. / 15.);
 
 		for (Entry<LSTTime, JobCombination> e : s1) {
 			LSTTime t = e.getKey();
-			JobCombination jc = s1.get(t);
-
+			JobCombination jc = e.getValue();
 			Set<JobCombination> jcs = possibles.get(t);
-			if (e.getValue() != null && !jcs.isEmpty()) {
-				s2.add(t, jc);
+			if (!jcs.isEmpty() && s2.isEmpty(t)) {
+				if (jc != null)
+					s2.add(t, jc);
 				if (toSkip > 0) {
 					toSkip--;
 				} else {
-					if (u.nextEvent(rng)
+					if (normalizeProbability(rng)
 							&& mutationProbability.nextValue().nextEvent(rng)) {
 						// randomly choose a task
-						jc = (JobCombination) jcs.toArray()[rng.nextInt(jcs
-								.size())];
+						jc = chooseRandomOther(rng, jcs, jc);
 
 						s2.add(t, jc);
 						toSkip = makeSimilarAround(t, jc, possibles, s2);
@@ -65,13 +65,14 @@ public class ScheduleKeepingMutation extends ScheduleSimilarMutation {
 				n++;
 			}
 		}
-		log.debug("changed " + i + " of " + n);
+		if (log.isDebugEnabled())
+			log.debug("changed " + i + " of " + n);
 		updateHistory(s2, s1, i, n);
 		updateCounters(s2, s1, i);
 
 		return s2;
 	}
-	
+
 	@Override
 	public String toString() {
 		return getClass().getSimpleName();

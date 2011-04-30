@@ -103,4 +103,17 @@ public abstract class AbstractScheduleMutation implements
 	public String toString() {
 		return getClass().getSimpleName();
 	}
+
+	protected JobCombination chooseRandomOther(Random rng,
+			Set<JobCombination> jcs, JobCombination jc) {
+		if (jcs.isEmpty())
+			throw new IllegalArgumentException("Set should not be empty");
+		if (jcs.size() == 1) {
+			return jcs.iterator().next();
+		}
+		jcs.remove(jc);
+		jc = (JobCombination) jcs.toArray()[rng.nextInt(jcs.size())];
+		jcs.add(jc);
+		return jc;
+	}
 }

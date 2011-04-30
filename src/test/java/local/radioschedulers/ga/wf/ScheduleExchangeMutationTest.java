@@ -67,6 +67,8 @@ public class ScheduleExchangeMutationTest {
 
 		int diffcount = 0;
 		int eqcount = 0;
+		boolean inModificationRange = false;
+		boolean hasPartner = false;
 		for (Entry<LSTTime, JobCombination> e : schedule1) {
 			LSTTime t = e.getKey();
 			JobCombination scheduleJc1 = schedule1.get(t);
@@ -85,8 +87,8 @@ public class ScheduleExchangeMutationTest {
 		Assert.assertEquals(MUTATION_PROBABILITY.doubleValue(), diffcount * 1.
 				/ (eqcount + diffcount), 0.05);
 
-		ScheduleFactoryTest.assertScheduleIsWithinTemplate(schedule2,
-				template, ndays);
+		ScheduleFactoryTest.assertScheduleIsWithinTemplate(schedule2, template,
+				ndays);
 
 	}
 

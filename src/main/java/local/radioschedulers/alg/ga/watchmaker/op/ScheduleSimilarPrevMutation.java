@@ -21,7 +21,8 @@ public class ScheduleSimilarPrevMutation extends AbstractScheduleMutation {
 
 	public ScheduleSimilarPrevMutation(ScheduleSpace possibles,
 			Probability probability) {
-		super(possibles, probability);
+		super(possibles, new Probability(Math.min(1., probability.doubleValue()
+				* Schedule.LST_SLOTS_PER_HOUR)));
 	}
 
 	@Override
@@ -30,17 +31,16 @@ public class ScheduleSimilarPrevMutation extends AbstractScheduleMutation {
 		int i = 0;
 		int n = 0;
 		JobCombination lastJc = null;
-		Probability u = new Probability(2. / 3);
 		for (Entry<LSTTime, JobCombination> e : s1) {
 			LSTTime t = e.getKey();
-			JobCombination jc = s1.get(t);
+			JobCombination jc = e.getValue();
 
 			Set<JobCombination> jcs = possibles.get(t);
-			if (e.getValue() != null && !jcs.isEmpty()) {
-				s2.add(t, jc);
-				if (lastJc != null && !lastJc.equals(jc)) {
-					if (u.nextEvent(rng)
-							&& mutationProbability.nextValue().nextEvent(rng)) {
+			if (!jcs.isEmpty()) {
+				if (jc != null)
+					s2.add(t, jc);
+				if (lastJc != null && !lastJc.equals(jc) && jcs.size() > 1) {
+					if (mutationProbability.nextValue().nextEvent(rng)) {
 						jc = getMostSimilar(lastJc, jcs);
 						if (jc != null) {
 							s2.add(t, jc);

@@ -10,6 +10,7 @@ import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.alg.ga.GeneticAlgorithmScheduler;
 import local.radioschedulers.alg.ga.ScheduleFitnessFunction;
+import local.radioschedulers.alg.ga.watchmaker.op.AbstractScheduleMutation;
 import local.radioschedulers.alg.ga.watchmaker.op.ScheduleCrossover;
 import local.radioschedulers.alg.ga.watchmaker.op.ScheduleExchangeMutation;
 import local.radioschedulers.alg.ga.watchmaker.op.ScheduleJobPlacementMutation;
@@ -147,7 +148,7 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 			operators.add(mutation);
 		}
 		if (getMutationKeepingProbability() > 0) {
-			ScheduleKeepingMutation mutation = new ScheduleKeepingMutation(
+			AbstractScheduleMutation mutation = new ScheduleKeepingMutation(
 					possibles, new Probability(getMutationKeepingProbability()));
 			mutation.setHistory(history);
 			mutation.setCounter(counter);
