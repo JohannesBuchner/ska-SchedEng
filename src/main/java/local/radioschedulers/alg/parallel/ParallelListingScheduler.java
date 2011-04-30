@@ -1,6 +1,5 @@
 package local.radioschedulers.alg.parallel;
 
-import java.util.HashMap;
 import java.util.Set;
 
 import local.radioschedulers.Job;
@@ -28,11 +27,6 @@ public class ParallelListingScheduler extends
 		this.sortFunction = sortFunction;
 		this.sortFunction.setPossibleSlots(possibleSlots);
 	}
-
-	/**
-	 * how many hours are left for this job
-	 */
-	protected HashMap<Job, Double> timeleft = new HashMap<Job, Double>();
 
 	@Override
 	protected Schedule doSchedule(ScheduleSpace timeline, Schedule s) {

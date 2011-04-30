@@ -26,8 +26,9 @@ public class JGAPGeneScheduleConverter {
 	}
 
 	public static LSTTime getLSTTimeFromGeneId(int i) {
-		return new LSTTime(i / Schedule.MINUTES_PER_DAY, i
-				% Schedule.MINUTES_PER_DAY);
+		return new LSTTime(i / ScheduleSpace.LST_SLOTS_PER_DAY,
+				(i % ScheduleSpace.LST_SLOTS_PER_DAY)
+						* ScheduleSpace.LST_SLOTS_MINUTES);
 	}
 
 	/**
