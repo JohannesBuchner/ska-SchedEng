@@ -18,8 +18,7 @@ import org.junit.Test;
 
 public class AtcaProposalReaderTest {
 
-	private File f = new File(
-			"/home/user/Downloads/ata-proposals/mp-johannes.txt");
+	private File f = new File("mp-johannes.txt");
 	private AtcaProposalReader reader;
 	private int ndays = 182;
 
@@ -30,7 +29,7 @@ public class AtcaProposalReaderTest {
 
 	@Before
 	public void setUp() throws Exception {
-		reader = new AtcaProposalReader(f, new Date(2011 - 1900, 1, 4), ndays );
+		reader = new AtcaProposalReader(f, new Date(2011 - 1900, 1, 4), ndays);
 	}
 
 	@Test
@@ -50,8 +49,8 @@ public class AtcaProposalReaderTest {
 			for (Job j1 : p.jobs) {
 				h += j1.hours + "; ";
 				s += j1.id + "; ";
-				lst += "lst(" + formatLSTHour(j1.lstmin) + "," + formatLSTHour(j1.lstmax) + ")"
-						+ "; ";
+				lst += "lst(" + formatLSTHour(j1.lstmin) + ","
+						+ formatLSTHour(j1.lstmax) + ")" + "; ";
 				JobWithResources jwr = (JobWithResources) j1;
 				GoodBadDateRangeRequirements d = (GoodBadDateRangeRequirements) jwr.date;
 				b += d.getBad() + "; ";

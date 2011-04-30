@@ -19,7 +19,7 @@ import org.junit.Test;
 
 public class PopulationGeneratingProposalReaderTest {
 
-	private static final String PROPOSALS_CSV = "/home/user/Downloads/ata-proposals.csv";
+	private static final String PROPOSALS_CSV = "ata-proposals.csv";
 	private static final String TMPDIR = "testoutput";
 	private PopulationGeneratingProposalReader reader;
 
@@ -134,8 +134,8 @@ public class PopulationGeneratingProposalReaderTest {
 		return new File(TMPDIR, filename);
 	}
 
-	private void dumpHistogramInt(Histogram<Integer> durationhist, String filename)
-			throws IOException {
+	private void dumpHistogramInt(Histogram<Integer> durationhist,
+			String filename) throws IOException {
 		FileWriter fw2;
 		fw2 = new FileWriter(getOutputFile(filename));
 		for (Bin<Integer> bin : durationhist) {
@@ -171,8 +171,8 @@ public class PopulationGeneratingProposalReaderTest {
 	private void calculateAntennaBins(Histogram<Integer> histantennas) {
 		histantennas.addBin(0, 1);
 		histantennas.addBin(1, 2);
-		for (int i = 2; i <= 42; i+=2) {
-			histantennas.addBin(i, i+2);
+		for (int i = 2; i <= 42; i += 2) {
+			histantennas.addBin(i, i + 2);
 		}
 	}
 
