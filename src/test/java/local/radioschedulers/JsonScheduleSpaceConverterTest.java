@@ -4,6 +4,10 @@ import java.io.File;
 import java.io.StringWriter;
 import java.util.Collection;
 
+import local.radioschedulers.IScheduler;
+import local.radioschedulers.Proposal;
+import local.radioschedulers.Schedule;
+import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.alg.serial.FirstSelector;
 import local.radioschedulers.alg.serial.SerialListingScheduler;
 import local.radioschedulers.exporter.ExportFactory;

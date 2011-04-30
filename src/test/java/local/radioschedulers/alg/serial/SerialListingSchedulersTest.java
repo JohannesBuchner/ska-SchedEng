@@ -1,29 +1,37 @@
-package local.radioschedulers;
+package local.radioschedulers.alg.serial;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import local.radioschedulers.Job;
+import local.radioschedulers.JobCombination;
+import local.radioschedulers.LSTTime;
+import local.radioschedulers.Proposal;
+import local.radioschedulers.Schedule;
+import local.radioschedulers.ScheduleSpace;
+import local.radioschedulers.alg.serial.FairPrioritizedSelector;
 import local.radioschedulers.alg.serial.FirstSelector;
-import local.radioschedulers.alg.serial.SerialLeastChoiceScheduler;
-import local.radioschedulers.ga.wf.ScheduleFactoryTest;
+import local.radioschedulers.alg.serial.PrioritizedSelector;
+import local.radioschedulers.alg.serial.RandomizedSelector;
+import local.radioschedulers.alg.serial.SerialListingScheduler;
+import local.radioschedulers.alg.serial.ShortestFirstSelector;
 import local.radioschedulers.importer.GeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
 import local.radioschedulers.preschedule.RequirementGuard;
 import local.radioschedulers.preschedule.SimpleTimelineGenerator;
-import local.radioschedulers.preschedule.parallel.ParallelRequirementGuard;
+import local.radioschedulers.preschedule.SingleRequirementGuard;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class GreedyLeastChoiceSchedulerTest {
+public class SerialListingSchedulersTest {
 
 	@SuppressWarnings("unused")
-	private static Logger log = Logger
-			.getLogger(GreedyLeastChoiceSchedulerTest.class);
+	private static Logger log = Logger.getLogger(SerialListingSchedulersTest.class);
 
 	public static int ndays = 10;
 
@@ -46,19 +54,49 @@ public class GreedyLeastChoiceSchedulerTest {
 	}
 
 	protected RequirementGuard getRequirementGuard() {
-		return new ParallelRequirementGuard();
+		return new SingleRequirementGuard();
 	}
 
 	@Test
 	public void testSingleFirst() throws Exception {
-		SerialLeastChoiceScheduler scheduler = new SerialLeastChoiceScheduler(
-				new FirstSelector());
+		SerialListingScheduler scheduler = new SerialListingScheduler(new FirstSelector());
 		Schedule s = scheduler.schedule(template);
-		checkSchedule(s, template);
+		checkSchedule(s);
 	}
 
-	private static void checkSchedule(Schedule s, ScheduleSpace template) {
-		ScheduleFactoryTest.assertScheduleIsWithinTemplate(s, template, ndays);
+	@Test
+	public void testSingleFair() throws Exception {
+		SerialListingScheduler scheduler = new SerialListingScheduler(
+				new FairPrioritizedSelector());
+		Schedule s = scheduler.schedule(template);
+		checkSchedule(s);
+	}
+
+	@Test
+	public void testSinglePrio() throws Exception {
+		SerialListingScheduler scheduler = new SerialListingScheduler(
+				new PrioritizedSelector());
+		Schedule s = scheduler.schedule(template);
+		checkSchedule(s);
+	}
+
+	@Test
+	public void testSingleShortest() throws Exception {
+		SerialListingScheduler scheduler = new SerialListingScheduler(
+				new ShortestFirstSelector());
+		Schedule s = scheduler.schedule(template);
+		checkSchedule(s);
+	}
+
+	@Test
+	public void testSingleRand() throws Exception {
+		SerialListingScheduler scheduler = new SerialListingScheduler(
+				new RandomizedSelector());
+		Schedule s = scheduler.schedule(template);
+		checkSchedule(s);
+	}
+
+	private void checkSchedule(Schedule s) {
 		Assert.assertEquals("ScheduleSpace and Schedule have the same length",
 				template.findLastEntry().day, s.findLastEntry().day);
 		int i = 0;
@@ -83,7 +121,7 @@ public class GreedyLeastChoiceSchedulerTest {
 
 		// Test if it is any good
 		Assert.assertTrue("Job slots filled: " + i, i > ndays);
-		Assert.assertTrue("Jobs scheduled: " + scheduledJobs.size(),
-				scheduledJobs.size() > 1);
+		Assert.assertTrue("Jobs scheduled: " + scheduledJobs.size() + " of "
+				+ proposals.size(), scheduledJobs.size() > 1);
 	}
 }

@@ -1,25 +1,32 @@
-package local.radioschedulers;
+package local.radioschedulers.alg.parallel;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import local.radioschedulers.alg.lp.ParallelLinearScheduler;
+import local.radioschedulers.Job;
+import local.radioschedulers.JobCombination;
+import local.radioschedulers.LSTTime;
+import local.radioschedulers.Proposal;
+import local.radioschedulers.Schedule;
+import local.radioschedulers.ScheduleSpace;
+import local.radioschedulers.alg.parallel.GreedyPressureScheduler;
 import local.radioschedulers.importer.GeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
+import local.radioschedulers.preschedule.RequirementGuard;
 import local.radioschedulers.preschedule.SimpleTimelineGenerator;
-import local.radioschedulers.preschedule.SingleRequirementGuard;
+import local.radioschedulers.preschedule.parallel.ParallelRequirementGuard;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class LinearSolverTest {
+public class GreedyPressureSchedulerTest {
 
 	@SuppressWarnings("unused")
-	private static Logger log = Logger.getLogger(LinearSolverTest.class);
+	private static Logger log = Logger.getLogger(GreedyPressureSchedulerTest.class);
 
 	public static int ndays = 10;
 
@@ -33,7 +40,7 @@ public class LinearSolverTest {
 		proposals = gpr.readall();
 		Assert.assertTrue(proposals.size() > 0);
 		ITimelineGenerator tlg = new SimpleTimelineGenerator(
-				new SingleRequirementGuard());
+				getRequirementGuard());
 		template = tlg.schedule(proposals, ndays);
 		for (Entry<LSTTime, Set<JobCombination>> e : template) {
 			Assert.assertFalse("Combinations at " + e.getKey(), e.getValue()
@@ -41,27 +48,37 @@ public class LinearSolverTest {
 		}
 	}
 
-	@Test
-	public void testSingle() throws Exception {
-		ParallelLinearScheduler ls = new ParallelLinearScheduler();
-		Schedule s = ls.schedule(template);
+	protected RequirementGuard getRequirementGuard() {
+		return new ParallelRequirementGuard();
+	}
 
+	@Test
+	public void testSingleFirst() throws Exception {
+		GreedyPressureScheduler scheduler = new GreedyPressureScheduler();
+		Schedule s = scheduler.schedule(template);
+		checkSchedule(s);
+	}
+
+	private void checkSchedule(Schedule s) {
 		Assert.assertEquals("ScheduleSpace and Schedule have the same length",
 				template.findLastEntry().day, s.findLastEntry().day);
 		int i = 0;
+		int emptyCount = 0;
 		Set<Proposal> scheduledJobs = new HashSet<Proposal>();
 		// Test correctness
 		for (Entry<LSTTime, JobCombination> e : s) {
 			Set<JobCombination> ref = template.get(e.getKey());
 			JobCombination actual = e.getValue();
 			if (actual == null)
-				continue;
-			Assert.assertTrue("Schedule is outside ScheduleSpace at " + i
-					+ "-- " + actual + " not in " + ref, ref.contains(actual));
-			Assert.assertTrue(actual.jobs.size() > 0);
-			i++;
-			for (Job j : actual.jobs) {
-				scheduledJobs.add(j.proposal);
+				emptyCount++;
+			else {
+				Assert.assertTrue("Schedule is outside ScheduleSpace at " + i,
+						ref.contains(actual));
+
+				i++;
+				for (Job j : actual.jobs) {
+					scheduledJobs.add(j.proposal);
+				}
 			}
 		}
 

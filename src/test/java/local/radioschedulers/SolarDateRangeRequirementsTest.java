@@ -1,6 +1,9 @@
 package local.radioschedulers;
 
 import junit.framework.Assert;
+import local.radioschedulers.LSTTime;
+import local.radioschedulers.LSTTimeIterator;
+import local.radioschedulers.Schedule;
 import local.radioschedulers.preschedule.date.SolarDateRangeRequirements;
 
 import org.junit.Before;

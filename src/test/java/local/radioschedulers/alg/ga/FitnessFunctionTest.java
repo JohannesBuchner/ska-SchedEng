@@ -1,4 +1,4 @@
-package local.radioschedulers.ga;
+package local.radioschedulers.alg.ga;
 
 import java.util.Collection;
 

@@ -4,6 +4,10 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import local.radioschedulers.JobCombination;
+import local.radioschedulers.LSTTime;
+import local.radioschedulers.Proposal;
+import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.importer.GeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
 import local.radioschedulers.preschedule.SimpleTimelineGenerator;

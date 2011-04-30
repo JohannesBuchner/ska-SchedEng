@@ -1,8 +1,14 @@
-package local.radioschedulers;
+package local.radioschedulers.alg.serial;
 
 import java.util.ArrayList;
 import java.util.Map.Entry;
 
+import local.radioschedulers.Job;
+import local.radioschedulers.JobCombination;
+import local.radioschedulers.LSTTime;
+import local.radioschedulers.Proposal;
+import local.radioschedulers.Schedule;
+import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.alg.serial.ContinuousLeastChoiceScheduler;
 import local.radioschedulers.alg.serial.ContinuousUnlessOneChoiceScheduler;
 import local.radioschedulers.alg.serial.ExtendingLeastChoiceScheduler;
@@ -16,10 +22,10 @@ import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
-public class GreedyLeastChoiceSchedulerTest2 {
+public class SerialLeastChoiceSchedulerTest2 {
 
 	private static Logger log = Logger
-			.getLogger(GreedyLeastChoiceSchedulerTest2.class);
+			.getLogger(SerialLeastChoiceSchedulerTest2.class);
 	private ScheduleSpace space;
 
 	@Before
