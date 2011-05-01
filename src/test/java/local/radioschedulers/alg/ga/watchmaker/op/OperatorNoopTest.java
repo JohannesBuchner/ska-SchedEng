@@ -1,4 +1,4 @@
-package local.radioschedulers.ga.wf;
+package local.radioschedulers.alg.ga.watchmaker.op;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,6 +11,7 @@ import local.radioschedulers.LSTTime;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
+import local.radioschedulers.alg.ga.watchmaker.ScheduleFactoryTest;
 import local.radioschedulers.alg.ga.watchmaker.op.ScheduleCrossover;
 import local.radioschedulers.alg.ga.watchmaker.op.ScheduleExchangeMutation;
 import local.radioschedulers.alg.ga.watchmaker.op.ScheduleKeepingMutation;
@@ -84,7 +85,7 @@ public class OperatorNoopTest {
 
 	@Test
 	public void testSimilarPrevMutation() throws Exception {
-		apply(new ScheduleSimilarPrevMutation(template, NOOP_PROBABILITY));
+		apply(new ScheduleSimilarPrevMutation(template, NOOP_PROBABILITY, false));
 	}
 
 

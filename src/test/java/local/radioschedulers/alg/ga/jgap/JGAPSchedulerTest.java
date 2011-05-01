@@ -1,4 +1,4 @@
-package local.radioschedulers.ga.jgap;
+package local.radioschedulers.alg.ga.jgap;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -1,4 +1,4 @@
-package local.radioschedulers.ga.wf;
+package local.radioschedulers.alg.ga.watchmaker.op;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,7 +11,8 @@ import local.radioschedulers.LSTTime;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
-import local.radioschedulers.alg.ga.watchmaker.op.ScheduleSimilarMutation;
+import local.radioschedulers.alg.ga.watchmaker.ScheduleFactoryTest;
+import local.radioschedulers.alg.ga.watchmaker.op.ScheduleExchangeMutation;
 import local.radioschedulers.alg.serial.RandomizedSelector;
 import local.radioschedulers.alg.serial.SerialListingScheduler;
 import local.radioschedulers.importer.GeneratingProposalReader;
@@ -26,11 +27,10 @@ import org.junit.Test;
 import org.uncommons.maths.random.MersenneTwisterRNG;
 import org.uncommons.maths.random.Probability;
 
-public class ScheduleSimilarMutationTest {
-	private static final Probability MUTATION_PROBABILITY = new Probability(0.1);
-
+public class ScheduleExchangeMutationTest {
+	private static final Probability MUTATION_PROBABILITY = new Probability(0.3);
 	private static Logger log = Logger
-			.getLogger(ScheduleSimilarMutationTest.class);
+			.getLogger(ScheduleExchangeMutationTest.class);
 
 	private Collection<Proposal> proposals;
 	private ScheduleSpace template;
@@ -38,8 +38,6 @@ public class ScheduleSimilarMutationTest {
 	private Schedule schedule1;
 	private Schedule schedule2;
 	private Random rng = new MersenneTwisterRNG();
-
-	private ScheduleSimilarMutation op;
 
 	@Before
 	public void setup() throws Exception {
@@ -53,35 +51,15 @@ public class ScheduleSimilarMutationTest {
 		SerialListingScheduler scheduler = new SerialListingScheduler(
 				new RandomizedSelector());
 		schedule1 = scheduler.schedule(template);
-		op = new ScheduleSimilarMutation(template,
-				MUTATION_PROBABILITY);
 	}
 
 	@Test
-	public void testBoth() throws Exception {
-		op.setBackwardsKeep(true);
-		op.setForwardsKeep(true);
-		testMutation(op);
-	}
-
-	@Test
-	public void testForward() throws Exception {
-		op.setBackwardsKeep(false);
-		op.setForwardsKeep(true);
-		testMutation(op);
-	}
-
-	@Test
-	public void testBackward() throws Exception {
-		op.setBackwardsKeep(true);
-		op.setForwardsKeep(false);
-		testMutation(op);
-	}
-
-	public void testMutation(ScheduleSimilarMutation op) throws Exception {
+	public void testMutation() throws Exception {
 		List<Schedule> schedules = new ArrayList<Schedule>(2);
 		schedules.add(schedule1);
 
+		ScheduleExchangeMutation op = new ScheduleExchangeMutation(template,
+				MUTATION_PROBABILITY);
 		schedules = op.apply(schedules, rng);
 		schedule2 = schedules.get(0);
 
@@ -90,26 +68,26 @@ public class ScheduleSimilarMutationTest {
 
 		int diffcount = 0;
 		int eqcount = 0;
+		boolean inModificationRange = false;
+		boolean hasPartner = false;
 		for (Entry<LSTTime, JobCombination> e : schedule1) {
 			LSTTime t = e.getKey();
 			JobCombination scheduleJc1 = schedule1.get(t);
 			JobCombination scheduleJc2 = schedule2.get(t);
 
-			if (!template.get(t).isEmpty()) {
-				if (schedEquals(scheduleJc1, scheduleJc2)) {
-					eqcount++;
-				} else {
-					diffcount++;
-				}
+			if (schedEquals(scheduleJc1, scheduleJc2)) {
+				eqcount++;
+			} else {
+				diffcount++;
 			}
 		}
+		Assert.assertTrue(diffcount > 0);
+		log.debug("mutation probability " + diffcount * 1.
+				/ (eqcount + diffcount) + " (should be "
+				+ MUTATION_PROBABILITY.doubleValue() + ")");
+
 		ScheduleFactoryTest.assertScheduleIsWithinTemplate(schedule2, template,
 				ndays);
-		Assert.assertTrue("something should have been changed", diffcount > 0);
-		log.debug("mutated parts " + eqcount + " vs " + diffcount + " --> "
-				+ diffcount * 1. / (eqcount + diffcount));
-		Assert.assertEquals(MUTATION_PROBABILITY.doubleValue(), diffcount * 1.
-				/ (eqcount + diffcount), 0.1);
 
 	}
 

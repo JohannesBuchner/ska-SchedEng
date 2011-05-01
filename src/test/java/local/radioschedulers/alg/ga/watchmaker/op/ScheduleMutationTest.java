@@ -1,4 +1,4 @@
-package local.radioschedulers.ga.wf;
+package local.radioschedulers.alg.ga.watchmaker.op;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,20 +11,18 @@ import local.radioschedulers.LSTTime;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
-import local.radioschedulers.alg.ga.watchmaker.op.AbstractScheduleMutation;
-import local.radioschedulers.alg.ga.watchmaker.op.ScheduleMutation;
-import local.radioschedulers.alg.serial.RandomizedSelector;
+import local.radioschedulers.alg.ga.watchmaker.ScheduleFactoryTest;
+import local.radioschedulers.alg.serial.PrioritizedSelector;
 import local.radioschedulers.alg.serial.SerialListingScheduler;
 import local.radioschedulers.importer.GeneratingProposalReader;
 import local.radioschedulers.preschedule.ITimelineGenerator;
 import local.radioschedulers.preschedule.SimpleTimelineGenerator;
-import local.radioschedulers.preschedule.parallel.ParallelRequirementGuard;
+import local.radioschedulers.preschedule.SingleRequirementGuard;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import static org.mockito.Mockito.*;
 import org.uncommons.maths.random.MersenneTwisterRNG;
 import org.uncommons.maths.random.Probability;
 
@@ -37,7 +35,7 @@ public class ScheduleMutationTest {
 	private int ndays = 10;
 	private Schedule schedule1;
 	private Schedule schedule2;
-	private Random rng = new MersenneTwisterRNG();
+	protected Random rng = new MersenneTwisterRNG();
 
 	protected AbstractScheduleMutation op;
 
@@ -62,10 +60,10 @@ public class ScheduleMutationTest {
 		proposals = gpr.readall();
 		Assert.assertTrue(proposals.size() > 0);
 		ITimelineGenerator tlg = new SimpleTimelineGenerator(
-				new ParallelRequirementGuard());
+				new SingleRequirementGuard());
 		template = tlg.schedule(proposals, ndays);
 		SerialListingScheduler scheduler = new SerialListingScheduler(
-				new RandomizedSelector());
+				new PrioritizedSelector());
 		schedule1 = scheduler.schedule(template);
 
 		op = getOperator();

@@ -1,4 +1,4 @@
-package local.radioschedulers.ga.wf;
+package local.radioschedulers.alg.ga.watchmaker.op;
 
 import local.radioschedulers.alg.ga.watchmaker.op.AbstractScheduleMutation;
 import local.radioschedulers.alg.ga.watchmaker.op.ScheduleSimilarPrevMutation;

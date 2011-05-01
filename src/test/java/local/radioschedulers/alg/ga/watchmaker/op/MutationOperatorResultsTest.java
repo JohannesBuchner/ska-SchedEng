@@ -14,7 +14,6 @@ import local.radioschedulers.SmallTestScenario;
 import local.radioschedulers.TestScenario;
 import local.radioschedulers.alg.serial.IdSelector;
 import local.radioschedulers.alg.serial.SerialListingScheduler;
-import local.radioschedulers.ga.wf.ScheduleCrossoverTest;
 
 import org.apache.log4j.Logger;
 import org.junit.Before;
@@ -96,7 +95,7 @@ public class MutationOperatorResultsTest {
 	@Test
 	public void testSimilarPrevMutation() throws Exception {
 		positive = 1;
-		Schedule s = apply(new ScheduleSimilarPrevMutation(space, p));
+		Schedule s = apply(new ScheduleSimilarPrevMutation(space, p, false));
 
 		int i = 0;
 		for (Entry<LSTTime, JobCombination> e : schedule) {

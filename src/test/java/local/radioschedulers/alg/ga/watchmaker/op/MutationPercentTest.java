@@ -1,4 +1,4 @@
-package local.radioschedulers.ga.wf;
+package local.radioschedulers.alg.ga.watchmaker.op;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -96,6 +96,7 @@ public class MutationPercentTest {
 
 	@Test
 	public void testSimilarPrevMutation() throws Exception {
+		/* normal constructor here, we want normalization */
 		apply(new ScheduleSimilarPrevMutation(template, testProbability));
 	}
 

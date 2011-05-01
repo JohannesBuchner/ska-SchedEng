@@ -51,7 +51,7 @@ public class JsonScheduleSpaceConverterTest {
 		StringWriter sw = new StringWriter();
 		mapper.writeValue(sw, template);
 		StringBuffer s = sw.getBuffer();
-		log.debug(s);
+		// log.debug(s);
 		// mapper.registerModule(getLSTModule());
 		ScheduleSpace space = mapper.readValue(s.toString(),
 				ScheduleSpace.class);

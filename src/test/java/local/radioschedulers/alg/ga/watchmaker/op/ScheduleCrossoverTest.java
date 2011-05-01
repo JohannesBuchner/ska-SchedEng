@@ -1,4 +1,4 @@
-package local.radioschedulers.ga.wf;
+package local.radioschedulers.alg.ga.watchmaker.op;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,7 +11,8 @@ import local.radioschedulers.LSTTime;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
-import local.radioschedulers.alg.ga.watchmaker.op.ScheduleExchangeMutation;
+import local.radioschedulers.alg.ga.watchmaker.ScheduleFactoryTest;
+import local.radioschedulers.alg.ga.watchmaker.op.ScheduleCrossover;
 import local.radioschedulers.alg.serial.RandomizedSelector;
 import local.radioschedulers.alg.serial.SerialListingScheduler;
 import local.radioschedulers.importer.GeneratingProposalReader;
@@ -26,10 +27,9 @@ import org.junit.Test;
 import org.uncommons.maths.random.MersenneTwisterRNG;
 import org.uncommons.maths.random.Probability;
 
-public class ScheduleExchangeMutationTest {
-	private static final Probability MUTATION_PROBABILITY = new Probability(0.3);
-	private static Logger log = Logger
-			.getLogger(ScheduleExchangeMutationTest.class);
+public class ScheduleCrossoverTest {
+	private static final Probability CROSSOVER_PROBABILITY = new Probability(1.);
+	private static Logger log = Logger.getLogger(ScheduleCrossoverTest.class);
 
 	private Collection<Proposal> proposals;
 	private ScheduleSpace template;
@@ -50,48 +50,55 @@ public class ScheduleExchangeMutationTest {
 		SerialListingScheduler scheduler = new SerialListingScheduler(
 				new RandomizedSelector());
 		schedule1 = scheduler.schedule(template);
+		schedule2 = scheduler.schedule(template);
 	}
 
 	@Test
-	public void testMutation() throws Exception {
+	public void testCrossover() throws Exception {
 		List<Schedule> schedules = new ArrayList<Schedule>(2);
 		schedules.add(schedule1);
+		schedules.add(schedule2);
 
-		ScheduleExchangeMutation op = new ScheduleExchangeMutation(template,
-				MUTATION_PROBABILITY);
+		ScheduleCrossover op = new ScheduleCrossover(1, CROSSOVER_PROBABILITY);
 		schedules = op.apply(schedules, rng);
-		schedule2 = schedules.get(0);
 
-		Assert.assertEquals(schedule2.findLastEntry(), schedule1
-				.findLastEntry());
+		ScheduleFactoryTest.assertScheduleIsWithinTemplate(schedule1, template,
+				ndays);
+		ScheduleFactoryTest.assertScheduleIsWithinTemplate(schedule2, template,
+				ndays);
+		ScheduleFactoryTest.assertScheduleIsWithinTemplate(schedules.get(0),
+				template, ndays);
+		ScheduleFactoryTest.assertScheduleIsWithinTemplate(schedules.get(1),
+				template, ndays);
 
-		int diffcount = 0;
 		int eqcount = 0;
-		boolean inModificationRange = false;
-		boolean hasPartner = false;
+		int neqcount = 0;
 		for (Entry<LSTTime, JobCombination> e : schedule1) {
 			LSTTime t = e.getKey();
 			JobCombination scheduleJc1 = schedule1.get(t);
 			JobCombination scheduleJc2 = schedule2.get(t);
+			JobCombination scheduleJc3 = schedules.get(0).get(t);
+			JobCombination scheduleJc4 = schedules.get(1).get(t);
 
-			if (schedEquals(scheduleJc1, scheduleJc2)) {
+			if (schedEquals(scheduleJc1, scheduleJc3)) {
+				Assert.assertTrue(schedEquals(scheduleJc2, scheduleJc4));
 				eqcount++;
 			} else {
-				diffcount++;
+				Assert.assertTrue(schedEquals(scheduleJc2, scheduleJc3));
+				Assert.assertTrue(schedEquals(scheduleJc1, scheduleJc4));
+				neqcount++;
 			}
 		}
-		Assert.assertTrue(diffcount > 0);
-		log.debug("mutation probability " + diffcount * 1.
-				/ (eqcount + diffcount) + " (should be "
-				+ MUTATION_PROBABILITY.doubleValue() + ")");
-
-		ScheduleFactoryTest.assertScheduleIsWithinTemplate(schedule2, template,
-				ndays);
-
+		log.debug("crossover parts " + eqcount + " vs " + neqcount);
+		Assert.assertTrue(eqcount != 0);
+		Assert.assertTrue(neqcount != 0);
 	}
 
-	private boolean schedEquals(JobCombination a, JobCombination b) {
-		return ScheduleCrossoverTest.schedEquals(a, b);
+	public static boolean schedEquals(JobCombination a, JobCombination b) {
+		if (a == null && b == null || a != null && a.equals(b))
+			return true;
+		else
+			return false;
 	}
 
 }

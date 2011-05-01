@@ -8,7 +8,7 @@ import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.SmallTestScenario;
 import local.radioschedulers.TestScenario;
-import local.radioschedulers.ga.wf.ScheduleFactoryTest;
+import local.radioschedulers.alg.ga.watchmaker.ScheduleFactoryTest;
 import local.radioschedulers.preschedule.RequirementGuard;
 import local.radioschedulers.preschedule.parallel.ParallelRequirementGuard;
 

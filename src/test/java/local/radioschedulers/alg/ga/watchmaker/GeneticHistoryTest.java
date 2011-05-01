@@ -1,4 +1,4 @@
-package local.radioschedulers.ga.watchmaker;
+package local.radioschedulers.alg.ga.watchmaker;
 
 import java.util.Map;
 

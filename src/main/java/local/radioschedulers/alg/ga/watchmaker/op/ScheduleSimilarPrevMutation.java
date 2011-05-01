@@ -4,11 +4,13 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 
+import org.apache.log4j.Logger;
 import org.uncommons.maths.random.Probability;
 
 /**
@@ -18,11 +20,19 @@ import org.uncommons.maths.random.Probability;
  * @author Johannes Buchner
  */
 public class ScheduleSimilarPrevMutation extends AbstractScheduleMutation {
+	private static Logger log = Logger
+			.getLogger(ScheduleSimilarPrevMutation.class);
 
 	public ScheduleSimilarPrevMutation(ScheduleSpace possibles,
 			Probability probability) {
-		super(possibles, new Probability(Math.min(1., probability.doubleValue()
-				* Schedule.LST_SLOTS_PER_HOUR)));
+		this(possibles, probability, true);
+	}
+
+	ScheduleSimilarPrevMutation(ScheduleSpace possibles,
+			Probability probability, boolean normalize) {
+		super(possibles, normalize ? new Probability(Math.min(1., probability
+				.doubleValue()
+				* Schedule.LST_SLOTS_PER_HOUR)) : probability);
 	}
 
 	@Override
@@ -39,9 +49,14 @@ public class ScheduleSimilarPrevMutation extends AbstractScheduleMutation {
 			if (!jcs.isEmpty()) {
 				if (jc != null)
 					s2.add(t, jc);
-				if (lastJc != null && !lastJc.equals(jc) && jcs.size() > 1) {
+				if (lastJc != null && !lastJc.equals(jc)
+						&& containsOneOf(jcs, lastJc)) {
 					if (mutationProbability.nextValue().nextEvent(rng)) {
+						if (log.isDebugEnabled())
+							log.debug("@" + t + " changing from " + jc);
 						jc = getMostSimilar(lastJc, jcs);
+						if (log.isDebugEnabled())
+							log.debug("@" + t + " changing  to  " + jc);
 						if (jc != null) {
 							s2.add(t, jc);
 							i++;
@@ -56,6 +71,18 @@ public class ScheduleSimilarPrevMutation extends AbstractScheduleMutation {
 		updateCounters(s2, s1, i);
 
 		return s2;
+	}
+
+	private boolean containsOneOf(Set<JobCombination> jcs, JobCombination lastJc) {
+		if (jcs.contains(lastJc))
+			return true;
+		for (Job j : lastJc.jobs) {
+			JobCombination jc = new JobCombination();
+			jc.jobs.add(j);
+			if (jcs.contains(j))
+				return true;
+		}
+		return false;
 	}
 
 }

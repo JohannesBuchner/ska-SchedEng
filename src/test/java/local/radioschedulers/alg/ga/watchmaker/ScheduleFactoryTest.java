@@ -1,4 +1,4 @@
-package local.radioschedulers.ga.wf;
+package local.radioschedulers.alg.ga.watchmaker;
 
 import java.util.Collection;
 import java.util.Random;
