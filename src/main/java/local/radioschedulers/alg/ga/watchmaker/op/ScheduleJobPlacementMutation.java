@@ -67,7 +67,8 @@ public class ScheduleJobPlacementMutation extends ScheduleSimilarMutation {
 			if (this.mutationProbability.nextValue().nextEvent(rng)) {
 				List<LSTTime> slots = possibleSlots.get(jc);
 				LSTTime t = slots.get(rng.nextInt(slots.size()));
-				log.debug("placing " + jc + " at " + t);
+				if (log.isDebugEnabled())
+					log.debug("placing " + jc + " at " + t);
 				s2.add(t, jc);
 				i += 1 + makeSimilarAround(t, jc, possibles, s2);
 			}

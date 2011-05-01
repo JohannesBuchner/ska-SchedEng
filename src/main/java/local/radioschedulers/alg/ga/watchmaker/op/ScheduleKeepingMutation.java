@@ -57,7 +57,10 @@ public class ScheduleKeepingMutation extends ScheduleSimilarMutation {
 						s2.add(t, jc);
 						toSkip = makeSimilarAround(t, jc, possibles, s2);
 						i += 1 + toSkip;
-						log.debug("mutated and made " + toSkip + " similar");
+						if (log.isDebugEnabled())
+							log
+									.debug("mutated and made " + toSkip
+											+ " similar");
 					}
 				}
 				n++;

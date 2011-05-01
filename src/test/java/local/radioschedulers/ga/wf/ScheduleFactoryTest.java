@@ -71,7 +71,7 @@ public class ScheduleFactoryTest {
 			Set<JobCombination> jcs = template.get(t);
 
 			if (jc != null && !jcs.contains(jc)) {
-				System.out.println(jc + " should be in " + jcs);
+				log.error(jc + " should be in " + jcs);
 			}
 			if (jc != null)
 				Assert

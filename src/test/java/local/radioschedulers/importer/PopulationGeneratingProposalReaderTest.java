@@ -14,10 +14,13 @@ import local.radioschedulers.Job;
 import local.radioschedulers.JobWithResources;
 import local.radioschedulers.Proposal;
 
+import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
 public class PopulationGeneratingProposalReaderTest {
+	private static Logger log = Logger
+			.getLogger(PopulationGeneratingProposalReaderTest.class);
 
 	private static final File TMPDIR = new File(
 			"target/test-classes/testoutput/");
@@ -66,7 +69,7 @@ public class PopulationGeneratingProposalReaderTest {
 
 			histhours.addItem(j.hours.intValue());
 			if (j.lstmax == null || j.lstmin == null)
-				System.out.println(j);
+				log.error(j);
 			double diff = j.lstmax - j.lstmin;
 			if (diff < 0)
 				diff = j.lstmax - j.lstmin + 24;
@@ -78,7 +81,7 @@ public class PopulationGeneratingProposalReaderTest {
 					j.hours * 1.);
 		}
 
-		System.out.println("hours:");
+		log.debug("hours:");
 		for (Bin<Integer> bin : histhours) {
 			int c = round(bin.getCount());
 			System.out.print(bin.getLow() + " .. " + bin.getHigh() + "  \t");
@@ -86,9 +89,9 @@ public class PopulationGeneratingProposalReaderTest {
 				System.out.print("C");
 				c -= 100;
 			}
-			System.out.println(" | " + bin.getCount());
+			log.debug(" | " + bin.getCount());
 		}
-		System.out.println("duration:");
+		log.debug("duration:");
 		for (Bin<Double> bin : histdurations) {
 			int c = round(bin.getCount());
 			System.out.print(bin.getLow() + " .. " + bin.getHigh() + "  \t");
@@ -107,7 +110,7 @@ public class PopulationGeneratingProposalReaderTest {
 				c -= 1;
 			}
 
-			System.out.println(" | " + bin.getCount());
+			log.debug(" | " + bin.getCount());
 		}
 		histdurations.normalize();
 		histdurationsw.normalize();
@@ -187,7 +190,7 @@ public class PopulationGeneratingProposalReaderTest {
 		for (int i = 9; i >= 0; i--) {
 			Integer border = round(10000 * Math.pow(3, -i));
 			hourhist.addBin(lastborder, border);
-			System.out.println(lastborder + " .. " + border);
+			log.debug(lastborder + " .. " + border);
 			lastborder = border;
 		}
 	}

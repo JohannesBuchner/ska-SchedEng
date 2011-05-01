@@ -39,6 +39,8 @@ public class ScheduleSimilarMutationTest {
 	private Schedule schedule2;
 	private Random rng = new MersenneTwisterRNG();
 
+	private ScheduleSimilarMutation op;
+
 	@Before
 	public void setup() throws Exception {
 		GeneratingProposalReader gpr = new GeneratingProposalReader();
@@ -51,12 +53,12 @@ public class ScheduleSimilarMutationTest {
 		SerialListingScheduler scheduler = new SerialListingScheduler(
 				new RandomizedSelector());
 		schedule1 = scheduler.schedule(template);
+		op = new ScheduleSimilarMutation(template,
+				MUTATION_PROBABILITY);
 	}
 
 	@Test
 	public void testBoth() throws Exception {
-		ScheduleSimilarMutation op = new ScheduleSimilarMutation(template,
-				MUTATION_PROBABILITY);
 		op.setBackwardsKeep(true);
 		op.setForwardsKeep(true);
 		testMutation(op);
@@ -64,8 +66,6 @@ public class ScheduleSimilarMutationTest {
 
 	@Test
 	public void testForward() throws Exception {
-		ScheduleSimilarMutation op = new ScheduleSimilarMutation(template,
-				MUTATION_PROBABILITY);
 		op.setBackwardsKeep(false);
 		op.setForwardsKeep(true);
 		testMutation(op);
@@ -73,8 +73,6 @@ public class ScheduleSimilarMutationTest {
 
 	@Test
 	public void testBackward() throws Exception {
-		ScheduleSimilarMutation op = new ScheduleSimilarMutation(template,
-				MUTATION_PROBABILITY);
 		op.setBackwardsKeep(true);
 		op.setForwardsKeep(false);
 		testMutation(op);

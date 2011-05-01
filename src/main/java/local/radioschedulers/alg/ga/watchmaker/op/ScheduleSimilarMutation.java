@@ -26,9 +26,18 @@ public class ScheduleSimilarMutation extends AbstractScheduleMutation {
 	private boolean backwardsKeep = true;
 
 	protected Probability u = new Probability(1. / 15.);
+	protected boolean normalize = true;
 
 	protected boolean normalizeProbability(Random rng) {
-		return u.nextEvent(rng);
+		if (normalize)
+			return u.nextEvent(rng);
+		else
+			return true;
+	}
+
+	/* for tests */
+	void disableNormalization() {
+		normalize = false;
 	}
 
 	private static Logger log = Logger.getLogger(ScheduleSimilarMutation.class);
@@ -74,7 +83,8 @@ public class ScheduleSimilarMutation extends AbstractScheduleMutation {
 					/* only if we have a change, we should consider it */
 					if (lastFailed || normalizeProbability(rng)
 							&& mutationProbability.nextValue().nextEvent(rng)) {
-						log.debug("mutating around " + t);
+						if (log.isDebugEnabled())
+							log.debug("mutating around " + t);
 						toSkip = makeSimilarAround(t, jc, possibles, s2);
 						i += toSkip;
 						if (toSkip == 0) {
@@ -137,7 +147,8 @@ public class ScheduleSimilarMutation extends AbstractScheduleMutation {
 					if (!jcs.isEmpty()) {
 						JobCombination jc = getMostSimilar(thisjc, jcs);
 						if (jc != null) {
-							log.debug(" new jc " + jc);
+							if (log.isDebugEnabled())
+								log.debug(" new jc " + jc);
 							s2.add(tPlus, jc);
 							// if (!jc.equals(thisjc))
 							countChanged++;
@@ -168,7 +179,8 @@ public class ScheduleSimilarMutation extends AbstractScheduleMutation {
 					if (!jcs.isEmpty()) {
 						JobCombination jc = getMostSimilar(thisjc, jcs);
 						if (jc != null) {
-							log.debug(" new jc " + jc);
+							if (log.isDebugEnabled())
+								log.debug(" new jc " + jc);
 							s2.add(tMinus, jc);
 							// if (!jc.equals(thisjc))
 							countChanged++;

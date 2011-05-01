@@ -1,4 +1,4 @@
-package local.radioschedulers.ga.wf;
+package local.radioschedulers.alg.ga.watchmaker.op;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,13 +12,9 @@ import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.SmallTestScenario;
 import local.radioschedulers.TestScenario;
-import local.radioschedulers.alg.ga.watchmaker.op.ScheduleJobPlacementMutation;
-import local.radioschedulers.alg.ga.watchmaker.op.ScheduleKeepingMutation;
-import local.radioschedulers.alg.ga.watchmaker.op.ScheduleMutation;
-import local.radioschedulers.alg.ga.watchmaker.op.ScheduleSimilarMutation;
-import local.radioschedulers.alg.ga.watchmaker.op.ScheduleSimilarPrevMutation;
 import local.radioschedulers.alg.serial.IdSelector;
 import local.radioschedulers.alg.serial.SerialListingScheduler;
+import local.radioschedulers.ga.wf.ScheduleCrossoverTest;
 
 import org.apache.log4j.Logger;
 import org.junit.Before;
@@ -72,7 +68,7 @@ public class MutationOperatorResultsTest {
 		for (Entry<LSTTime, JobCombination> e : schedule) {
 			i++;
 			LSTTime t = e.getKey();
-			System.out.println(i + "@" + t + " " + e.getValue() + " -- "
+			log.debug(i + "@" + t + " " + e.getValue() + " -- "
 					+ s.get(t));
 			// before mutation
 			if (pos == 0) {
@@ -105,8 +101,7 @@ public class MutationOperatorResultsTest {
 		int i = 0;
 		for (Entry<LSTTime, JobCombination> e : schedule) {
 			LSTTime t = e.getKey();
-			System.out
-					.println("@" + t + " " + e.getValue() + " -- " + s.get(t));
+			log.debug("@" + t + " " + e.getValue() + " -- " + s.get(t));
 			// before mutation
 			if (i < positive) {
 				Assert.assertEquals(e.getValue(), s.get(t));
@@ -161,23 +156,15 @@ public class MutationOperatorResultsTest {
 
 		ScheduleSimilarMutation op;
 		if (mut) {
-			op = new ScheduleKeepingMutation(space, p) {
-				@Override
-				protected boolean normalizeProbability(Random rng) {
-					return true;
-				}
-			};
+			op = new ScheduleKeepingMutation(space, p);
+			op.disableNormalization();
 		} else {
 			JobCombination myjc = schedule.get(new LSTTime(0,
 					9 * Schedule.LST_SLOTS_MINUTES));
 			schedule.add(tcenter, myjc);
 
-			op = new ScheduleSimilarMutation(space, p) {
-				@Override
-				protected boolean normalizeProbability(Random rng) {
-					return true;
-				}
-			};
+			op = new ScheduleSimilarMutation(space, p);
+			op.disableNormalization();
 		}
 		op.setBackwardsKeep(bw);
 		op.setForwardsKeep(fw);
@@ -187,7 +174,7 @@ public class MutationOperatorResultsTest {
 		for (Entry<LSTTime, JobCombination> e : schedule) {
 			i++;
 			LSTTime t = e.getKey();
-			System.out.println(i + "@" + t + " " + e.getValue() + " -- "
+			log.debug(i + "@" + t + " " + e.getValue() + " -- "
 					+ s.get(t));
 		}
 
@@ -212,8 +199,7 @@ public class MutationOperatorResultsTest {
 		for (Entry<LSTTime, JobCombination> e : schedule) {
 			i++;
 			LSTTime t = e.getKey();
-			System.out.println(i + "@" + t + " " + e.getValue() + " -- "
-					+ s.get(t));
+			log.debug(i + "@" + t + " " + e.getValue() + " -- " + s.get(t));
 			if (i > 6 && i < 12) {
 				Assert.assertEquals(e.getValue(), s.get(t));
 			} else {
