@@ -172,7 +172,12 @@ public class MutationOperatorResultsTest {
 					9 * Schedule.LST_SLOTS_MINUTES));
 			schedule.add(tcenter, myjc);
 
-			op = new ScheduleSimilarMutation(space, p);
+			op = new ScheduleSimilarMutation(space, p) {
+				@Override
+				protected boolean normalizeProbability(Random rng) {
+					return true;
+				}
+			};
 		}
 		op.setBackwardsKeep(bw);
 		op.setForwardsKeep(fw);

@@ -70,6 +70,8 @@ public abstract class AbstractScheduleMutation implements
 
 	private MappingFunction<JobCombination, Integer> getMappingFunction(
 			final JobCombination lastJc) {
+		if (lastJc == null)
+			throw new NullPointerException("lastJc must not be null!");
 		return new MappingFunction<JobCombination, Integer>() {
 
 			@Override
@@ -111,9 +113,14 @@ public abstract class AbstractScheduleMutation implements
 		if (jcs.size() == 1) {
 			return jcs.iterator().next();
 		}
-		jcs.remove(jc);
-		jc = (JobCombination) jcs.toArray()[rng.nextInt(jcs.size())];
-		jcs.add(jc);
-		return jc;
+		if (jc != null)
+			jcs.remove(jc);
+		JobCombination newjc = (JobCombination) jcs.toArray()[rng.nextInt(jcs
+				.size())];
+		if (newjc == null)
+			throw new NullPointerException();
+		if (jc != null)
+			jcs.add(jc);
+		return newjc;
 	}
 }

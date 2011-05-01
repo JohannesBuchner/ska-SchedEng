@@ -41,12 +41,21 @@ public class ScheduleMutationTest {
 
 	protected AbstractScheduleMutation op;
 
-	protected Probability mutationProbability;
+	protected Probability mutationProbability = new Probability(0.1);
+
+	protected int positive = 1;
 
 	@Before
 	public void setup() throws Exception {
-		mutationProbability = mock(Probability.class);
-		when(mutationProbability.nextEvent(rng)).thenReturn(true, false);
+		rng = new Random() {
+			private int i = 0;
+
+			@Override
+			public double nextDouble() {
+				i++;
+				return (i == positive ? 0. : 1.);
+			}
+		};
 
 		GeneratingProposalReader gpr = new GeneratingProposalReader();
 		gpr.fill();

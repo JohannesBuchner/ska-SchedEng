@@ -44,14 +44,16 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 
 		List<Schedule> lastPopulation = population;
 		population = null;
-		
+
 		try {
 			population = evolveSchedules(possibles, lastPopulation);
 			Schedule bestschedule = population.get(0);
 			return bestschedule;
+		} catch (NullPointerException e) {
+			log.error("Scheduling with Genetic algorithm failed", e);
+			return null;
 		} catch (Exception e) {
 			log.error(e);
-			e.printStackTrace();
 			return null;
 		}
 	}

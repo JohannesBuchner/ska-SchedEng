@@ -32,8 +32,6 @@ public class ScheduleKeepingMutation extends ScheduleSimilarMutation {
 		super(possibles, mutationProbability);
 	}
 
-	protected Probability u = new Probability(1. / 15.);
-
 	@Override
 	protected Schedule mutateSchedule(Schedule s1, Random rng) {
 		Schedule s2 = new Schedule();
