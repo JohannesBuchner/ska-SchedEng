@@ -59,10 +59,10 @@ public class ContinuousLeastChoiceScheduler extends SerialLeastChoiceScheduler {
 
 		if (!neighbors.isEmpty()) {
 			lastSlot = neighbors.remove(0);
-			log.debug("@" + lastSlot + " using neighbor");
+			// log.debug("@" + lastSlot + " using neighbor");
 		} else {
 			lastSlot = super.getNextUnassignedTimeslot();
-			log.debug("@" + lastSlot + " using least choice");
+			// log.debug("@" + lastSlot + " using least choice");
 		}
 		unassignedTimeslots.remove(lastSlot);
 		return lastSlot;
@@ -84,7 +84,8 @@ public class ContinuousLeastChoiceScheduler extends SerialLeastChoiceScheduler {
 		while (backward || forward) {
 			if (backward) {
 				LSTTime tBack = itbw.next();
-				if (unassignedTimeslots.contains(tBack) && tBack.day >= lastSlot.day - 1
+				if (unassignedTimeslots.contains(tBack)
+						&& tBack.day >= lastSlot.day - 1
 						&& choices.get(tBack).contains(jc)) {
 					neighbors.add(tBack);
 				} else {
@@ -101,8 +102,9 @@ public class ContinuousLeastChoiceScheduler extends SerialLeastChoiceScheduler {
 				}
 			}
 		}
-		log.debug("@" + lastSlot + " ... extended to " + itbw.next() + ".."
-				+ it.next());
+		if (log.isDebugEnabled())
+			log.debug("@" + lastSlot + " ... extended to " + itbw.next() + ".."
+					+ it.next());
 		return neighbors;
 	}
 }

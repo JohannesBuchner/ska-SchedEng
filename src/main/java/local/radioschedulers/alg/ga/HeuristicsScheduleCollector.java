@@ -17,16 +17,19 @@ import java.util.concurrent.TimeUnit;
 import local.radioschedulers.IScheduler;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
+import local.radioschedulers.alg.lp.ParallelLinearScheduler;
 import local.radioschedulers.alg.parallel.GreedyPressureScheduler;
 import local.radioschedulers.alg.parallel.PressureJobSortCriterion;
 import local.radioschedulers.alg.parallel.PriorityJobSortCriterion;
 import local.radioschedulers.alg.parallel.TrivialFirstParallelListingScheduler;
 import local.radioschedulers.alg.serial.ContinuousLeastChoiceScheduler;
 import local.radioschedulers.alg.serial.ContinuousUnlessOneChoiceScheduler;
+import local.radioschedulers.alg.serial.EarliestDeadlineSelector;
 import local.radioschedulers.alg.serial.ExtendingLeastChoiceScheduler;
 import local.radioschedulers.alg.serial.FairPrioritizedSelector;
 import local.radioschedulers.alg.serial.JobSelector;
 import local.radioschedulers.alg.serial.KeepingPrioritizedSelector;
+import local.radioschedulers.alg.serial.MinimumLaxitySelector;
 import local.radioschedulers.alg.serial.PrioritizedSelector;
 import local.radioschedulers.alg.serial.RandomizedSelector;
 import local.radioschedulers.alg.serial.SerialLeastChoiceScheduler;
@@ -42,6 +45,7 @@ public class HeuristicsScheduleCollector {
 
 	public static boolean PARALLEL_EXECUTION = false;
 	public static boolean SHOW_SCHEDULE = false;
+	public static boolean USE_LINEAR_SCHEDULER = false;
 
 	private static Logger log = Logger
 			.getLogger(HeuristicsScheduleCollector.class);
@@ -141,7 +145,7 @@ public class HeuristicsScheduleCollector {
 	}
 
 	private static int getNJobSelectors() {
-		return 5;
+		return 7;
 	}
 
 	private static JobSelector getJobSelector(int i) {
@@ -155,13 +159,19 @@ public class HeuristicsScheduleCollector {
 			return new RandomizedSelector();
 		if (i == 4)
 			return new FairPrioritizedSelector();
+		if (i == 5)
+			return new EarliestDeadlineSelector();
+		if (i == 6)
+			return new MinimumLaxitySelector();
 		return null;
 	}
 
 	private static List<IScheduler> getSchedulers() {
 		final List<IScheduler> schedulers = new ArrayList<IScheduler>();
 
-		// schedulers.add(new ParallelLinearScheduler());
+		if (USE_LINEAR_SCHEDULER ) {
+			schedulers.add(new ParallelLinearScheduler());
+		}
 
 		for (int i = 0; i < getNJobSelectors(); i++)
 			schedulers.add(new SerialListingScheduler(getJobSelector(i)));

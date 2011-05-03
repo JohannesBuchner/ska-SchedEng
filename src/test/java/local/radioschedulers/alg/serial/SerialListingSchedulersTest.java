@@ -24,6 +24,7 @@ import local.radioschedulers.preschedule.SimpleTimelineGenerator;
 import local.radioschedulers.preschedule.SingleRequirementGuard;
 
 import org.apache.log4j.Logger;
+import org.jgap.impl.CrossoverOperator;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +32,8 @@ import org.junit.Test;
 public class SerialListingSchedulersTest {
 
 	@SuppressWarnings("unused")
-	private static Logger log = Logger.getLogger(SerialListingSchedulersTest.class);
+	private static Logger log = Logger
+			.getLogger(SerialListingSchedulersTest.class);
 
 	public static int ndays = 10;
 
@@ -59,7 +61,8 @@ public class SerialListingSchedulersTest {
 
 	@Test
 	public void testSingleFirst() throws Exception {
-		SerialListingScheduler scheduler = new SerialListingScheduler(new FirstSelector());
+		SerialListingScheduler scheduler = new SerialListingScheduler(
+				new FirstSelector());
 		Schedule s = scheduler.schedule(template);
 		checkSchedule(s);
 	}
@@ -96,12 +99,31 @@ public class SerialListingSchedulersTest {
 		checkSchedule(s);
 	}
 
+	@Test
+	public void testSingleDeadline() throws Exception {
+		SerialListingScheduler scheduler = new SerialListingScheduler(
+				new EarliestDeadlineSelector());
+		Schedule s = scheduler.schedule(template);
+		checkSchedule(s);
+	}
+
+	@Test
+	public void testSingleLaxity() throws Exception {
+		SerialListingScheduler scheduler = new SerialListingScheduler(
+				new MinimumLaxitySelector());
+		Schedule s = scheduler.schedule(template);
+		checkSchedule(s);
+	}
+
 	private void checkSchedule(Schedule s) {
 		Assert.assertEquals("ScheduleSpace and Schedule have the same length",
 				template.findLastEntry().day, s.findLastEntry().day);
 		int i = 0;
 		int emptyCount = 0;
 		Set<Proposal> scheduledJobs = new HashSet<Proposal>();
+		double value = 0.;
+		int interrupts = 0;
+		JobCombination lastJc = null;
 		// Test correctness
 		for (Entry<LSTTime, JobCombination> e : s) {
 			Set<JobCombination> ref = template.get(e.getKey());
@@ -113,15 +135,21 @@ public class SerialListingSchedulersTest {
 						ref.contains(actual));
 
 				i++;
+				value += actual.calculatePriority();
 				for (Job j : actual.jobs) {
 					scheduledJobs.add(j.proposal);
 				}
 			}
+			if (lastJc == null && actual == null
+					|| (lastJc != null && lastJc.equals(actual)))
+				interrupts++;
+			lastJc = actual;
 		}
 
 		// Test if it is any good
 		Assert.assertTrue("Job slots filled: " + i, i > ndays);
 		Assert.assertTrue("Jobs scheduled: " + scheduledJobs.size() + " of "
 				+ proposals.size(), scheduledJobs.size() > 1);
+		log.info("value " + value + " interrupts: " + interrupts);
 	}
 }

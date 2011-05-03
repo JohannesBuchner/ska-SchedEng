@@ -29,7 +29,8 @@ public class ExtendingLeastChoiceScheduler extends SerialLeastChoiceScheduler {
 	@Override
 	protected void choose(LSTTime t, JobCombination jc, Schedule s) {
 		// handle this slot
-		log.debug("assigning @" + t + " :: " + jc);
+		if (log.isDebugEnabled())
+			log.debug("assigning @" + t + " :: " + jc);
 		super.choose(t, jc, s);
 
 		// if (timeslotsByChoice.containsKey(1))
@@ -54,7 +55,8 @@ public class ExtendingLeastChoiceScheduler extends SerialLeastChoiceScheduler {
 				if (unassignedTimeslots.contains(tBack)
 						&& tBack.day >= t.day - 1
 						&& choices.get(tBack).contains(jc) && !isFinished(jc)) {
-					log.debug("extending backwards @" + tBack);
+					if (log.isDebugEnabled())
+						log.debug("extending backwards @" + tBack);
 					super.choose(tBack, jc, s);
 				} else {
 					backward = false;
@@ -64,7 +66,8 @@ public class ExtendingLeastChoiceScheduler extends SerialLeastChoiceScheduler {
 				LSTTime tFw = it.next();
 				if (unassignedTimeslots.contains(tFw) && it.hasNext()
 						&& choices.get(tFw).contains(jc) && !isFinished(jc)) {
-					log.debug("extending forwards @" + tFw);
+					if (log.isDebugEnabled())
+						log.debug("extending forwards @" + tFw);
 					super.choose(tFw, jc, s);
 				} else {
 					forward = false;

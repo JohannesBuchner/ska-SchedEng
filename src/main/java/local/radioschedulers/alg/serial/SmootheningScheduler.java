@@ -25,6 +25,11 @@ public class SmootheningScheduler extends ListingScheduler {
 		this.scheduler = scheduler;
 	}
 
+	@Override
+	public String toString() {
+		return this.scheduler.toString() + " (smoothened)";
+	}
+
 	private static Logger log = Logger.getLogger(SmootheningScheduler.class);
 
 	@Override
@@ -66,7 +71,8 @@ public class SmootheningScheduler extends ListingScheduler {
 				LSTTime tBack = itbw.next();
 				if (s.isEmpty(tBack) && tBack.day >= t.day - 1
 						&& timeline.get(tBack).contains(jc) && !isFinished(jc)) {
-					log.debug("extending backwards @" + tBack);
+					if (log.isDebugEnabled())
+						log.debug("extending backwards @" + tBack);
 					s.add(tBack, jc);
 					reduceTimeleft(jc);
 				} else {
@@ -77,7 +83,8 @@ public class SmootheningScheduler extends ListingScheduler {
 				LSTTime tFw = it.next();
 				if (s.isEmpty(tFw) && it.hasNext()
 						&& timeline.get(tFw).contains(jc) && !isFinished(jc)) {
-					log.debug("extending forwards @" + tFw);
+					if (log.isDebugEnabled())
+						log.debug("extending forwards @" + tFw);
 					s.add(tFw, jc);
 					reduceTimeleft(jc);
 				} else {

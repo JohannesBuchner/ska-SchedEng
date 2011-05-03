@@ -53,7 +53,6 @@ public abstract class CompatibleJobFactory {
 
 		HashMap<LSTTime, Set<Job>> possibles = new HashMap<LSTTime, Set<Job>>();
 
-		log.debug("Possibles:");
 		for (Job j : alljobs) {
 			for (int slot = 0; slot < ScheduleSpace.LST_SLOTS_PER_DAY; slot++) {
 				long minute = (((int) Math.ceil(j.lstmin * 60
