@@ -38,7 +38,7 @@ public class SmootheningScheduler extends ListingScheduler {
 	}
 
 	@Override
-	public Schedule doSchedule(ScheduleSpace timeline, Schedule s) {
+	protected Schedule doSchedule(ScheduleSpace timeline, Schedule s) {
 		timeleft.clear();
 		super.fillTimeleft(timeline);
 		Schedule s2 = new Schedule();

@@ -2,7 +2,6 @@ package local.radioschedulers.alg.serial;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -59,7 +58,7 @@ public class SerialListingScheduler extends ListingScheduler {
 	 * 
 	 * @see IScheduler#schedule(java.util.Collection)
 	 */
-	public Schedule doSchedule(ScheduleSpace timeline, Schedule s) {
+	protected Schedule doSchedule(ScheduleSpace timeline, Schedule s) {
 		while (!possibleSlots.isEmpty()) {
 			LSTTime t = getNextUnassignedTimeslot();
 			if (t == null)
@@ -100,11 +99,7 @@ public class SerialListingScheduler extends ListingScheduler {
 	}
 
 	protected JobCombination select(Collection<JobCombination> jcs) {
-		Collection<JobCombination> jc = this.jobselector.select(jcs);
-		Iterator<JobCombination> it = jc.iterator();
-		if (!it.hasNext())
-			return null;
-		return jc.iterator().next();
+		return this.jobselector.select(jcs);
 	}
 
 }

@@ -1,7 +1,5 @@
 package local.radioschedulers.alg.serial;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
@@ -42,23 +40,12 @@ public class FairPrioritizedSelector extends JobSelector {
 	}
 
 	@Override
-	public Collection<JobCombination> select(Collection<JobCombination> list) {
-		List<JobCombination> jobs = pruneDone(list);
-		if (jobs.isEmpty())
-			return jobs;
-
-		List<JobCombination> selected = new ArrayList<JobCombination>();
+	protected JobCombination doSelect(List<JobCombination> jobs) {
 		while (!jobs.isEmpty()) {
 			Double priototal = 0.;
 			for (JobCombination jc : jobs) {
 				for (Job j : jc.jobs) {
-					if (j.proposal.mustcomplete) {
-						selected.add(jc);
-						jobs.remove(jc);
-						break;
-					} else {
-						priototal += j.proposal.priority;
-					}
+					priototal += j.proposal.priority;
 				}
 			}
 			// throw a coin (on which job it lands is proportional to the
@@ -68,13 +55,10 @@ public class FairPrioritizedSelector extends JobSelector {
 				coin -= jc.calculatePriority();
 				if (coin <= 0) {
 					// pick this job
-					selected.add(jc);
-					jobs.remove(jc);
-					break;
+					return jc;
 				}
 			}
 		}
-
-		return selected;
+		throw new IllegalStateException("coin flew away");
 	}
 }

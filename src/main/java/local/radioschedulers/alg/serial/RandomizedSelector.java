@@ -1,8 +1,7 @@
 package local.radioschedulers.alg.serial;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import local.radioschedulers.JobCombination;
 
@@ -12,11 +11,12 @@ import local.radioschedulers.JobCombination;
  * @author Johannes Buchner
  */
 public class RandomizedSelector extends JobSelector {
+
+	private Random rng = new Random();
+
 	@Override
-	public Collection<JobCombination> select(Collection<JobCombination> list) {
-		List<JobCombination> jobs = pruneDone(list);
-		Collections.shuffle(jobs);
-		return super.select(jobs);
+	protected JobCombination doSelect(List<JobCombination> list) {
+		return list.get(rng.nextInt(list.size()));
 	}
 
 }

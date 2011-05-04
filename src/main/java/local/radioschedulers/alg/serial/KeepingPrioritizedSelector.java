@@ -1,8 +1,7 @@
 package local.radioschedulers.alg.serial;
 
-import java.util.Collection;
 import java.util.Comparator;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import local.radioschedulers.Job;
@@ -41,16 +40,14 @@ public class KeepingPrioritizedSelector extends PrioritizedSelector {
 
 			private int compareContinuedCount(JobCombination o1,
 					JobCombination o2) {
-				Integer continued1 = countContinuedJobs(lastJobCombination,
-						o1);
-				Integer continued2 = countContinuedJobs(lastJobCombination,
-						o2);
+				Integer continued1 = countContinuedJobs(lastJobCombination, o1);
+				Integer continued2 = countContinuedJobs(lastJobCombination, o2);
 				int v = continued2.compareTo(continued1);
 				return v;
 			}
 
-			private Integer countContinuedJobs(
-					JobCombination lastjc, JobCombination jc) {
+			private Integer countContinuedJobs(JobCombination lastjc,
+					JobCombination jc) {
 				int count = 0;
 				for (Job j : lastjc.jobs) {
 					if (jc.jobs.contains(j))
@@ -62,12 +59,8 @@ public class KeepingPrioritizedSelector extends PrioritizedSelector {
 	}
 
 	@Override
-	public Collection<JobCombination> select(Collection<JobCombination> list) {
-		Collection<JobCombination> l = super.select(list);
-		Iterator<JobCombination> it = l.iterator();
-		if (it.hasNext()) {
-			lastJobCombination = it.next();
-		}
-		return l;
+	protected JobCombination doSelect(List<JobCombination> jobs) {
+		lastJobCombination = super.doSelect(jobs);
+		return lastJobCombination;
 	}
 }

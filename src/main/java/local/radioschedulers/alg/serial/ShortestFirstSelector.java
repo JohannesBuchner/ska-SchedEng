@@ -1,6 +1,5 @@
 package local.radioschedulers.alg.serial;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -46,9 +45,8 @@ public class ShortestFirstSelector extends JobSelector {
 	};
 
 	@Override
-	public Collection<JobCombination> select(Collection<JobCombination> list) {
-		List<JobCombination> jobs = pruneDone(list);
-		Collections.sort(jobs, cmp);
-		return super.select(jobs);
+	protected JobCombination doSelect(List<JobCombination> list) {
+		Collections.sort(list, cmp);
+		return list.get(0);
 	};
 }

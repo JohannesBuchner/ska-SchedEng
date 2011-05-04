@@ -18,7 +18,7 @@ import local.radioschedulers.LSTTime;
  * 
  * @author Johannes Buchner
  */
-public class JobSelector {
+public abstract class JobSelector {
 
 	protected Map<Job, Double> timeleft;
 	protected Map<Job, List<LSTTime>> possibles;
@@ -31,15 +31,31 @@ public class JobSelector {
 	}
 
 	/**
-	 * Brings the given list in order of preference
+	 * Selects a non-completed job from the list by preference
 	 * 
 	 * @param list
 	 *            must not be modified
 	 * @return ordered list
 	 */
-	public Collection<JobCombination> select(Collection<JobCombination> list) {
-		return pruneDone(list);
+	public JobCombination select(Collection<JobCombination> list) {
+		List<JobCombination> unfinished = pruneDone(list);
+		if (unfinished.isEmpty())
+			return null;
+		if (unfinished.size() == 1)
+			return unfinished.get(0);
+		else
+			return doSelect(unfinished);
 	}
+
+	/**
+	 * Selects a job from the list by preference
+	 * 
+	 * @param list
+	 *            list of jobs to choose from. is guarranteed to contain at
+	 *            least 2 items
+	 * @return preferred job
+	 */
+	protected abstract JobCombination doSelect(List<JobCombination> list);
 
 	/**
 	 * returns elements in the list that have not completed yet.
@@ -52,13 +68,13 @@ public class JobSelector {
 				if (!timeleft.containsKey(j) || timeleft.get(j) <= 0) {
 					complete = true;
 				}
-	}
+			}
 			if (!complete)
 				selected.add(jc);
 		}
 		return selected;
 	}
-	
+
 	@Override
 	public String toString() {
 		return getClass().getSimpleName();
