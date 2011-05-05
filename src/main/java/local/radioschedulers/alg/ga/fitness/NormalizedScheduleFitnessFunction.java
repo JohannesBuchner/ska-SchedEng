@@ -23,6 +23,10 @@ public class NormalizedScheduleFitnessFunction extends
 
 	protected Double normalization = 1.;
 
+	public Double getNormalization() {
+		return normalization;
+	}
+
 	public void setupNormalization(ScheduleSpace timeline,
 			Collection<Proposal> proposals) {
 		Map<Double, Double> priorityHours = new TreeMap<Double, Double>();
