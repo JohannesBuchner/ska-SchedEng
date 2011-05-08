@@ -1,7 +1,6 @@
 package local.radioschedulers.alg.parallel;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -9,6 +8,7 @@ import java.util.Map.Entry;
 
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
+import local.radioschedulers.LSTMap;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
@@ -58,7 +58,7 @@ public class GreedyPressureScheduler extends ParallelListingScheduler {
 
 	@Override
 	protected Schedule doSchedule(ScheduleSpace timeline, Schedule s) {
-		pressureOrderedTasks = new HashMap<LSTTime, List<Job>>();
+		pressureOrderedTasks = new LSTMap<List<Job>>();
 		super.doSchedule(timeline, s);
 		assignTasks(timeline, s, pressureOrderedTasks);
 		return s;

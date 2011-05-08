@@ -22,6 +22,9 @@ public class LSTTime implements Comparable<LSTTime> {
 		if (this.minute > Schedule.MINUTES_PER_DAY)
 			throw new IllegalArgumentException("minute argument too large: "
 					+ this.minute);
+		if (this.minute < 0)
+			throw new IllegalArgumentException("minute argument too small: "
+					+ this.minute);
 	}
 
 	public LSTTime(String s) {
@@ -105,4 +108,20 @@ public class LSTTime implements Comparable<LSTTime> {
 		return true;
 	}
 
+	public static LSTTime add(LSTTime a, LSTTime b) {
+		long min = a.minute + b.minute;
+		long days = min / Schedule.MINUTES_PER_DAY;
+		min = min % Schedule.MINUTES_PER_DAY;
+		return new LSTTime(a.day + b.day + days, min);
+	}
+
+	public static LSTTime minus(LSTTime a, LSTTime b) {
+		long min = a.minute - b.minute;
+		long days = 0;
+		if (min < 0) {
+			min += Schedule.MINUTES_PER_DAY;
+			days--;
+		}
+		return new LSTTime(a.day - b.day + days, min);
+	}
 }

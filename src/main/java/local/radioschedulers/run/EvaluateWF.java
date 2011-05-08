@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import local.radioschedulers.Schedule;
@@ -100,7 +101,7 @@ public class EvaluateWF extends EvaluateGA {
 
 		printContributions(population, history, counter);
 
-		compareInitialAndFinalPopulations(schedules, f, population);
+		// compareInitialAndFinalPopulations(schedules, f, population);
 		return population;
 	}
 

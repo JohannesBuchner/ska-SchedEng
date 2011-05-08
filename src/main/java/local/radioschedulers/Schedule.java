@@ -1,9 +1,7 @@
 package local.radioschedulers;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
 
@@ -24,7 +22,10 @@ public class Schedule implements Iterable<Entry<LSTTime, JobCombination>> {
 	public static final int MINUTES_PER_DAY = 60 * 24;
 
 	@JsonProperty
-	private Map<LSTTime, JobCombination> content = new TreeMap<LSTTime, JobCombination>();
+	private Map<LSTTime, JobCombination> content = new LSTMap<JobCombination>();
+
+	@JsonIgnore
+	private LSTTime last = new LSTTime(0, 0);
 
 	public void clear(LSTTime t) {
 		content.remove(t);
@@ -33,8 +34,11 @@ public class Schedule implements Iterable<Entry<LSTTime, JobCombination>> {
 	public void add(LSTTime t, JobCombination jc) {
 		if (jc == null)
 			clear(t);
-		else
+		else {
 			content.put(t, jc);
+			if (t.isAfter(last))
+				last = new LSTTime(t.day, t.minute);
+		}
 	}
 
 	public boolean isEmpty(LSTTime t) {
@@ -52,7 +56,7 @@ public class Schedule implements Iterable<Entry<LSTTime, JobCombination>> {
 		if (content.isEmpty()) {
 			return new LSTTime(0, 0);
 		} else {
-			return Collections.max(content.keySet());
+			return last;
 		}
 	}
 

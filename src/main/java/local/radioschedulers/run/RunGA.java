@@ -35,9 +35,10 @@ import org.uncommons.watchmaker.framework.PopulationData;
 
 public class RunGA {
 	private static int ndays = 365 / 2;
-	private static final File outputDir = new File("/tmp");
-	private static final boolean WRITE_PROPOSALS = false;
-	private static final boolean WRITE_SCHEDULES = false;
+	private static final File outputDir = new File(".");
+	private static final boolean WRITE_PROPOSALS = true;
+	private static final boolean READ_SCHEDULES = true;
+	private static final boolean WRITE_SCHEDULES = true;
 
 	public static void main(String[] args) throws Exception {
 		IProposalReader pr = getProposalReader();
@@ -55,21 +56,30 @@ public class RunGA {
 				new ParallelRequirementGuard());
 		ScheduleSpace template = tlg.schedule(proposals, ndays);
 
-		CsvScheduleReader csv;
+		CsvScheduleReader csv = getScheduleReader(proposals);
 		if (WRITE_SCHEDULES) {
-			csv = getScheduleReader(proposals);
 			csv.write(template);
 		}
 
-		Map<IScheduler, Schedule> schedules = HeuristicsScheduleCollector
-				.getStartSchedules(template);
-
-		Map<String, Schedule> schedules2 = new HashMap<String, Schedule>();
-		for (Entry<IScheduler, Schedule> e : schedules.entrySet()) {
-			schedules2.put(e.getKey().toString(), e.getValue());
+		Map<String, Schedule> schedules = null;
+		if (READ_SCHEDULES) {
+			try {
+				schedules = csv.readall();
+			} catch (IOException e) {
+			} catch (NullPointerException e) {
+			}
 		}
-		if (WRITE_SCHEDULES) {
-			csv.write(schedules2);
+		if (schedules == null || schedules.isEmpty()) {
+			Map<IScheduler, Schedule> schedules2 = HeuristicsScheduleCollector
+					.getStartSchedules(template);
+
+			schedules = new HashMap<String, Schedule>();
+			for (Entry<IScheduler, Schedule> e : schedules2.entrySet()) {
+				schedules.put(e.getKey().toString(), e.getValue());
+			}
+			if (WRITE_SCHEDULES) {
+				csv.write(schedules);
+			}
 		}
 
 		ScheduleFitnessFunction fitness = getFitnessFunction();
@@ -86,7 +96,7 @@ public class RunGA {
 		PrintWriter o = new PrintWriter(index);
 		o.println("<h2>Initial results</h2>");
 		o.println("<ul>");
-		for (Entry<IScheduler, Schedule> e : schedules.entrySet()) {
+		for (Entry<String, Schedule> e : schedules.entrySet()) {
 			Schedule s = e.getValue();
 			String name = e.getKey().toString();
 			File f = export(name, "schedule_" + i, s);
@@ -106,7 +116,7 @@ public class RunGA {
 		scheduler.schedule(template);
 
 		o.println("<h2>GA survivors</h2>");
-		o.println("<strong><a href='/tmp/schedule_" + i
+		o.println("<strong><a href='schedule_" + i
 				+ ".html'>&quot;Best&quot; schedule<a></strong>");
 
 		o.println("<h3>GA survivors</h3>");
@@ -154,17 +164,17 @@ public class RunGA {
 		scheduler.setEliteSize(1);
 
 		scheduler.setCrossoverProbability(0.1);
-		scheduler.setMutationProbability(0.0);
+		scheduler.setMutationProbability(0.08);
 
-		scheduler.setDoubleCrossoverProbability(0.2);
-		scheduler.setCrossoverDays(3);
+		scheduler.setDoubleCrossoverProbability(0.01);
+		scheduler.setCrossoverDays(7);
 
-		scheduler.setMutationKeepingProbability(0.03);
+		scheduler.setMutationKeepingProbability(0.01);
 		scheduler.setMutationSimilarForwardsProbability(0.03);
-		scheduler.setMutationSimilarBackwardsProbability(0.03);
+		scheduler.setMutationSimilarBackwardsProbability(0.02);
 		scheduler.setMutationSimilarPrevProbability(0.03);
 		scheduler.setMutationExchangeProbability(0.03);
-		scheduler.setMutationJobPlacementProbability(0.1);
+		scheduler.setMutationJobPlacementProbability(0.08);
 
 		scheduler.setObserver(new EvolutionObserver<Schedule>() {
 

@@ -9,13 +9,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
-
 import local.radioschedulers.Job;
 import local.radioschedulers.JobCombination;
+import local.radioschedulers.LSTMap;
 import local.radioschedulers.LSTTime;
 import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.preschedule.RequirementGuard;
+
+import org.apache.log4j.Logger;
 
 public abstract class CompatibleJobFactory {
 	static Logger log = Logger.getLogger(CompatibleJobFactory.class);
@@ -51,7 +52,7 @@ public abstract class CompatibleJobFactory {
 	public ScheduleSpace getPossibleTimeLine(Collection<Job> alljobs) {
 		ScheduleSpace timeline;
 
-		HashMap<LSTTime, Set<Job>> possibles = new HashMap<LSTTime, Set<Job>>();
+		Map<LSTTime, Set<Job>> possibles = new LSTMap<Set<Job>>();
 
 		for (Job j : alljobs) {
 			for (int slot = 0; slot < ScheduleSpace.LST_SLOTS_PER_DAY; slot++) {

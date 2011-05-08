@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
 
@@ -26,7 +25,7 @@ public class ScheduleSpace implements
 	public static final int LST_SLOTS_PER_DAY = 60 * 24 / LST_SLOTS_MINUTES;
 
 	@JsonProperty
-	private Map<LSTTime, JobCombinationChoice> possibles = new TreeMap<LSTTime, JobCombinationChoice>();
+	private Map<LSTTime, JobCombinationChoice> possibles = new LSTMap<JobCombinationChoice>();
 
 	@JsonIgnore
 	private LSTTime last = new LSTTime(0, 0);
