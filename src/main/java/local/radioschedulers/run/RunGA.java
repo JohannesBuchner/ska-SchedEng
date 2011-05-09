@@ -139,10 +139,6 @@ public class RunGA {
 		scheduler.schedule(template);
 
 		o.println("<h2>GA survivors</h2>");
-		o.println("<strong><a href='schedule_" + i
-				+ ".html'>&quot;Best&quot; schedule<a></strong>");
-
-		o.println("<h3>GA survivors</h3>");
 		o.println("<ul>");
 		int j = 1;
 		for (Schedule s : scheduler.getPopulation()) {
@@ -154,6 +150,7 @@ public class RunGA {
 					+ "'"
 					+ (fv >= goodFitnessLimit ? " style='font-weight:bold'"
 							: "") + ">" + formatFitness(fv) + " -- " + name
+					+ (j == 1 ? " (&quot;Best&quot; schedule)" : "")
 					+ "</a></li>");
 			oq.println(fv + "\t" + observatoryFitness.evaluate(s) + "\t"
 					+ observerFitness.evaluate(s) + "\t" + name);
@@ -271,8 +268,8 @@ public class RunGA {
 		// scheduler.setMutationSimilarForwardsProbability(0.03);
 		// scheduler.setMutationSimilarBackwardsProbability(0.02);
 		// scheduler.setMutationSimilarPrevProbability(0.03);
-		scheduler.setMutationExchangeProbability(0.05);
-		scheduler.setMutationJobPlacementProbability(0.02);
+		scheduler.setMutationExchangeProbability(0.01);
+		scheduler.setMutationJobPlacementProbability(0.01);
 
 		scheduler.setObserver(new EvolutionObserver<Schedule>() {
 
