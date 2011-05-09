@@ -23,7 +23,7 @@ public class CsvExport implements IExport {
 			if (e.getValue() == null)
 				continue;
 			p.append(e.getKey().toString());
-			p.append("; ");
+			p.append(";");
 			for (Job j : e.getValue().jobs) {
 				p.append(j.proposal.id);
 				p.append(".");

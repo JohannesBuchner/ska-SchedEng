@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import local.radioschedulers.Schedule;
@@ -52,7 +51,7 @@ public class EvaluateWF extends EvaluateGA {
 		wfs.setCounter(counter);
 		GeneticAlgorithmScheduler scheduler = wfs;
 		scheduler.setNumberOfGenerations(numberOfEvaluations / populationSize);
-		scheduler.setEliteSize(1);
+		scheduler.setEliteSize(2);
 		scheduler.setCrossoverProbability(crossoverProb);
 		scheduler.setMutationProbability(mutationProb);
 		scheduler.setPopulationSize(populationSize);

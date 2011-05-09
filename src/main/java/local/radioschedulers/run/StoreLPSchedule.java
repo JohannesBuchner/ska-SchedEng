@@ -34,14 +34,15 @@ public class StoreLPSchedule {
 		int maxParallel = 4;
 		if (args.length >= 2)
 			maxParallel = Integer.parseInt(args[1]);
-		schedulesFile = new File("schedule_testset_ndays-" + ndays
-				+ "_oversubs-" + oversubscriptionFactor + "_parallel-"
-				+ maxParallel + ".csv");
-		schedulesHtmlFile = new File("schedule_testset_ndays-" + ndays
-				+ "_oversubs-" + oversubscriptionFactor + "_parallel-"
-				+ maxParallel + ".html");
-		spaceFile = new File("space_testset_ndays-" + ndays + "_oversubs-"
-				+ oversubscriptionFactor + "_parallel-" + maxParallel + ".csv");
+		PropertiesContext.addReplacement("ndays", ndays + "");
+		PropertiesContext.addReplacement("oversubs", oversubscriptionFactor
+				+ "");
+		PropertiesContext.addReplacement("parallel", maxParallel + "");
+
+		schedulesFile = new File(PropertiesContext.schedulesFilename());
+		schedulesHtmlFile = new File(PropertiesContext.schedulesFilename()
+				.replace(".csv", ".html"));
+		spaceFile = new File(PropertiesContext.spaceFilename());
 
 		IProposalReader pr = getProposalReader();
 		Collection<Proposal> proposals = pr.readall();
@@ -88,8 +89,7 @@ public class StoreLPSchedule {
 		// PopulationGeneratingProposalReader();
 		// pr.fill((int) (ndays * oversubscriptionFactor));
 		JsonProposalReader pr = new JsonProposalReader(new File(
-				"proposals_testset_ndays-" + ndays + "_oversubs-"
-						+ oversubscriptionFactor + ".json"));
+				PropertiesContext.proposalsFilename()));
 		return pr;
 	}
 

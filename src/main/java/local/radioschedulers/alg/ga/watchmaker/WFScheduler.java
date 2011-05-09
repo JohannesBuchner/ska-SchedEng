@@ -85,7 +85,8 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 
 		PopulationEvolutionEngine<Schedule> engine = new PopulationEvolutionEngine<Schedule>(
 				factory, pipeline, fitness, selection, rng);
-
+		engine.setSingleThreaded(true);
+		
 		if (observer != null)
 			engine.addEvolutionObserver(observer);
 

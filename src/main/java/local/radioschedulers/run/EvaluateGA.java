@@ -1,6 +1,7 @@
 package local.radioschedulers.run;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -8,6 +9,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Map.Entry;
 
 import local.radioschedulers.Job;
@@ -17,6 +19,7 @@ import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.alg.ga.ScheduleFitnessFunction;
+import local.radioschedulers.alg.ga.fitness.NormalizedScheduleFitnessFunction;
 import local.radioschedulers.alg.ga.fitness.SimpleScheduleFitnessFunction;
 import local.radioschedulers.importer.CsvScheduleReader;
 import local.radioschedulers.importer.IProposalReader;
@@ -47,11 +50,15 @@ public abstract class EvaluateGA {
 	protected double mutationPlacementProb = 0.;
 	private boolean simpleFitnessFunction = true;
 
-	private ScheduleFitnessFunction getFitnessFunction() {
+	private ScheduleFitnessFunction getFitnessFunction(
+			Collection<Proposal> proposals, ScheduleSpace timeline) {
 		if (simpleFitnessFunction) {
 			SimpleScheduleFitnessFunction f = new SimpleScheduleFitnessFunction();
 			f.setSwitchLostMinutes(15);
-			return f;
+			NormalizedScheduleFitnessFunction n = new NormalizedScheduleFitnessFunction(
+					f);
+			n.setupNormalization(timeline, proposals);
+			return n;
 		}
 		throw new IllegalStateException("no other fitness function known!");
 	}
@@ -147,6 +154,11 @@ public abstract class EvaluateGA {
 	}
 
 	public void run() throws Exception {
+		PropertiesContext.addReplacement("ndays", ndays + "");
+		PropertiesContext.addReplacement("oversubs", oversubscriptionFactor
+				+ "");
+		PropertiesContext.addReplacement("parallel", maxParallel + "");
+
 		PrintStream ps = getOutputFile("ga-settings.txt");
 		logSettings(ps);
 
@@ -154,7 +166,7 @@ public abstract class EvaluateGA {
 		Collection<Proposal> proposals = pr.readall();
 
 		log.debug("loading schedule space");
-		CsvScheduleReader sr = getScheduleReader(maxParallel, proposals);
+		CsvScheduleReader sr = getScheduleReader(proposals);
 		ScheduleSpace template = sr.readspace();
 		log.debug("loaded schedule space");
 
@@ -162,7 +174,7 @@ public abstract class EvaluateGA {
 		Map<String, Schedule> schedules = readSchedules(sr);
 		log.debug("loaded heuristic initial population");
 
-		ScheduleFitnessFunction f = getFitnessFunction();
+		ScheduleFitnessFunction f = getFitnessFunction(proposals, template);
 
 		List<Schedule> lastPopulation;
 		PrintStream p = getOutputFile("ga-population-development.txt");
@@ -278,21 +290,26 @@ public abstract class EvaluateGA {
 		// PopulationGeneratingProposalReader pr = new
 		// PopulationGeneratingProposalReader();
 		// pr.fill((int) (ndays * oversubscriptionFactor));
-		File f;
-		f = new File("proposals_testset_ndays-" + ndays + "_oversubs-"
-				+ oversubscriptionFactor + ".json");
-		// f = new File("proposals_testset_mopra.json");
-		JsonProposalReader pr = new JsonProposalReader(f);
+
+		JsonProposalReader pr = new JsonProposalReader(new File(
+				PropertiesContext.proposalsFilename()));
 		return pr;
 	}
 
-	private CsvScheduleReader getScheduleReader(int maxParallel,
-			Collection<Proposal> proposals) {
-		File schedulesFile = new File("schedule_testset_ndays-" + ndays
-				+ "_oversubs-" + oversubscriptionFactor + "_parallel-"
-				+ maxParallel + ".csv");
-		File spaceFile = new File("space_testset_ndays-" + ndays + "_oversubs-"
-				+ oversubscriptionFactor + "_parallel-" + maxParallel + ".csv");
+	private CsvScheduleReader getScheduleReader(Collection<Proposal> proposals)
+			throws IOException {
+		File schedulesFile;
+		// = new File("schedule_testset_ndays-" + ndays
+		// + "_oversubs-" + oversubscriptionFactor + "_parallel-"
+		// + maxParallel + ".csv");
+		File spaceFile;
+		// = new File("space_testset_ndays-" + ndays + "_oversubs-"
+		// + oversubscriptionFactor + "_parallel-" + maxParallel + ".csv");
+		Properties p = new Properties();
+		p.load(new FileInputStream("run.properties"));
+		schedulesFile = new File(PropertiesContext.schedulesFilename());
+		spaceFile = new File(PropertiesContext.spaceFilename());
+
 		CsvScheduleReader csv = new CsvScheduleReader(schedulesFile, spaceFile,
 				proposals);
 		// CsvScheduleReader csv = new CsvScheduleReader(new File(

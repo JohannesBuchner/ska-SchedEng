@@ -7,6 +7,7 @@ import java.util.List;
 
 import local.radioschedulers.Job;
 import local.radioschedulers.Proposal;
+import local.radioschedulers.importer.IProposalReader;
 import local.radioschedulers.importer.JsonProposalReader;
 import local.radioschedulers.importer.PopulationGeneratingProposalReader;
 
@@ -20,17 +21,33 @@ public class StoreProposals {
 	public static void main(String[] args) throws Exception {
 		if (args.length == 1)
 			oversubscriptionFactor = Double.parseDouble(args[0]);
+		PropertiesContext.addReplacement("ndays", ndays + "");
+		PropertiesContext.addReplacement("oversubs", oversubscriptionFactor
+				+ "");
 
-		PopulationGeneratingProposalReader pr = new PopulationGeneratingProposalReader();
-		pr.fill((int) (ndays * oversubscriptionFactor));
+		IProposalReader pr = getProposalReader();
 		Collection<Proposal> proposals = pr.readall();
 
 		JsonProposalReader json = new JsonProposalReader(new File(
-				"proposals_testset_ndays-" + ndays + "_oversubs-"
-						+ oversubscriptionFactor + ".json"));
+				PropertiesContext.proposalsFilename()));
 		json.write(proposals);
 
 		checkProposals(proposals, json.readall());
+	}
+
+	private static IProposalReader getProposalReader() throws Exception {
+		try {
+			File f = new File(PropertiesContext.proposalsFilename());
+			if (f.exists()) {
+				return new JsonProposalReader(f);
+			}
+		} catch (Exception e) {
+			log.error(e);
+		}
+
+		PopulationGeneratingProposalReader pr = new PopulationGeneratingProposalReader();
+		pr.fill((int) (ndays * oversubscriptionFactor));
+		return pr;
 	}
 
 	private static void checkProposals(Collection<Proposal> proposals,
