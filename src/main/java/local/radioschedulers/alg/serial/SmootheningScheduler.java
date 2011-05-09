@@ -57,8 +57,8 @@ public class SmootheningScheduler extends ListingScheduler {
 		reduceTimeleft(jc);
 
 		// find neighbors
-		LSTTimeIterator itbw = new LSTTimeIterator(t, new LSTTime(t.day + 1,
-				t.minute), -ScheduleSpace.LST_SLOTS_MINUTES);
+		LSTTimeIterator itbw = new LSTTimeIterator(t, new LSTTime(0, 0),
+				-ScheduleSpace.LST_SLOTS_MINUTES);
 		itbw.next();
 		LSTTimeIterator it = new LSTTimeIterator(t, new LSTTime(t.day + 1,
 				t.minute), ScheduleSpace.LST_SLOTS_MINUTES);
@@ -67,31 +67,28 @@ public class SmootheningScheduler extends ListingScheduler {
 		boolean backward = true;
 		boolean forward = true;
 		while (backward || forward) {
-			if (backward) {
-				LSTTime tBack = itbw.next();
-				if (s.isEmpty(tBack) && tBack.day >= t.day - 1
-						&& timeline.get(tBack).contains(jc) && !isFinished(jc)) {
-					if (log.isDebugEnabled())
-						log.debug("extending backwards @" + tBack);
-					s.add(tBack, jc);
-					reduceTimeleft(jc);
-				} else {
-					backward = false;
-				}
+			backward = makeSimilar(jc, s, timeline, itbw, backward);
+			forward = makeSimilar(jc, s, timeline, it, forward);
+		}
+	}
+
+	private boolean makeSimilar(JobCombination jc, Schedule s,
+			ScheduleSpace timeline, LSTTimeIterator it, boolean enabled) {
+		if (enabled) {
+			if (!it.hasNext()) {
+				return false;
 			}
-			if (forward) {
-				LSTTime tFw = it.next();
-				if (s.isEmpty(tFw) && it.hasNext()
-						&& timeline.get(tFw).contains(jc) && !isFinished(jc)) {
-					if (log.isDebugEnabled())
-						log.debug("extending forwards @" + tFw);
-					s.add(tFw, jc);
-					reduceTimeleft(jc);
-				} else {
-					forward = false;
-				}
+			LSTTime t = it.next();
+			if (s.isEmpty(t) && timeline.get(t).contains(jc) && !isFinished(jc)) {
+				if (log.isDebugEnabled())
+					log.debug("extending @" + t);
+				s.add(t, jc);
+				reduceTimeleft(jc);
+			} else {
+				enabled = false;
 			}
 		}
+		return enabled;
 	}
 
 	private void reduceTimeleft(JobCombination jc) {

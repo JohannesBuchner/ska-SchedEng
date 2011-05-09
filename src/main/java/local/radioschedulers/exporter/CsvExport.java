@@ -18,15 +18,21 @@ public class CsvExport implements IExport {
 	}
 
 	public void export(Schedule schedule) throws IOException {
-		PrintWriter fw = new PrintWriter(f);
+		PrintWriter p = new PrintWriter(f);
 		for (Entry<LSTTime, JobCombination> e : schedule) {
 			if (e.getValue() == null)
 				continue;
-			fw.append(e.getKey() + "; ");
+			p.append(e.getKey().toString());
+			p.append("; ");
 			for (Job j : e.getValue().jobs) {
-				fw.append(j.proposal.id + "." + j.id + ",");
+				p.append(j.proposal.id);
+				p.append(".");
+				p.append(j.id);
+				p.append(",");
 			}
-			fw.append(";\n");
+			p.append(";\n");
 		}
+		p.close();
 	}
+	
 }

@@ -19,7 +19,9 @@ public class LSTTimeIterator implements Iterator<LSTTime> {
 
 	@Override
 	public boolean hasNext() {
-		if (next.isBeforeOrEqual(last) && next.day >= 0)
+		if (minuteSteps > 0 && next.isBeforeOrEqual(last))
+			return true;
+		else if (minuteSteps < 0 && next.isAfterOrEqual(last))
 			return true;
 		else
 			return false;
@@ -27,6 +29,7 @@ public class LSTTimeIterator implements Iterator<LSTTime> {
 
 	/**
 	 * returns current value, then forwards internal current value
+	 * 
 	 * @return current value
 	 */
 	@Override
@@ -37,10 +40,9 @@ public class LSTTimeIterator implements Iterator<LSTTime> {
 		if (next.minute < 0) {
 			next.day--;
 			next.minute += 24 * 60;
-		}
-		if (next.minute >= 24 * 60) {
+		} else if (next.minute >= 24 * 60) {
 			next.day++;
-			next.minute = 0L;
+			next.minute -= 24 * 60;
 		}
 		return entry;
 	}

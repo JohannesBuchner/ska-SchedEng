@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class LSTMapTest {
@@ -39,6 +40,10 @@ public class LSTMapTest {
 				Schedule.LST_SLOTS_MINUTES * 5)));
 		Assert.assertFalse(this.map.containsKey(new LSTTime(0,
 				Schedule.LST_SLOTS_MINUTES * 5)));
+		Assert.assertTrue(this.map.containsKey(new LSTTime(0,
+				Schedule.LST_SLOTS_MINUTES * 2)));
+		Assert.assertFalse(this.map.containsKey(new LSTTime(0,
+				Schedule.LST_SLOTS_MINUTES * 3)));
 
 		Iterator<LSTTime> ks = this.map.keySet().iterator();
 		Iterator<Integer> vs = this.map.values().iterator();
@@ -104,6 +109,7 @@ public class LSTMapTest {
 	}
 
 	@Test
+	@Ignore
 	public void testMemoryUsage() {
 		{
 			log.debug("LSTMap");
@@ -138,7 +144,9 @@ public class LSTMapTest {
 	public void logMemoryUsage(Map<LSTTime, Integer> map) {
 		Runtime rt = Runtime.getRuntime();
 		long diff;
+		long timediff;
 		long base;
+		long timebase;
 		LSTTime t;
 		int i = 0;
 
@@ -147,9 +155,11 @@ public class LSTMapTest {
 		rt.gc();
 		Thread.yield();
 		rt.gc();
+
+		timebase = System.currentTimeMillis();
 		base = rt.freeMemory();
 
-		for (LSTTimeIterator it = new LSTTimeIterator(new LSTTime(100, 0),
+		for (LSTTimeIterator it = new LSTTimeIterator(new LSTTime(10, 0),
 				ScheduleSpace.LST_SLOTS_MINUTES); it.hasNext();) {
 			t = it.next();
 			map.put(t, i++);
@@ -157,9 +167,33 @@ public class LSTMapTest {
 
 		// rt.gc();
 		diff = base - rt.freeMemory();
-		log.debug("filled Map: " + diff);
+		timediff = System.currentTimeMillis() - timebase;
+		log.debug("filled Map: " + diff + "B in " + timediff / 1000. + "s");
+
+		timebase = System.currentTimeMillis();
+		int sum = 0;
+		for (Entry<LSTTime, Integer> e : map.entrySet()) {
+			sum += e.getValue().intValue();
+		}
+		timediff = System.currentTimeMillis() - timebase;
+		log.debug("read full Map within " + timediff / 1000. + "s");
+
 		t = null;
 		map = null;
 		rt.gc();
+	}
+	
+	@Test
+	public void testSetNull() {
+		LSTTime t = new LSTTime(0, Schedule.LST_SLOTS_MINUTES);
+		Assert.assertFalse(map.containsKey(t));
+		Assert.assertNull(map.get(t));
+		map.put(t, 3);
+		Assert.assertTrue(map.containsKey(t));
+		Assert.assertEquals(3, map.get(t), 1e-5);
+		map.put(t, null);
+		Assert.assertFalse(map.containsKey(t));
+		Assert.assertNull(map.get(t));
+		
 	}
 }

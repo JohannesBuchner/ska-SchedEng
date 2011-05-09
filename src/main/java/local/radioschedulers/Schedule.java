@@ -1,8 +1,6 @@
 package local.radioschedulers;
 
 import java.util.Iterator;
-import java.util.Map;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
@@ -22,10 +20,7 @@ public class Schedule implements Iterable<Entry<LSTTime, JobCombination>> {
 	public static final int MINUTES_PER_DAY = 60 * 24;
 
 	@JsonProperty
-	private Map<LSTTime, JobCombination> content = new LSTMap<JobCombination>();
-
-	@JsonIgnore
-	private LSTTime last = new LSTTime(0, 0);
+	private LSTMap<JobCombination> content = new LSTMap<JobCombination>();
 
 	public void clear(LSTTime t) {
 		content.remove(t);
@@ -36,8 +31,6 @@ public class Schedule implements Iterable<Entry<LSTTime, JobCombination>> {
 			clear(t);
 		else {
 			content.put(t, jc);
-			if (t.isAfter(last))
-				last = new LSTTime(t.day, t.minute);
 		}
 	}
 
@@ -53,36 +46,13 @@ public class Schedule implements Iterable<Entry<LSTTime, JobCombination>> {
 	}
 
 	public LSTTime findLastEntry() {
-		if (content.isEmpty()) {
-			return new LSTTime(0, 0);
-		} else {
-			return last;
-		}
+		return content.lastKey();
 	}
 
 	@JsonIgnore
 	@Override
 	public Iterator<Entry<LSTTime, JobCombination>> iterator() {
-		return new Iterator<Entry<LSTTime, JobCombination>>() {
-			private Iterator<LSTTime> it = new LSTTimeIterator(findLastEntry(),
-					Schedule.LST_SLOTS_MINUTES);
-
-			@Override
-			public boolean hasNext() {
-				return it.hasNext();
-			}
-
-			@Override
-			public Entry<LSTTime, JobCombination> next() {
-				LSTTime t = it.next();
-				return new SimpleEntry<LSTTime, JobCombination>(t, get(t));
-			}
-
-			@Override
-			public void remove() {
-				throw new Error("Not implemented.");
-			}
-		};
+		return content.entrySet().iterator();
 	}
 
 	@Override

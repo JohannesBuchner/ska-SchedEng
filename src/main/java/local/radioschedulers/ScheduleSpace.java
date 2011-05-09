@@ -1,11 +1,9 @@
 package local.radioschedulers;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
@@ -25,23 +23,11 @@ public class ScheduleSpace implements
 	public static final int LST_SLOTS_PER_DAY = 60 * 24 / LST_SLOTS_MINUTES;
 
 	@JsonProperty
-	private Map<LSTTime, JobCombinationChoice> possibles = new LSTMap<JobCombinationChoice>();
-
-	@JsonIgnore
-	private LSTTime last = new LSTTime(0, 0);
-
-	/*
-	 * this stupid intermediate class is needed for JSON export. Sorry.
-	 */
-	@SuppressWarnings("serial")
-	public static class JobCombinationChoice extends HashSet<JobCombination> {
-	}
+	private LSTMap<Set<JobCombination>> possibles = new LSTMap<Set<JobCombination>>();
 
 	private void createIfNeeded(LSTTime t) {
 		if (!possibles.containsKey(t)) {
-			possibles.put(t, new JobCombinationChoice());
-			if (t.isAfter(last))
-				last = new LSTTime(t.day, t.minute);
+			possibles.put(t, new HashSet<JobCombination>());
 		}
 	}
 
@@ -67,40 +53,21 @@ public class ScheduleSpace implements
 	}
 
 	public LSTTime findLastEntry() {
-		return last;
+		return possibles.lastKey();
 	}
 
-	Map<LSTTime, JobCombinationChoice> getPossibles() {
+	Map<LSTTime, Set<JobCombination>> getPossibles() {
 		return possibles;
 	}
-	
-	void setPossibles(Map<LSTTime, JobCombinationChoice> possibles) {
-		this.possibles = possibles;
-		last = Collections.max(possibles.keySet());
+
+	void setPossibles(Map<LSTTime, Set<JobCombination>> possibles) {
+		this.possibles.clear();
+		this.possibles.putAll(possibles);
 	}
 
 	@JsonIgnore
 	@Override
 	public Iterator<Entry<LSTTime, Set<JobCombination>>> iterator() {
-		return new Iterator<Entry<LSTTime, Set<JobCombination>>>() {
-			private Iterator<LSTTime> it = new LSTTimeIterator(findLastEntry(),
-					Schedule.LST_SLOTS_MINUTES);
-
-			@Override
-			public boolean hasNext() {
-				return it.hasNext();
-			}
-
-			@Override
-			public Entry<LSTTime, Set<JobCombination>> next() {
-				LSTTime t = it.next();
-				return new SimpleEntry<LSTTime, Set<JobCombination>>(t, get(t));
-			}
-
-			@Override
-			public void remove() {
-				throw new Error("Not implemented.");
-			}
-		};
+		return this.possibles.entrySet().iterator();
 	}
 }

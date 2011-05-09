@@ -44,6 +44,13 @@ public class ScheduleFactory implements CandidateFactory<Schedule> {
 			while (list.size() < populationSize) {
 				// log.debug("making copies of seed candidates");
 				list.addAll(seedCandidates);
+				/*
+				 * do not do this multiple times. The danger is that the
+				 * diversity of solutions is limited by many good solutions. If
+				 * few good solutions are present, the rest of the population
+				 * can explore the surroundings better.
+				 */
+				break;
 			}
 		}
 		while (list.size() < populationSize) {

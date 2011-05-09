@@ -13,15 +13,23 @@ import local.radioschedulers.LSTTime;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
+import local.radioschedulers.alg.ga.ScheduleFitnessFunction;
 
 import org.apache.log4j.Logger;
 
-public class NormalizedScheduleFitnessFunction extends
-		SimpleScheduleFitnessFunction {
+public class NormalizedScheduleFitnessFunction implements
+		ScheduleFitnessFunction {
+	public NormalizedScheduleFitnessFunction(
+			ScheduleFitnessFunction fitnessFunction) {
+		this.f = fitnessFunction;
+	}
+
 	private static Logger log = Logger
 			.getLogger(NormalizedScheduleFitnessFunction.class);
 
 	protected Double normalization = 1.;
+
+	private ScheduleFitnessFunction f;
 
 	public Double getNormalization() {
 		return normalization;
@@ -33,11 +41,11 @@ public class NormalizedScheduleFitnessFunction extends
 
 		for (Proposal p : proposals) {
 			for (Job j : p.jobs) {
-				if (priorityHours.containsKey(p.priority)) {
-					priorityHours.put(p.priority
-							+ priorityHours.get(p.priority), j.hours);
+				if (priorityHours.containsKey(-p.priority)) {
+					priorityHours.put(-p.priority, j.hours
+							+ priorityHours.get(-p.priority));
 				} else {
-					priorityHours.put(p.priority, j.hours);
+					priorityHours.put(-p.priority, j.hours);
 				}
 			}
 		}
@@ -46,10 +54,10 @@ public class NormalizedScheduleFitnessFunction extends
 				* ScheduleSpace.LST_SLOTS_PER_DAY + end.minute;
 		Double value = 0.;
 		for (Entry<Double, Double> e : priorityHours.entrySet()) {
-			Double prio = e.getKey();
-			Double minutes = e.getValue();
+			Double prio = -e.getKey();
+			Double minutes = e.getValue() * 60;
 			Double part = Math.min(totalMinutes, minutes);
-			// "schedule" prio for part minutes
+			log.debug("\"scheduling\" " + prio + " for " + part + " minutes");
 			if (prio * part > 0) {
 				value += prio * part;
 			}
@@ -68,7 +76,7 @@ public class NormalizedScheduleFitnessFunction extends
 
 	@Override
 	public double evaluate(Schedule s) {
-		return super.evaluate(s) / normalization;
+		return f.evaluate(s) / normalization;
 	}
 
 }

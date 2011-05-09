@@ -7,6 +7,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -17,8 +18,11 @@ import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.alg.ga.GeneticAlgorithmScheduler;
 import local.radioschedulers.alg.ga.HeuristicsScheduleCollector;
 import local.radioschedulers.alg.ga.ScheduleFitnessFunction;
+import local.radioschedulers.alg.ga.fitness.NormalizedScheduleFitnessFunction;
 import local.radioschedulers.alg.ga.fitness.SimpleScheduleFitnessFunction;
+import local.radioschedulers.alg.ga.watchmaker.SortedCollection;
 import local.radioschedulers.alg.ga.watchmaker.WFScheduler;
+import local.radioschedulers.alg.ga.watchmaker.SortedCollection.MappingFunction;
 import local.radioschedulers.exporter.CsvExport;
 import local.radioschedulers.exporter.HtmlExportWithFitness;
 import local.radioschedulers.exporter.IExport;
@@ -35,6 +39,8 @@ import org.uncommons.watchmaker.framework.PopulationData;
 
 public class RunGA {
 	private static int ndays = 365 / 2;
+	private static double bestFitness;
+	private static double goodFitnessLimit;
 	private static final File outputDir = new File(".");
 	private static final boolean WRITE_PROPOSALS = true;
 	private static final boolean READ_SCHEDULES = true;
@@ -82,13 +88,18 @@ public class RunGA {
 			}
 		}
 
-		ScheduleFitnessFunction fitness = getFitnessFunction();
-		SimpleScheduleFitnessFunction observatoryFitness = new SimpleScheduleFitnessFunction();
-		observatoryFitness.setSwitchLostMinutes(0);
-		SimpleScheduleFitnessFunction observerFitness = new SimpleScheduleFitnessFunction();
-		observerFitness.setSwitchLostMinutes(60);
+		final ScheduleFitnessFunction fitness = n(getFitnessFunction(),
+				proposals, template);
+		ScheduleFitnessFunction observatoryFitness = n(
+				getObservatoryFitnessFunction(), proposals, template);
+		ScheduleFitnessFunction observerFitness = n(
+				getObserverFitnessFunction(), proposals, template);
 
 		GeneticAlgorithmScheduler scheduler = getScheduler(fitness);
+		bestFitness = calculateBestFitness(schedules, fitness);
+		goodFitnessLimit = bestFitness * 0.95;
+		scheduler.setPopulation(getInitialPopulationTopPercent(schedules,
+				fitness));
 
 		PrintWriter oq = new PrintWriter("quality.txt");
 		int i = 1;
@@ -96,14 +107,27 @@ public class RunGA {
 		PrintWriter o = new PrintWriter(index);
 		o.println("<h2>Initial results</h2>");
 		o.println("<ul>");
-		for (Entry<String, Schedule> e : schedules.entrySet()) {
+		Iterable<Entry<String, Schedule>> sortedSchedules = new SortedCollection<Entry<String, Schedule>>(
+				schedules.entrySet(),
+				new MappingFunction<Entry<String, Schedule>, Comparable<Double>>() {
+
+					@Override
+					public Comparable<Double> map(Entry<String, Schedule> item) {
+						return -fitness.evaluate(item.getValue());
+					}
+				});
+		for (Entry<String, Schedule> e : sortedSchedules) {
 			Schedule s = e.getValue();
 			String name = e.getKey().toString();
-			File f = export(name, "schedule_" + i, s);
-			o.println("\t<li><a href='" + f.getName() + "'>" + f.getName()
-					+ " -- " + name + "</a></li>");
-			oq.println(fitness.evaluate(s) + "\t"
-					+ observatoryFitness.evaluate(s) + "\t"
+			File f = export(name, "schedule_" + i, s, fitness);
+			double fv = fitness.evaluate(s);
+			o.println("\t<li><a href='"
+					+ f.getName()
+					+ "'"
+					+ (fv >= goodFitnessLimit ? " style='font-weight:bold'"
+							: "") + ">" + formatFitness(fv) + " -- " + name
+					+ "</a></li>");
+			oq.println(fv + "\t" + observatoryFitness.evaluate(s) + "\t"
 					+ observerFitness.evaluate(s) + "\t" + name);
 			System.out.println("Schedule of " + name + " in " + f);
 			i++;
@@ -112,7 +136,6 @@ public class RunGA {
 		o.flush();
 		oq.flush();
 
-		scheduler.setPopulation(new ArrayList<Schedule>(schedules.values()));
 		scheduler.schedule(template);
 
 		o.println("<h2>GA survivors</h2>");
@@ -124,11 +147,15 @@ public class RunGA {
 		int j = 1;
 		for (Schedule s : scheduler.getPopulation()) {
 			String name = "GA survivor " + j;
-			File f = export(name, "schedule_" + i, s);
-			o.println("\t<li><a href='" + f.getName() + "'>" + f.getName()
-					+ " -- " + name + "</a></li>");
-			oq.println(fitness.evaluate(s) + "\t"
-					+ observatoryFitness.evaluate(s) + "\t"
+			File f = export(name, "schedule_" + i, s, fitness);
+			double fv = fitness.evaluate(s);
+			o.println("\t<li><a href='"
+					+ f.getName()
+					+ "'"
+					+ (fv >= goodFitnessLimit ? " style='font-weight:bold'"
+							: "") + ">" + formatFitness(fv) + " -- " + name
+					+ "</a></li>");
+			oq.println(fv + "\t" + observatoryFitness.evaluate(s) + "\t"
 					+ observerFitness.evaluate(s) + "\t" + name);
 			i++;
 			j++;
@@ -139,6 +166,77 @@ public class RunGA {
 		System.out.println("Index of results at " + index);
 	}
 
+	private static ScheduleFitnessFunction n(
+			ScheduleFitnessFunction fitnessFunction,
+			Collection<Proposal> proposals, ScheduleSpace space) {
+		NormalizedScheduleFitnessFunction normfit = new NormalizedScheduleFitnessFunction(
+				fitnessFunction);
+		normfit.setupNormalization(space, proposals);
+		return normfit;
+	}
+
+	private static double calculateBestFitness(Map<String, Schedule> schedules,
+			final ScheduleFitnessFunction fitness) {
+		SortedCollection<Schedule> sortedPopulation = new SortedCollection<Schedule>(
+				schedules.values(),
+				new MappingFunction<Schedule, Comparable<Double>>() {
+
+					@Override
+					public Comparable<Double> map(Schedule item) {
+						return -fitness.evaluate(item);
+					}
+				});
+		return fitness.evaluate(sortedPopulation.first());
+	}
+
+	@SuppressWarnings("unused")
+	private static ArrayList<Schedule> getInitialPopulationTopN(
+			Map<String, Schedule> schedules,
+			final ScheduleFitnessFunction fitness) {
+		SortedCollection<Schedule> sortedPopulation = new SortedCollection<Schedule>(
+				schedules.values(),
+				new MappingFunction<Schedule, Comparable<Double>>() {
+
+					@Override
+					public Comparable<Double> map(Schedule item) {
+						return -fitness.evaluate(item);
+					}
+				});
+		ArrayList<Schedule> initialPopulation = new ArrayList<Schedule>();
+		Iterator<Schedule> it = sortedPopulation.iterator();
+		Schedule s, s2;
+
+		s = it.next();
+		bestFitness = fitness.evaluate(s);
+		initialPopulation.add(s);
+		while (initialPopulation.size() < 3) {
+			s2 = it.next();
+			if (!s2.equals(s)) {
+				initialPopulation.add(s);
+			} else {
+				System.out.println("skipping duplicate solution");
+			}
+			s = s2;
+		}
+		return initialPopulation;
+	}
+
+	private static String formatFitness(double v) {
+		return Double.toString(Math.round(v * 10000) / 100.) + "%";
+	}
+
+	private static ArrayList<Schedule> getInitialPopulationTopPercent(
+			Map<String, Schedule> schedules,
+			final ScheduleFitnessFunction fitness) {
+		ArrayList<Schedule> initialPopulation = new ArrayList<Schedule>();
+		for (Entry<String, Schedule> e : schedules.entrySet()) {
+			double fv = fitness.evaluate(e.getValue());
+			if (fv > goodFitnessLimit)
+				initialPopulation.add(e.getValue());
+		}
+		return initialPopulation;
+	}
+
 	private static CsvScheduleReader getScheduleReader(
 			Collection<Proposal> proposals) {
 		CsvScheduleReader csv = new CsvScheduleReader(new File(
@@ -146,10 +244,10 @@ public class RunGA {
 		return csv;
 	}
 
-	private static File export(String title, String prefix, Schedule s)
-			throws IOException {
-		File f = new File(outputDir, prefix + ".html");
-		IExport ex = new HtmlExportWithFitness(f, title, getFitnessFunction());
+	private static File export(String title, String prefix, Schedule s,
+			ScheduleFitnessFunction fitness) throws IOException {
+		File f = new File(outputDir, prefix + "__" + title + ".html");
+		IExport ex = new HtmlExportWithFitness(f, title, fitness);
 		ex.export(s);
 		ex = new CsvExport(new File(outputDir, prefix + ".csv"));
 		ex.export(s);
@@ -161,20 +259,20 @@ public class RunGA {
 		WFScheduler scheduler = new WFScheduler(f);
 		scheduler.setPopulationSize(50);
 		scheduler.setNumberOfGenerations(2000 / scheduler.getPopulationSize());
-		scheduler.setEliteSize(1);
+		scheduler.setEliteSize(2);
 
-		scheduler.setCrossoverProbability(0.1);
-		scheduler.setMutationProbability(0.08);
+		scheduler.setCrossoverProbability(0.02);
+		scheduler.setMutationProbability(0.);
 
-		scheduler.setDoubleCrossoverProbability(0.01);
-		scheduler.setCrossoverDays(7);
+		scheduler.setDoubleCrossoverProbability(0.1);
+		scheduler.setCrossoverDays(1);
 
-		scheduler.setMutationKeepingProbability(0.01);
-		scheduler.setMutationSimilarForwardsProbability(0.03);
-		scheduler.setMutationSimilarBackwardsProbability(0.02);
-		scheduler.setMutationSimilarPrevProbability(0.03);
-		scheduler.setMutationExchangeProbability(0.03);
-		scheduler.setMutationJobPlacementProbability(0.08);
+		// scheduler.setMutationKeepingProbability(0.02);
+		// scheduler.setMutationSimilarForwardsProbability(0.03);
+		// scheduler.setMutationSimilarBackwardsProbability(0.02);
+		// scheduler.setMutationSimilarPrevProbability(0.03);
+		scheduler.setMutationExchangeProbability(0.05);
+		scheduler.setMutationJobPlacementProbability(0.02);
 
 		scheduler.setObserver(new EvolutionObserver<Schedule>() {
 
@@ -193,6 +291,18 @@ public class RunGA {
 	private static ScheduleFitnessFunction getFitnessFunction() {
 		SimpleScheduleFitnessFunction f = new SimpleScheduleFitnessFunction();
 		f.setSwitchLostMinutes(15);
+		return f;
+	}
+
+	private static ScheduleFitnessFunction getObserverFitnessFunction() {
+		SimpleScheduleFitnessFunction f = new SimpleScheduleFitnessFunction();
+		f.setSwitchLostMinutes(60);
+		return f;
+	}
+
+	private static ScheduleFitnessFunction getObservatoryFitnessFunction() {
+		SimpleScheduleFitnessFunction f = new SimpleScheduleFitnessFunction();
+		f.setSwitchLostMinutes(0);
 		return f;
 	}
 

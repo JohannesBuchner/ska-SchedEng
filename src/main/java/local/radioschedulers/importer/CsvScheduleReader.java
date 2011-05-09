@@ -17,6 +17,7 @@ import local.radioschedulers.LSTTime;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
+import local.radioschedulers.exporter.CsvExport;
 
 import org.apache.log4j.Logger;
 
@@ -64,21 +65,8 @@ public class CsvScheduleReader {
 	public void write(Map<String, Schedule> schedules) throws Exception {
 		schedulesFile.mkdir();
 		for (Entry<String, Schedule> a : schedules.entrySet()) {
-			PrintStream p = new PrintStream(new File(schedulesFile, a.getKey()));
-			Schedule s = a.getValue();
-			for (Entry<LSTTime, JobCombination> e : s) {
-				p.print(e.getKey());
-				p.print(";");
-				if (e.getValue() != null) {
-					JobCombination jc = e.getValue();
-					for (Job j : jc.jobs) {
-						p.print(j.proposal.id + "." + j.id);
-						p.print(",");
-					}
-				}
-				p.println();
-			}
-			p.close();
+			CsvExport csv = new CsvExport(new File(schedulesFile, a.getKey()));
+			csv.export(a.getValue());
 		}
 		log.debug("wrote " + schedules.size() + " to " + schedulesFile);
 	}

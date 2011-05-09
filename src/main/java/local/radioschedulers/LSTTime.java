@@ -17,14 +17,16 @@ public class LSTTime implements Comparable<LSTTime> {
 	public LSTTime(@JsonProperty("day") Long day,
 			@JsonProperty("minute") Long minute) {
 		super();
-		this.day = day;
-		this.minute = minute;
-		if (this.minute > Schedule.MINUTES_PER_DAY)
+		if (minute > Schedule.MINUTES_PER_DAY)
 			throw new IllegalArgumentException("minute argument too large: "
-					+ this.minute);
-		if (this.minute < 0)
+					+ minute);
+		if (minute < 0)
 			throw new IllegalArgumentException("minute argument too small: "
 					+ this.minute);
+		//if (day < 0)
+		//	throw new IllegalArgumentException("day argument too small: " + day);
+		this.day = day;
+		this.minute = minute;
 	}
 
 	public LSTTime(String s) {

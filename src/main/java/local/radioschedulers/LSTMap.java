@@ -39,7 +39,7 @@ public class LSTMap<V> implements Map<LSTTime, V> {
 	@Override
 	public boolean containsKey(Object key) {
 		int id = idFromTime((LSTTime) key);
-		if (id < values.size() && values.get(id) != null)
+		if (id >= 0 && id < values.size() && values.get(id) != null)
 			return true;
 		else
 			return false;
@@ -142,7 +142,7 @@ public class LSTMap<V> implements Map<LSTTime, V> {
 	@Override
 	public V put(LSTTime key, V value) {
 		if (value == null)
-			return get(key);
+			return remove(key);
 		int i = idFromTime(key);
 		while (i >= values.size())
 			values.add(null);
@@ -188,6 +188,7 @@ public class LSTMap<V> implements Map<LSTTime, V> {
 		return result;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -196,13 +197,26 @@ public class LSTMap<V> implements Map<LSTTime, V> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		LSTMap other = (LSTMap) obj;
+		LSTMap<V> other = (LSTMap<V>) obj;
 		if (values == null) {
 			if (other.values != null)
 				return false;
 		} else if (!values.equals(other.values))
 			return false;
 		return true;
+	}
+
+	public LSTMap<V> copy() {
+		LSTMap<V> other = new LSTMap<V>();
+		other.values.addAll(values);
+		return other;
+	}
+
+	public LSTTime lastKey() {
+		if (this.values.isEmpty())
+			return timeFromId(0);
+		else
+			return timeFromId(this.values.size() - 1);
 	}
 
 }
