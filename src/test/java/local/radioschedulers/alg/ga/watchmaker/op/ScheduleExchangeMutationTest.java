@@ -68,8 +68,6 @@ public class ScheduleExchangeMutationTest {
 
 		int diffcount = 0;
 		int eqcount = 0;
-		boolean inModificationRange = false;
-		boolean hasPartner = false;
 		for (Entry<LSTTime, JobCombination> e : schedule1) {
 			LSTTime t = e.getKey();
 			JobCombination scheduleJc1 = schedule1.get(t);

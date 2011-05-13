@@ -2,7 +2,6 @@ package local.radioschedulers.alg.ga.watchmaker.op;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.Map.Entry;
 
 import junit.framework.Assert;
@@ -27,16 +26,15 @@ public class MutationOperatorResultsTest {
 
 	private ScheduleSpace space;
 
-	protected Integer positive = 5;
-	private Random rng;
+	private OnceTrueRandomMock rng;
 	private Probability p = new Probability(0.01);
 	private Schedule schedule;
 
 	@Test
 	public void testMockProbability() {
-		positive = 5;
+		rng = new OnceTrueRandomMock(5);
 		for (int i = 0; i < 10; i++) {
-			Assert.assertEquals("at " + i, i + 1 == positive, p.nextEvent(rng));
+			Assert.assertEquals("at " + i, i + 1 == rng.getPositive(), p.nextEvent(rng));
 		}
 	}
 
@@ -46,20 +44,12 @@ public class MutationOperatorResultsTest {
 		space = ts.getSpace();
 		SerialListingScheduler s = new SerialListingScheduler(new IdSelector());
 		schedule = s.schedule(space);
-		rng = new Random() {
-			private int i = 0;
-
-			@Override
-			public double nextDouble() {
-				i++;
-				return (i == positive ? 0. : 1.);
-			}
-		};
+		rng = new OnceTrueRandomMock(1);
 	}
 
 	@Test
 	public void testMutation() throws Exception {
-		positive = 5;
+		rng = new OnceTrueRandomMock(5);
 		Schedule s = apply(new ScheduleMutation(space, p));
 
 		int pos = 0;
@@ -67,11 +57,10 @@ public class MutationOperatorResultsTest {
 		for (Entry<LSTTime, JobCombination> e : schedule) {
 			i++;
 			LSTTime t = e.getKey();
-			log.debug(i + "@" + t + " " + e.getValue() + " -- "
-					+ s.get(t));
+			log.debug(i + "@" + t + " " + e.getValue() + " -- " + s.get(t));
 			// before mutation
 			if (pos == 0) {
-				if (i < positive) {
+				if (i < rng.getPositive()) {
 					Assert.assertEquals(e.getValue(), s.get(t));
 				}
 				if (!same(e.getValue(), s.get(t))) {
@@ -94,7 +83,7 @@ public class MutationOperatorResultsTest {
 
 	@Test
 	public void testSimilarPrevMutation() throws Exception {
-		positive = 1;
+		rng = new OnceTrueRandomMock(1);
 		Schedule s = apply(new ScheduleSimilarPrevMutation(space, p, false));
 
 		int i = 0;
@@ -102,9 +91,9 @@ public class MutationOperatorResultsTest {
 			LSTTime t = e.getKey();
 			log.debug("@" + t + " " + e.getValue() + " -- " + s.get(t));
 			// before mutation
-			if (i < positive) {
+			if (i < rng.getPositive()) {
 				Assert.assertEquals(e.getValue(), s.get(t));
-			} else if (i > positive) {
+			} else if (i > rng.getPositive()) {
 				Assert.assertEquals(e.getValue(), s.get(t));
 			} else {
 				// Assert.assertFalse(e.getValue().equals(s.get(t)));
@@ -145,12 +134,12 @@ public class MutationOperatorResultsTest {
 
 	public void testSimilarMutation(boolean mut, boolean fw, boolean bw)
 			throws Exception {
-		positive = 4;
-		LSTTime tbefore = new LSTTime(0, (positive - 1 - 1)
+		rng = new OnceTrueRandomMock(4);
+		LSTTime tbefore = new LSTTime(0, (rng.getPositive() - 1 - 1)
 				* Schedule.LST_SLOTS_MINUTES);
-		LSTTime tcenter = new LSTTime(0, (positive - 1)
+		LSTTime tcenter = new LSTTime(0, (rng.getPositive() - 1)
 				* Schedule.LST_SLOTS_MINUTES);
-		LSTTime tafter = new LSTTime(0, (positive - 1 + 1)
+		LSTTime tafter = new LSTTime(0, (rng.getPositive() - 1 + 1)
 				* Schedule.LST_SLOTS_MINUTES);
 
 		ScheduleSimilarMutation op;
@@ -173,8 +162,7 @@ public class MutationOperatorResultsTest {
 		for (Entry<LSTTime, JobCombination> e : schedule) {
 			i++;
 			LSTTime t = e.getKey();
-			log.debug(i + "@" + t + " " + e.getValue() + " -- "
-					+ s.get(t));
+			log.debug(i + "@" + t + " " + e.getValue() + " -- " + s.get(t));
 		}
 
 		JobCombination oldjc = s.get(tcenter);
@@ -191,7 +179,7 @@ public class MutationOperatorResultsTest {
 
 	@Test
 	public void testJobPlacementMutation() throws Exception {
-		positive = 1;
+		rng = new OnceTrueRandomMock(1);
 		Schedule s = apply(new ScheduleJobPlacementMutation(space, p));
 
 		int i = 0;

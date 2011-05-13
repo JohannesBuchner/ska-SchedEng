@@ -3,7 +3,6 @@ package local.radioschedulers.alg.ga.watchmaker.op;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Random;
 import java.util.Map.Entry;
 
 import local.radioschedulers.JobCombination;
@@ -23,7 +22,6 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.uncommons.maths.random.MersenneTwisterRNG;
 import org.uncommons.maths.random.Probability;
 
 public class ScheduleMutationTest {
@@ -35,25 +33,16 @@ public class ScheduleMutationTest {
 	private int ndays = 10;
 	private Schedule schedule1;
 	private Schedule schedule2;
-	protected Random rng = new MersenneTwisterRNG();
+	protected OnceTrueRandomMock rng;
 
 	protected AbstractScheduleMutation op;
 
 	protected Probability mutationProbability = new Probability(0.1);
 
-	protected int positive = 1;
-
 	@Before
 	public void setup() throws Exception {
-		rng = new Random() {
-			private int i = 0;
-
-			@Override
-			public double nextDouble() {
-				i++;
-				return (i == positive ? 0. : 1.);
-			}
-		};
+		rng = new OnceTrueRandomMock(1);
+		rng.setPositive(1);
 
 		GeneratingProposalReader gpr = new GeneratingProposalReader();
 		gpr.fill();
