@@ -54,7 +54,7 @@ public class RunGA {
 		}
 		if (WRITE_PROPOSALS) {
 			JsonProposalReader json = new JsonProposalReader(new File(
-					"proposals_testset_mopra.json"));
+					PropertiesContext.proposalsFilename()));
 			json.write(proposals);
 		}
 
@@ -227,9 +227,11 @@ public class RunGA {
 			final ScheduleFitnessFunction fitness) {
 		ArrayList<Schedule> initialPopulation = new ArrayList<Schedule>();
 		for (Entry<String, Schedule> e : schedules.entrySet()) {
-			double fv = fitness.evaluate(e.getValue());
-			if (fv > goodFitnessLimit)
-				initialPopulation.add(e.getValue());
+			if (e.getKey().contains("RandomizedSelector"))
+				continue;
+			// double fv = fitness.evaluate(e.getValue());
+			// if (fv > goodFitnessLimit * 3 / 4)
+			initialPopulation.add(e.getValue());
 		}
 		return initialPopulation;
 	}
@@ -254,22 +256,22 @@ public class RunGA {
 	private static GeneticAlgorithmScheduler getScheduler(
 			ScheduleFitnessFunction f) {
 		WFScheduler scheduler = new WFScheduler(f);
-		scheduler.setPopulationSize(50);
-		scheduler.setNumberOfGenerations(2000 / scheduler.getPopulationSize());
 		scheduler.setEliteSize(2);
 
-		scheduler.setCrossoverProbability(0.02);
+		scheduler.setPopulationSize(62);
+
+		scheduler.setCrossoverProbability(0.09);
 		scheduler.setMutationProbability(0.);
 
-		scheduler.setDoubleCrossoverProbability(0.1);
+		scheduler.setDoubleCrossoverProbability(0.09);
 		scheduler.setCrossoverDays(1);
 
-		// scheduler.setMutationKeepingProbability(0.02);
-		// scheduler.setMutationSimilarForwardsProbability(0.03);
-		// scheduler.setMutationSimilarBackwardsProbability(0.02);
-		// scheduler.setMutationSimilarPrevProbability(0.03);
-		scheduler.setMutationExchangeProbability(0.01);
-		scheduler.setMutationJobPlacementProbability(0.01);
+		scheduler.setMutationKeepingProbability(0.0);
+		scheduler.setMutationSimilarForwardsProbability(0.0);
+		scheduler.setMutationSimilarBackwardsProbability(0.0006);
+		scheduler.setMutationSimilarPrevProbability(0.04);
+		scheduler.setMutationExchangeProbability(0.0009);
+		scheduler.setMutationJobPlacementProbability(0.03);
 
 		scheduler.setObserver(new EvolutionObserver<Schedule>() {
 
@@ -281,6 +283,7 @@ public class RunGA {
 						+ " stdev: " + data.getFitnessStandardDeviation());
 			}
 		});
+		scheduler.setNumberOfGenerations(2000 / scheduler.getPopulationSize());
 
 		return scheduler;
 	}
