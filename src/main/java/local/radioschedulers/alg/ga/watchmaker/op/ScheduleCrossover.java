@@ -90,8 +90,8 @@ public class ScheduleCrossover extends AbstractCrossover<Schedule> {
 			a = tmp;
 		}
 
-		int i = 0;
-		int n = 0;
+		long i = 0;
+		long n = 0;
 		for (LSTTimeIterator it = new LSTTimeIterator(last,
 				Schedule.LST_SLOTS_MINUTES); it.hasNext();) {
 			LSTTime t = it.next();
@@ -120,8 +120,9 @@ public class ScheduleCrossover extends AbstractCrossover<Schedule> {
 			counter.derive(mix2, parent1);
 			counter.derive(mix1, parent2);
 			counter.derive(mix2, parent2);
+			// how many were really newly introduced? only i items
 			counter.add(mix1, this.toString(), i);
-			counter.add(mix2, this.toString(), n - i);
+			counter.add(mix2, this.toString(), i);
 		}
 
 		return list;
