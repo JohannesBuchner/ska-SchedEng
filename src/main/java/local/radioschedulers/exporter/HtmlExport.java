@@ -38,10 +38,9 @@ public class HtmlExport implements IExport {
 		fw.append("<head>");
 		if (this.title != null)
 			fw.append("<title>" + this.title + "</title>");
-		fw
-				.append("<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">");
+		fw.append("<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">");
 		fw.append("</head>");
-		fw.append("<table>\n\t<thead>\n\t\t<tr>\n\t\t\t<th>day \\ LST</th>");
+		fw.append("<table class='schedule'>\n\t<thead>\n\t\t<tr>\n\t\t\t<th>day \\ LST</th>");
 		for (int i = 0; i < 24; i++) {
 			fw.append("\n\t\t\t<th>" + i + "</th>");
 			for (int j = 1; j < Schedule.LST_SLOTS_PER_HOUR; j++) {
@@ -53,7 +52,9 @@ public class HtmlExport implements IExport {
 		LSTTime lastday = schedule.findLastEntry();
 
 		Map<Job, Integer> jobs = new HashMap<Job, Integer>();
-		int nslots = 0;
+		int interruptcount = 0;
+		int totalslots = 0;
+		int idleslots = 0;
 
 		JobCombination jc = null;
 
@@ -66,7 +67,7 @@ public class HtmlExport implements IExport {
 				// day, we mustn't count that as a interrupt.
 				if (t.minute != 0
 						|| jc == schedule.get(new LSTTime(t.day, t.minute)))
-					nslots++;
+					interruptcount++;
 				jc = schedule.get(new LSTTime(t.day, t.minute));
 				int ncells = 1;
 				LSTTime t2 = new LSTTime(t.day, t.minute
@@ -92,9 +93,11 @@ public class HtmlExport implements IExport {
 					params += " colspan=" + ncells + " ";
 				}
 				fw.append("<td " + params + ">");
+				totalslots += ncells;
 
 				if (jc == null || jc.jobs.isEmpty()) {
 					fw.append("&nbsp;");
+					idleslots += ncells;
 				} else {
 					for (Job j : jc.jobs) {
 						Integer i = jobs.get(j);
@@ -124,16 +127,17 @@ public class HtmlExport implements IExport {
 
 		fw.append("\n\t</tbody>\n</table>\n");
 
-		appendAdditionalStats(schedule, fw, jobs, nslots);
+		appendAdditionalStats(schedule, fw, jobs, interruptcount, totalslots,
+				idleslots);
 
 		fw.close();
 	}
 
 	protected void appendAdditionalStats(Schedule schedule, FileWriter fw,
-			Map<Job, Integer> jobs, int nslots) throws IOException {
+			Map<Job, Integer> jobs, int interruptcount, int totalslots,
+			int idleslots) throws IOException {
 		fw.append("<h2>Jobs scheduled</h2>");
-		fw
-				.append("<table><thead><th>Job</th><th>Hours scheduled</th><th>completed</th></thead><tbody>");
+		fw.append("<table class='jobsummary'><thead><th>Job</th><th>Hours scheduled</th><th>completed</th></thead><tbody>");
 		int completed = 0;
 		int halfcompleted = 0;
 		double prioritysum = 0;
@@ -156,7 +160,9 @@ public class HtmlExport implements IExport {
 		fw.append("<br/>Completed jobs: " + completed);
 		fw.append("<br/>Completed jobs: Average priority: " + prioritysum
 				/ completed);
-		fw.append("<br/>Interruptions (number of blocks): " + nslots);
+		fw.append("<br/>Idle blocks: " + idleslots + " ("
+				+ (idleslots * 100 / totalslots) + "%)");
+		fw.append("<br/>Interruptions (number of blocks): " + interruptcount);
 		fw.append("<br/>At least half-Completed jobs: " + halfcompleted);
 		fw.append("<br/>");
 	}
