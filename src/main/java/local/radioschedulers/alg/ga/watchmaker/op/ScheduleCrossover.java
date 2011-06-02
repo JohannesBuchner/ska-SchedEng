@@ -90,8 +90,8 @@ public class ScheduleCrossover extends AbstractCrossover<Schedule> {
 			a = tmp;
 		}
 
-		long i = 0;
-		long n = 0;
+		int i = 0;
+		int n = 0;
 		for (LSTTimeIterator it = new LSTTimeIterator(last,
 				Schedule.LST_SLOTS_MINUTES); it.hasNext();) {
 			LSTTime t = it.next();

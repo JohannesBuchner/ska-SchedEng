@@ -28,7 +28,7 @@ import local.radioschedulers.importer.JsonProposalReader;
 import org.apache.log4j.Logger;
 
 public abstract class EvaluateGA {
-	public static final int numberOfEvaluations = 1000;
+	public static final int numberOfEvaluations = 2000;
 	private static boolean loadSchedules = false;
 	public static int ndays = 365 / 4;
 	public static double oversubscriptionFactor = 0.2;
@@ -147,6 +147,7 @@ public abstract class EvaluateGA {
 				+ mutationSimilarBackwardsProb);
 		logSetting(ps, "mutationSimilarPrevProb: " + mutationSimilarPrevProb);
 		logSetting(ps, "mutationExchangeProb: " + mutationExchangeProb);
+		logSetting(ps, "mutationJobPlacementProb: " + mutationPlacementProb);
 		logSetting(ps, "crossoverDoubleProb: " + crossoverDoubleProb);
 		logSetting(ps, "crossoverDays: " + crossoverDays);
 		logSetting(ps, "simpleFitnessFunction: " + simpleFitnessFunction);

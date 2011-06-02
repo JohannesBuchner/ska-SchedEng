@@ -8,10 +8,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import local.radioschedulers.IScheduler;
 import local.radioschedulers.Proposal;
 import local.radioschedulers.Schedule;
 import local.radioschedulers.ScheduleSpace;
+import local.radioschedulers.alg.lp.KeepingOneDayParallelLinearScheduler;
+import local.radioschedulers.alg.lp.OneDayParallelLinearScheduler;
 import local.radioschedulers.alg.lp.ParallelLinearScheduler;
+import local.radioschedulers.alg.serial.SmootheningScheduler;
 import local.radioschedulers.exporter.ExportFactory;
 import local.radioschedulers.exporter.IExport;
 import local.radioschedulers.importer.CsvScheduleReader;
@@ -57,7 +61,9 @@ public class StoreLPSchedule {
 				"executiontime_lp_" + oversubscriptionFactor + "_"
 						+ maxParallel + ".log", true));
 		long start = System.currentTimeMillis();
-		ParallelLinearScheduler scheduler = new ParallelLinearScheduler();
+		//ParallelLinearScheduler scheduler = new ParallelLinearScheduler();
+		//IScheduler scheduler = new OneDayParallelLinearScheduler();
+		IScheduler scheduler = new KeepingOneDayParallelLinearScheduler();
 		Schedule s = scheduler.schedule(template);
 		long duration = System.currentTimeMillis() - start;
 		executionTimeLog
@@ -66,6 +72,7 @@ public class StoreLPSchedule {
 		schedules.put(scheduler.toString(), s);
 		log.debug("created linear solver solution");
 		csv.write(schedules);
+		ExportFactory.setSpace(template, proposals);
 
 		schedulesHtmlFile.mkdir();
 		for (Entry<String, Schedule> e : schedules.entrySet()) {

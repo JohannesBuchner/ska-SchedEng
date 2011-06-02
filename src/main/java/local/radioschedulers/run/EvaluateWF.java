@@ -50,7 +50,8 @@ public class EvaluateWF extends EvaluateGA {
 		wfs.setHistory(history);
 		wfs.setCounter(counter);
 		GeneticAlgorithmScheduler scheduler = wfs;
-		scheduler.setNumberOfGenerations(numberOfEvaluations / populationSize);
+		final int ngen = numberOfEvaluations / populationSize;
+		scheduler.setNumberOfGenerations(ngen);
 		scheduler.setEliteSize(2);
 		scheduler.setCrossoverProbability(crossoverProb);
 		scheduler.setMutationProbability(mutationProb);
@@ -58,8 +59,7 @@ public class EvaluateWF extends EvaluateGA {
 		scheduler.setPopulation(population);
 		wfs.setMutationExchangeProbability(mutationExchangeProb);
 		wfs.setMutationSimilarForwardsProbability(mutationSimilarForwardsProb);
-		wfs
-				.setMutationSimilarBackwardsProbability(mutationSimilarBackwardsProb);
+		wfs.setMutationSimilarBackwardsProbability(mutationSimilarBackwardsProb);
 		wfs.setMutationKeepingProbability(mutationKeepingProb);
 		wfs.setMutationSimilarPrevProbability(mutationSimilarPrevProb);
 		wfs.setMutationJobPlacementProbability(mutationPlacementProb);
@@ -68,9 +68,17 @@ public class EvaluateWF extends EvaluateGA {
 
 		wfs.setObserver(new EvolutionObserver<Schedule>() {
 
+			private long lasttime = System.currentTimeMillis();
+			private int numberOfGenerations = ngen;
+
 			@Override
 			public void populationUpdate(PopulationData<? extends Schedule> data) {
 				// not doing this :(
+				// p.println(data.getGenerationNumber() + "\t"
+				// + data.getBestCandidateFitness() + "\t"
+				// + data.getMeanFitness() + "\t"
+				// + data.getFitnessStandardDeviation());
+
 				p.println(data.getGenerationNumber() + "\t"
 						+ data.getBestCandidateFitness());
 				p.println(data.getGenerationNumber()
@@ -82,15 +90,21 @@ public class EvaluateWF extends EvaluateGA {
 						+ (data.getMeanFitness() - 3 * data
 								.getFitnessStandardDeviation()));
 				// p.println(i + "\t" + v);
+				long deltat = -lasttime + System.currentTimeMillis();
+				long eta = deltat
+						* (numberOfGenerations - data.getGenerationNumber())
+						/ 1000 / 60;
 
 				System.out.println("Gen. " + data.getGenerationNumber()
 						+ ", pop.-qual. avg: " + data.getMeanFitness()
 						+ " best: " + data.getBestCandidateFitness()
-						+ " stdev: " + data.getFitnessStandardDeviation());
+						+ " stdev: " + data.getFitnessStandardDeviation()
+						+ " eta: " + eta + "min");
 				ps.println("Gen. " + data.getGenerationNumber()
 						+ ", pop.-qual. avg: " + data.getMeanFitness()
 						+ " best: " + data.getBestCandidateFitness()
 						+ " stdev: " + data.getFitnessStandardDeviation());
+				lasttime = System.currentTimeMillis();
 			}
 		});
 
@@ -124,9 +138,10 @@ public class EvaluateWF extends EvaluateGA {
 					title = "";
 					for (Entry<String, Double> e : props.entrySet()) {
 						if (contributions.containsKey(e.getKey())) {
-							contributions.put(e.getKey(), contributions.get(e
-									.getKey())
-									+ e.getValue());
+							contributions.put(
+									e.getKey(),
+									contributions.get(e.getKey())
+											+ e.getValue());
 						} else {
 							contributions.put(e.getKey(), e.getValue());
 						}

@@ -6,7 +6,7 @@ MAXPARALLEL=2
 
 DIR=$(dirname $0)
 
-export CLASSPATH="${DIR}/target/classes/:/usr/share/java/log4j.jar:/home/user/.m2/repository/net/sf/jgap/jgap/3.4.4/jgap-3.4.4.jar:/home/user/.m2/repository/net/sf/trove4j/trove4j/2.0.2/trove4j-2.0.2.jar:/home/user/.m2/repository/org/codehaus/jackson/jackson-core-asl/1.7.1/jackson-core-asl-1.7.1.jar:/home/user/.m2/repository/org/codehaus/jackson/jackson-mapper-asl/1.7.1/jackson-mapper-asl-1.7.1.jar:/home/user/.m2/repository/org/uncommons/watchmaker/watchmaker-framework/0.7.1/watchmaker-framework-0.7.1.jar:/home/user/.m2/repository/org/uncommons/maths/uncommons-maths/1.2/uncommons-maths-1.2.jar"
+. $DIR/loadclasspath.sh
 
 JAVA_OPTS="-server -Xmx500m -XX:-UseGCOverheadLimit"
 
@@ -39,9 +39,9 @@ do
 for parallel in 1 2 4 # 3 
 do
 
-#if [ "$oversubs" == 400.0 ] && [ "$parallel" == 4 ]; then
-#        continue;
-#fi
+if [ "$oversubs" == 400.0 ] && [ "$parallel" == 4 ]; then
+        continue;
+fi
 
 mkdir -p "results_${LOAD}_${BLOCK}/${oversubs}_${parallel}/"
 

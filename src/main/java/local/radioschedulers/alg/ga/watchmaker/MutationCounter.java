@@ -1,17 +1,11 @@
 package local.radioschedulers.alg.ga.watchmaker;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentMap;
 
-import local.radioschedulers.Schedule;
-
-import org.uncommons.watchmaker.framework.EvaluatedCandidate;
+import com.google.common.collect.MapMaker;
 
 /**
  * The mutation counter keeps track of to how many genes an operator was
@@ -27,7 +21,12 @@ import org.uncommons.watchmaker.framework.EvaluatedCandidate;
  */
 public class MutationCounter<K, V> {
 
-	private Map<K, Map<V, Integer>> counts = new HashMap<K, Map<V, Integer>>();
+	/*
+	 * weak key map; element is garbage-collected when key is not referenced
+	 * anymore.
+	 */
+	private final transient ConcurrentMap<K, Map<V, Integer>> counts = new MapMaker()
+			.weakKeys().makeMap();
 
 	private Map<V, Integer> ensureKnown(K key) {
 		if (!counts.containsKey(key)) {
@@ -63,27 +62,5 @@ public class MutationCounter<K, V> {
 
 	public Map<V, Integer> getProperties(K key) {
 		return counts.get(key);
-	}
-
-	public void retain(Collection<K> keys) {
-		List<K> toRemove = new ArrayList<K>();
-		for (K key : counts.keySet()) {
-			if (!keys.contains(key))
-				toRemove.add(key);
-		}
-		for (K key : toRemove) {
-			counts.remove(key);
-		}
-	}
-
-	public void retain(List<EvaluatedCandidate<Schedule>> pop) {
-		Set<K> toRemove = new HashSet<K>(counts.keySet());
-
-		for (EvaluatedCandidate<Schedule> c : pop) {
-			toRemove.remove(c.getCandidate());
-		}
-		for (K key : toRemove) {
-			counts.remove(key);
-		}
 	}
 }

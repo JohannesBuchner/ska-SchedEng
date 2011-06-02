@@ -22,6 +22,7 @@ import local.radioschedulers.alg.ga.watchmaker.op.ScheduleSimilarPrevMutation;
 import org.apache.log4j.Logger;
 import org.uncommons.maths.random.MersenneTwisterRNG;
 import org.uncommons.maths.random.Probability;
+import org.uncommons.watchmaker.framework.CachingFitnessEvaluator;
 import org.uncommons.watchmaker.framework.EvaluatedCandidate;
 import org.uncommons.watchmaker.framework.EvolutionObserver;
 import org.uncommons.watchmaker.framework.EvolutionaryOperator;
@@ -84,22 +85,11 @@ public class WFScheduler extends GeneticAlgorithmScheduler {
 		factory.setHistory(history);
 
 		PopulationEvolutionEngine<Schedule> engine = new PopulationEvolutionEngine<Schedule>(
-				factory, pipeline, fitness, selection, rng);
-		engine.setSingleThreaded(true);
+				factory, pipeline, new CachingFitnessEvaluator<Schedule>(fitness), selection, rng);
+		// engine.setSingleThreaded(true);
 		
 		if (observer != null)
 			engine.addEvolutionObserver(observer);
-
-		engine.addPopulationObserver(new PopulationObserver<Schedule>() {
-
-			@Override
-			public void updatePopulation(List<EvaluatedCandidate<Schedule>> pop) {
-				if (history != null)
-					history.retain(pop);
-				if (counter != null)
-					counter.retain(pop);
-			}
-		});
 
 		log.debug("# of generations: " + getNumberOfGenerations());
 		log.debug("# of chromosomes: " + getPopulationSize());

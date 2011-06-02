@@ -67,6 +67,7 @@ public class StoreSchedules {
 		CsvScheduleReader csv = getScheduleReader(maxParallel, proposals);
 		csv.write(template);
 		csv.write(schedules);
+		ExportFactory.setSpace(template, proposals);
 
 		schedulesHtmlFile.mkdir();
 		for (Entry<String, Schedule> e : schedules.entrySet()) {

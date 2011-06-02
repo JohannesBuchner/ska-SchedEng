@@ -46,6 +46,7 @@ public class HeuristicsScheduleCollector {
 	public static boolean PARALLEL_EXECUTION = false;
 	public static boolean SHOW_SCHEDULE = false;
 	public static boolean USE_LINEAR_SCHEDULER = false;
+	public static boolean USE_SMOOTHENED_SCHEDULERS = false;
 
 	private static Logger log = Logger
 			.getLogger(HeuristicsScheduleCollector.class);
@@ -169,7 +170,7 @@ public class HeuristicsScheduleCollector {
 	private static List<IScheduler> getSchedulers() {
 		final List<IScheduler> schedulers = new ArrayList<IScheduler>();
 
-		if (USE_LINEAR_SCHEDULER ) {
+		if (USE_LINEAR_SCHEDULER) {
 			schedulers.add(new ParallelLinearScheduler());
 		}
 
@@ -191,8 +192,9 @@ public class HeuristicsScheduleCollector {
 					.add(new ContinuousLeastChoiceScheduler(getJobSelector(i)));
 			schedulers
 					.add(new ExtendingLeastChoiceScheduler(getJobSelector(i)));
-			schedulers.add(new SmootheningScheduler(
-					new SerialLeastChoiceScheduler(getJobSelector(i))));
+			if (USE_SMOOTHENED_SCHEDULERS)
+				schedulers.add(new SmootheningScheduler(
+						new SerialLeastChoiceScheduler(getJobSelector(i))));
 		}
 		return schedulers;
 	}

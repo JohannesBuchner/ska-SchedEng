@@ -54,6 +54,7 @@ public abstract class GeneticAlgorithmScheduler implements IScheduler {
 			return null;
 		} catch (Exception e) {
 			log.error(e);
+			e.printStackTrace();
 			return null;
 		}
 	}
