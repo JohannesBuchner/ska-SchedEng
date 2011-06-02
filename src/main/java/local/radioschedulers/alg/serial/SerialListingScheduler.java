@@ -21,9 +21,12 @@ public class SerialListingScheduler extends ListingScheduler {
 
 	protected JobSelector jobselector;
 
+	private boolean trackPossiblesReduction;
+
 	public SerialListingScheduler(JobSelector jobselector) {
 		this.jobselector = jobselector;
 		this.jobselector.setTimeleft(timeleft);
+		setTrackPossiblesReduction(false);
 		this.jobselector.setPossibles(possibleSlots);
 	}
 
@@ -61,17 +64,27 @@ public class SerialListingScheduler extends ListingScheduler {
 	protected Schedule doSchedule(ScheduleSpace timeline, Schedule s) {
 		while (!possibleSlots.isEmpty()) {
 			LSTTime t = getNextUnassignedTimeslot();
+			if (log.isDebugEnabled())
+				log.debug("@" + t);
 			if (t == null)
 				break;
 			Collection<JobCombination> list = getChoices(timeline, t);
+			if (log.isDebugEnabled())
+				log.debug("@" + t + " " + list.size() + "choices");
 			JobCombination jc = select(list);
+			if (log.isDebugEnabled())
+				log.debug("@" + t + " -- selected " + jc);
 			if (jc != null)
 				choose(t, jc, s);
+			if (log.isDebugEnabled())
+				log.debug("@" + t + " -- chose " + jc);
 
-			for (JobCombination jc1 : list) {
-				for (Job j : jc1.jobs) {
-					if (possibleSlots.containsKey(j))
-						possibleSlots.get(j).remove(t);
+			if (trackPossiblesReduction) {
+				for (JobCombination jc1 : list) {
+					for (Job j : jc1.jobs) {
+						if (possibleSlots.containsKey(j))
+							possibleSlots.get(j).remove(t);
+					}
 				}
 			}
 		}
@@ -100,6 +113,14 @@ public class SerialListingScheduler extends ListingScheduler {
 
 	protected JobCombination select(Collection<JobCombination> jcs) {
 		return this.jobselector.select(jcs);
+	}
+
+	protected void setTrackPossiblesReduction(boolean trackPossiblesReduction) {
+		this.trackPossiblesReduction = trackPossiblesReduction;
+	}
+
+	protected boolean isTrackPossiblesReduction() {
+		return trackPossiblesReduction;
 	}
 
 }

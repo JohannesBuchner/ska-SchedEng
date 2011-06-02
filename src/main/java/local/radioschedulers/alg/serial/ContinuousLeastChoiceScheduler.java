@@ -19,16 +19,16 @@ import org.apache.log4j.Logger;
  * @author Johannes Buchner
  */
 public class ContinuousLeastChoiceScheduler extends SerialLeastChoiceScheduler {
-	public ContinuousLeastChoiceScheduler(JobSelector selector) {
-		super(selector);
-	}
-
 	private static Logger log = Logger
 			.getLogger(ContinuousLeastChoiceScheduler.class);
 
 	protected List<LSTTime> neighbors = new ArrayList<LSTTime>();
 	protected LSTTime lastSlot;
 	protected JobCombination lastJc;
+
+	public ContinuousLeastChoiceScheduler(JobSelector selector) {
+		super(selector);
+	}
 
 	@Override
 	protected LSTTime getNextUnassignedTimeslot() {

@@ -33,16 +33,16 @@ import org.apache.log4j.Logger;
  * @author Johannes Buchner
  */
 public class SerialLeastChoiceScheduler extends SerialListingScheduler {
-	public SerialLeastChoiceScheduler(JobSelector jobselector) {
-		super(jobselector);
-	}
-
 	private static Logger log = Logger
 			.getLogger(SerialLeastChoiceScheduler.class);
 
 	protected Map<Integer, List<LSTTime>> timeslotsByChoice = new HashMap<Integer, List<LSTTime>>();
 
 	protected ScheduleSpace choices;
+
+	public SerialLeastChoiceScheduler(JobSelector jobselector) {
+		super(jobselector);
+	}
 
 	/**
 	 * fill nchoices and timeslotsByChoice; and timeleft
@@ -128,8 +128,8 @@ public class SerialLeastChoiceScheduler extends SerialListingScheduler {
 
 	@Override
 	protected LSTTime getNextUnassignedTimeslot() {
-		ArrayList<Integer> keys = new ArrayList<Integer>(timeslotsByChoice
-				.keySet());
+		ArrayList<Integer> keys = new ArrayList<Integer>(
+				timeslotsByChoice.keySet());
 		Collections.sort(keys);
 		for (Integer k : keys) {
 			if (k == 0)
