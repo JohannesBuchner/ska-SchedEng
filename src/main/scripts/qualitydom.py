@@ -124,7 +124,8 @@ for i in nondominated_ids:
 		label=labels[i])
 	j = j + 1
 
-plt.plot(dominated_values[:,2], dominated_values[:,3], ".", color='grey', label="other heuristics")
+if len(dominated_values) != 0:
+	plt.plot(dominated_values[:,2], dominated_values[:,3], ".", color='grey', label="other heuristics")
 
 if lpid is not None:
 	plt.plot(values[lpid,2], values[lpid,3], "rd", label="ParallelLinear")
@@ -185,13 +186,17 @@ for i in nondominated_ids:
 		label=labels[i])
 	j = j + 1
 for i in lpids:
+	if len(x) == 0:
+		continue
 	plt.plot([0,max(x)], [values[i,1]]*2, '--', label=labels[i])
 
-plt.plot([0,max(x)], [max(values[:,1])]*2, '--', label='highest')
-if len(lpids) > 0:
+if len(x) > 0:
+	plt.plot([0,max(x)], [max(values[:,1])]*2, '--', label='highest')
+if len(lpids) > 0 and len(x) > 0:
 	lpid = lpids[0]
 	plt.plot([0,max(x)], [values[lpid,1]]*2, '--', label=labels[lpid])
-plt.plot(x, y, '.', color='grey', label='other heuristics')
+if len(x) > 0:
+	plt.plot(x, y, '.', color='grey', label='other heuristics')
 
 plt.ylim(0, 1)
 plt.xlim(0)

@@ -26,7 +26,10 @@ def getConfigName(cf):
 	folder, config = cf.split('/%s/', 2)
 	replaceMap = {
 		'results_false_false':'empty',
-		'results_true_false':'filled, without LP solution',
+		'results_true_false':'filled',
+		'results_true_false_all':'filled, with LP solution',
+		'results_true_false_lp':'filled, only with LP solution',
+		'results_true_false_heuristicsonly':'filled, without LP solution',
 		'results_truelin_false':'filled, elite=2',
 		'results_noelite_true_false':'filled, no elite',
 	}
@@ -163,7 +166,8 @@ for p in revpriors:
 
 
 marker = ['--x','--+'] + ['s:','d-'] + ['^-','v:']
-colors = ['c', 'c', 'm', 'm', 'r', 'r', 'y', 'k', 'lightgreen', 'lightblue']
+marker = marker * 5
+colors = ['c', 'c', 'm', 'm', 'r', 'r', 'y', 'k', 'lightgreen', 'lightblue'] * 5
 i = 0
 for cf in configfolders:
 	cfname = getConfigName(cf)

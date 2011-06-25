@@ -88,8 +88,8 @@ styles = {}
 
 for oi in range(len(oversubs_percent)):
 	for p in [1,2,4]:
-		#if p == 4 and oi == 2:
-		#	continue
+		if p == 4 and oi == 2:
+			continue
 		k = '%s%% %d' % (oversubs_percent[oi],p)
 		scenarios_keys.append(k)
 		scenarios[k] = '%s_%d' % (oversubs_file[oi], p)
@@ -132,6 +132,7 @@ def overallsort(x,y):
 		return 1
 	if min(xv) > min(yv):
 		return -1
+	return 0
 
 order.sort(cmp=overallsort)
 for i in range(len(order)):
