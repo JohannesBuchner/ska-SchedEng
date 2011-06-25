@@ -1,6 +1,7 @@
 package local.radioschedulers.importer;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
@@ -22,9 +23,13 @@ import local.radioschedulers.exporter.CsvExport;
 import org.apache.log4j.Logger;
 
 public class CsvScheduleReader {
+
 	private static Logger log = Logger.getLogger(CsvScheduleReader.class);
+
 	private File spaceFile;
+
 	private File schedulesFile;
+
 	private Map<String, Job> jobmap = new HashMap<String, Job>();
 
 	public CsvScheduleReader(File scheduleFile, File spaceFile,
@@ -76,27 +81,31 @@ public class CsvScheduleReader {
 
 		for (File f : schedulesFile.listFiles()) {
 			if (f.isFile()) {
-				Schedule schedule = new Schedule();
-				LineNumberReader r = new LineNumberReader(new FileReader(f));
-				while (true) {
-					String line = r.readLine();
-					if (line == null)
-						break;
-					String[] parts = line.split(";");
-					LSTTime t = new LSTTime(parts[0]);
-					for (int i = 1; i < parts.length; i++) {
-						JobCombination jc = new JobCombination();
-						String[] subparts = parts[i].split(",");
-						for (String jobid : subparts) {
-							jc.jobs.add(lookup(jobid));
-						}
-						schedule.add(t, jc);
-					}
-				}
-				schedules.put(f.getName(), schedule);
+				schedules.put(f.getName(), read(f));
 			}
 		}
 		return schedules;
+	}
+
+	public Schedule read(File f) throws FileNotFoundException, IOException {
+		Schedule schedule = new Schedule();
+		LineNumberReader r = new LineNumberReader(new FileReader(f));
+		while (true) {
+			String line = r.readLine();
+			if (line == null)
+				break;
+			String[] parts = line.split(";");
+			LSTTime t = new LSTTime(parts[0]);
+			for (int i = 1; i < parts.length; i++) {
+				JobCombination jc = new JobCombination();
+				String[] subparts = parts[i].split(",");
+				for (String jobid : subparts) {
+					jc.jobs.add(lookup(jobid));
+				}
+				schedule.add(t, jc);
+			}
+		}
+		return schedule;
 	}
 
 	public ScheduleSpace readspace() throws IOException {

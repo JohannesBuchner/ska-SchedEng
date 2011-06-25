@@ -3,6 +3,7 @@ package local.radioschedulers.preschedule;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import local.radioschedulers.Job;
@@ -16,7 +17,9 @@ import local.radioschedulers.preschedule.parallel.CompatibleJobFactory;
 import org.apache.log4j.Logger;
 
 public class SimpleTimelineGenerator implements ITimelineGenerator {
+
 	private RequirementGuard req;
+
 	private static Logger log = Logger.getLogger(SimpleTimelineGenerator.class);
 
 	public SimpleTimelineGenerator(RequirementGuard req) {
@@ -49,12 +52,13 @@ public class SimpleTimelineGenerator implements ITimelineGenerator {
 			LSTTime t = new LSTTime(0, minute * ScheduleSpace.LST_SLOTS_MINUTES);
 
 			Set<JobCombination> jcs = timelineConstruct.get(t);
-			if (jcs.isEmpty())
-				continue;
 			// log.debug("at " + t.minute + ": " + jcs.size() +
 			// " combinations");
 			for (int day = 0; day < ndays; day++) {
 				LSTTime t2 = new LSTTime(Long.valueOf(day), t.minute);
+
+				// this will put a empty set there, instead of a null
+				timeline.get(t2);
 
 				for (JobCombination jc : jcs) {
 					boolean gooddate = true;
@@ -68,6 +72,10 @@ public class SimpleTimelineGenerator implements ITimelineGenerator {
 				}
 				// log.debug("   " + t.day + ": " + jcs.size());
 			}
+		}
+		for (Entry<LSTTime, Set<JobCombination>> e : timeline) {
+			if (e.getValue() == null)
+				log.debug("created ScheduleSpace is null at " + e.getKey() + "");
 		}
 
 		return timeline;

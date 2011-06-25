@@ -55,6 +55,11 @@ public abstract class CompatibleJobFactory {
 		Map<LSTTime, Set<Job>> possibles = new LSTMap<Set<Job>>();
 
 		for (Job j : alljobs) {
+			/**
+			 * This smart piece of code does not iterate through all slots a
+			 * day can have. It starts at the first slot a job can be placed,
+			 * and continues until the last slot (by lstmin/lstmax).
+			 */
 			for (int slot = 0; slot < ScheduleSpace.LST_SLOTS_PER_DAY; slot++) {
 				long minute = (((int) Math.ceil(j.lstmin * 60
 						/ ScheduleSpace.LST_SLOTS_MINUTES)
@@ -80,8 +85,12 @@ public abstract class CompatibleJobFactory {
 					possibles.put(t, list);
 				}
 				list.add(j);
-				// log.debug("@" + t + " : " + j);
 			}
+		}
+
+		for (Entry<LSTTime, Set<Job>> e : possibles.entrySet()) {
+			if (e.getValue() == null)
+				possibles.put(e.getKey(), new HashSet<Job>());
 		}
 
 		timeline = new ScheduleSpace();

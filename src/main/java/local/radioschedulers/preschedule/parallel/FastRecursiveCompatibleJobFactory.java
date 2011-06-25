@@ -45,6 +45,8 @@ public class FastRecursiveCompatibleJobFactory extends CompatibleJobFactory {
 	}
 
 	protected Set<JobCombination> getCombinationsInternal(Set<Job> jobs) {
+		if (jobs == null)
+			throw new NullPointerException();
 		Set<JobCombination> combo = new HashSet<JobCombination>();
 		for (JobCombination c : combinations) {
 			boolean allthere = true;

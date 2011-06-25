@@ -9,11 +9,9 @@ import local.radioschedulers.ScheduleSpace;
 import local.radioschedulers.alg.ga.GeneticAlgorithmScheduler;
 import local.radioschedulers.alg.ga.ScheduleFitnessFunction;
 import local.radioschedulers.alg.ga.fitness.SimpleScheduleFitnessFunction;
-import local.radioschedulers.alg.ga.jgap.JGAPScheduler;
+import local.radioschedulers.alg.ga.watchmaker.WFScheduler;
 import local.radioschedulers.preschedule.RequirementGuard;
 import local.radioschedulers.preschedule.SimpleTimelineGenerator;
-
-import org.jgap.InvalidConfigurationException;
 
 public class SchedulePipeline {
 
@@ -47,11 +45,11 @@ public class SchedulePipeline {
 			List<Schedule> priorSchedules) throws Exception {
 		GeneticAlgorithmScheduler scheduler;
 		try {
-			scheduler = new JGAPScheduler(getFitnessFunction());
+			scheduler = new WFScheduler(getFitnessFunction());
 			scheduler.setPopulation(priorSchedules);
 			scheduler.schedule(space);
 			return scheduler.getPopulation();
-		} catch (InvalidConfigurationException e) {
+		} catch (Exception e) {
 			throw new Exception(e);
 		}
 	}
